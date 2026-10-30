@@ -1,0 +1,255 @@
+,,,,,,,
+AMRG Global document checklist,,,,,,,
+D001–D012 are fictional examples. Other IDs form the master checklist; receipt and applicability are not assessed.,,,,,,,
+"Repeat each applicable checklist item for every entity and required period. Record actual coverage, files, gaps and review status.",,,,,,,
+Conditional requests are not universal legal obligations. The source register below identifies guidance; check historical versions.,,,,,,,
+Document / request ID,Entity ID,Area,Document type,Required / received period,Receipt status,File / gap description,Obtain from / source link
+D001,ENT-001,Free Zone,Trade licence,2025,Received,Example licence.pdf,[Add source link]
+D002,ENT-001,Accounting / CT,Audited financial statements,FY2025,Received,Example audited FS.pdf,[Add source link]
+D003,ENT-001,VAT,VAT returns,FY2025 aligned quarters,Received,Example VAT returns.pdf,[Add source link]
+D004,ENT-001,Accounting / VAT,Sales ledger,FY2025,Received,Example sales ledger.xlsx,[Add source link]
+D005,ENT-001,CT,CT return and computation,FY2025,Received,Example CT return.pdf,[Add source link]
+D006,ENT-001,Accounting / CT,Trial balance,FY2025,Received,Example trial balance.xlsx,[Add source link]
+D007,ENT-001,Free Zone,Audit submission receipt,FY2025,Potentially missing,Not located,[Await receipt]
+D008,ENT-001,CT / Free Zone,Qualifying income analysis,FY2025,Potentially missing,Not located,[Await evidence]
+D009,ENT-001,Banking,Bank statements,FY2025,Partially received,Jan–Nov example statements.pdf,[Add source link]
+D010,ENT-001,Secretarial,Ownership and UBO records,Inception–cutoff,Potentially missing,Not located,[Await evidence]
+D011,ENT-001,Labour,Employee and payroll records,FY2025,Applicability to confirm,Not located,[Await applicability]
+D012,ENT-001,CT / VAT,Notices and portal history,Inception–cutoff,Potentially missing,Not located,[Await evidence]
+GOV001,To scope,Corporate / Free Zone,Certificate of incorporation / registration,Inception to cutoff; all changes,Not assessed,To obtain / assess,Registrar / company secretary
+GOV002,To scope,Corporate / Free Zone,"Memorandum and articles, including amendments",Inception to cutoff; all changes,Not assessed,To obtain / assess,Company secretary / registrar
+GOV003,To scope,Corporate / Free Zone,Current and historical trade licences,Inception to cutoff; all changes,Not assessed,To obtain / assess,Licensing authority portal
+GOV004,To scope,Corporate / Free Zone,Commercial register extract / incumbency certificate,Inception to cutoff; all changes,Not assessed,To obtain / assess,Registrar / company secretary
+GOV005,To scope,Corporate / Free Zone,Branch registrations and branch licences,Inception to cutoff; all changes,Not assessed,To obtain / assess,Parent and branch management
+GOV006,To scope,Corporate / Free Zone,Parent incorporation and constitutional records,Inception to cutoff; all changes,Not assessed,To obtain / assess,Parent company secretary
+GOV007,To scope,Corporate / Free Zone,Shareholder register and share certificates,Inception to cutoff; all changes,Not assessed,To obtain / assess,Company secretary
+GOV008,To scope,Corporate / Free Zone,"Share allotment, transfer and capital-change records",Inception to cutoff; all changes,Not assessed,To obtain / assess,Company secretary / finance
+GOV009,To scope,Corporate / Free Zone,Ownership chart to natural-person controllers,Inception to cutoff; all changes,Not assessed,To obtain / assess,Management / compliance
+GOV010,To scope,Corporate / Free Zone,"UBO register, declarations and filing receipts",Inception to cutoff; all changes,Not assessed,To obtain / assess,Company secretary / registrar
+GOV011,To scope,Corporate / Free Zone,Nominee director / shareholder declarations,Inception to cutoff; all changes,Not assessed,To obtain / assess,Company secretary
+GOV012,To scope,Corporate / Free Zone,"Director, manager and secretary appointments / resignations",Inception to cutoff; all changes,Not assessed,To obtain / assess,Company secretary
+GOV013,To scope,Corporate / Free Zone,Authorised signatory powers and powers of attorney,Inception to cutoff; all changes,Not assessed,To obtain / assess,Legal / board
+GOV014,To scope,Corporate / Free Zone,Identity and address evidence of relevant owners / signatories,Inception to cutoff; all changes,Not assessed,To obtain / assess,Compliance / authorised individual
+GOV015,To scope,Corporate / Free Zone,Board and shareholder meeting minutes / resolutions,Inception to cutoff; all changes,Not assessed,To obtain / assess,Company secretary
+GOV016,To scope,Corporate / Free Zone,Annual returns / confirmation statements and receipts,Inception to cutoff; all changes,Not assessed,To obtain / assess,Registrar portal
+GOV017,To scope,Corporate / Free Zone,Good-standing certificates,Inception to cutoff; all changes,Not assessed,To obtain / assess,Registrar / parent
+GOV018,To scope,Corporate / Free Zone,"Registered office lease, Ejari / occupancy evidence",Inception to cutoff; all changes,Not assessed,To obtain / assess,Landlord / facilities / portal
+GOV019,To scope,Corporate / Free Zone,Mainland / dual-licence operating permissions,Inception to cutoff; all changes,Not assessed,To obtain / assess,Licensing authority / legal
+GOV020,To scope,Corporate / Free Zone,Regulatory licences and activity-specific NOCs,Inception to cutoff; all changes,Not assessed,To obtain / assess,Sector regulator
+GOV021,To scope,Corporate / Free Zone,Previous adviser engagement and handover records,Inception to cutoff; all changes,Not assessed,To obtain / assess,Management / previous adviser
+GOV022,To scope,Corporate / Free Zone,"Legal disputes, claims, guarantees and undertakings",Inception to cutoff; all changes,Not assessed,To obtain / assess,Legal counsel / management
+GOV023,To scope,Corporate / Free Zone,"Liquidation, cessation, strike-off or redomiciliation records",Inception to cutoff; all changes,Not assessed,To obtain / assess,Liquidator / registrar / legal
+ACC001,To scope,Accounting / Banking,Signed financial statements and notes,Each financial year and intervening period,Not assessed,To obtain / assess,Finance / auditor
+ACC002,To scope,Accounting / Banking,Auditor report and management letter,Each financial year and intervening period,Not assessed,To obtain / assess,Auditor / management
+ACC003,To scope,Accounting / Banking,Audit appointment and independence records,Each financial year and intervening period,Not assessed,To obtain / assess,Board / auditor / registrar
+ACC004,To scope,Accounting / Banking,Trial balance and chart of accounts,Each financial year and intervening period,Not assessed,To obtain / assess,Finance / accounting system
+ACC005,To scope,Accounting / Banking,Full general ledger and journal audit trail,Each financial year and intervening period,Not assessed,To obtain / assess,Finance / ERP
+ACC006,To scope,Accounting / Banking,Opening balance and prior-year closing reconciliation,Each financial year and intervening period,Not assessed,To obtain / assess,Finance / former accountant
+ACC007,To scope,Accounting / Banking,Management accounts and reporting packs,Each financial year and intervening period,Not assessed,To obtain / assess,Finance
+ACC008,To scope,Accounting / Banking,Sales register and invoice sequence report,Each financial year and intervening period,Not assessed,To obtain / assess,Sales / ERP
+ACC009,To scope,Accounting / Banking,Purchase register and expense ledger,Each financial year and intervening period,Not assessed,To obtain / assess,Procurement / ERP
+ACC010,To scope,Accounting / Banking,Customer and supplier master data,Each financial year and intervening period,Not assessed,To obtain / assess,Sales / procurement
+ACC011,To scope,Accounting / Banking,Accounts receivable ageing and confirmations,Each financial year and intervening period,Not assessed,To obtain / assess,Finance / customers
+ACC012,To scope,Accounting / Banking,Accounts payable ageing and confirmations,Each financial year and intervening period,Not assessed,To obtain / assess,Finance / suppliers
+ACC013,To scope,Accounting / Banking,"Inventory register, counts and movement reports",Each financial year and intervening period,Not assessed,To obtain / assess,Warehouse / finance
+ACC014,To scope,Accounting / Banking,Fixed-asset register and acquisition / disposal records,Each financial year and intervening period,Not assessed,To obtain / assess,Finance / facilities
+ACC015,To scope,Accounting / Banking,"Accruals, prepayments, provisions and estimates",Each financial year and intervening period,Not assessed,To obtain / assess,Finance
+ACC016,To scope,Accounting / Banking,"All bank statements, including closed / foreign accounts",Each financial year and intervening period,Not assessed,To obtain / assess,Bank / authorised treasury
+ACC017,To scope,Accounting / Banking,Bank account register and opening / closure letters,Each financial year and intervening period,Not assessed,To obtain / assess,Treasury / bank
+ACC018,To scope,Accounting / Banking,Year-end and monthly bank reconciliations,Each financial year and intervening period,Not assessed,To obtain / assess,Finance
+ACC019,To scope,Accounting / Banking,"Bank confirmations, facilities, security and covenants",Each financial year and intervening period,Not assessed,To obtain / assess,Bank / treasury
+ACC020,To scope,Accounting / Banking,Loan agreements and interest schedules,Each financial year and intervening period,Not assessed,To obtain / assess,Treasury / legal
+ACC021,To scope,Accounting / Banking,"Cash book, petty cash and cash counts",Each financial year and intervening period,Not assessed,To obtain / assess,Finance / cashier
+ACC022,To scope,Accounting / Banking,"Payment gateway, merchant and marketplace settlements",Each financial year and intervening period,Not assessed,To obtain / assess,Platform / treasury
+ACC023,To scope,Accounting / Banking,Foreign exchange rates and translation workings,Each financial year and intervening period,Not assessed,To obtain / assess,Finance / ERP
+ACC024,To scope,Accounting / Banking,Intercompany balances and confirmations,Each financial year and intervening period,Not assessed,To obtain / assess,Group finance
+ACC025,To scope,Accounting / Banking,Dividend declarations and payment evidence,Each financial year and intervening period,Not assessed,To obtain / assess,Board / finance
+ACC026,To scope,Accounting / Banking,"Accounting policies, ERP exports and migration mapping",Each financial year and intervening period,Not assessed,To obtain / assess,Finance / IT
+VAT001,To scope,VAT,VAT registration application and attachments,Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,EmaraTax / previous adviser
+VAT002,To scope,VAT,VAT certificate and registration decision,Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,EmaraTax
+VAT003,To scope,VAT,Pre-registration turnover and expense schedules,Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Finance
+VAT004,To scope,VAT,FTA-assigned VAT periods and filing dashboard,Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,EmaraTax
+VAT005,To scope,VAT,VAT period-change requests and approvals,Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,EmaraTax
+VAT006,To scope,VAT,"VAT group application, approval and member history",Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Representative member / EmaraTax
+VAT007,To scope,VAT,VAT group consolidation and elimination workings,Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Group tax / finance
+VAT008,To scope,VAT,VAT registration amendments and acknowledgement,Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,EmaraTax / company secretary
+VAT009,To scope,VAT,VAT201 returns and submission acknowledgements,Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,EmaraTax / former adviser
+VAT010,To scope,VAT,VAT return box-by-box workings,Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Finance / tax adviser
+VAT011,To scope,VAT,Sales-to-VAT and accounts-to-VAT reconciliations,Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Finance / tax adviser
+VAT012,To scope,VAT,Input VAT-to-purchases and GL reconciliations,Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Finance / tax adviser
+VAT013,To scope,VAT,"Output tax, input tax and VAT control ledgers",Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Finance / ERP
+VAT014,To scope,VAT,Tax payment receipts and FTA allocation ledger,Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,EmaraTax / bank
+VAT015,To scope,VAT,Sales tax invoices and simplified invoices,Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Sales / ERP
+VAT016,To scope,VAT,Purchase tax invoices and alternative import evidence,Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Procurement / finance
+VAT017,To scope,VAT,Issued and received credit notes with original invoices,Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Sales / procurement
+VAT018,To scope,VAT,"Sales contracts, orders, delivery and acceptance records",Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Sales / operations
+VAT019,To scope,VAT,"Purchase contracts, receipt evidence and payment terms",Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Procurement / finance
+VAT020,To scope,VAT,"Advance receipts, deposits and retention schedules",Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Finance / contracts team
+VAT021,To scope,VAT,Tax-code matrix and treatment memos,Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Tax / finance
+VAT022,To scope,VAT,Emirate-wise output reporting support,Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Sales / ERP
+VAT023,To scope,VAT,E-commerce threshold and emirate-location evidence,Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Platform / IT / finance
+VAT024,To scope,VAT,Customs registration and TRN linkage evidence,Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Customs portal / logistics
+VAT025,To scope,VAT,Import declarations and customs statements,Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Logistics / customs broker
+VAT026,To scope,VAT,Import VAT adjustments and clearing-agent reconciliations,Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Customs broker / finance
+VAT027,To scope,VAT,"Export declarations, transport and delivery evidence",Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Logistics / carrier
+VAT028,To scope,VAT,Overseas service contracts and recipient-location evidence,Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Sales / legal
+VAT029,To scope,VAT,Reverse-charge services invoices and calculations,Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Finance / procurement
+VAT030,To scope,VAT,Domestic reverse-charge declarations and TRN checks,Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Procurement / sales
+VAT031,To scope,VAT,Designated-zone status and premises / boundary evidence,Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Zone authority / lease records
+VAT032,To scope,VAT,Designated-zone goods movement and consumption records,Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Warehouse / customs
+VAT033,To scope,VAT,Input-tax attribution and apportionment workings,Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Finance / tax adviser
+VAT034,To scope,VAT,Annual wash-up and actual-use adjustments,Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Finance / tax adviser
+VAT035,To scope,VAT,Special apportionment method application and approval,Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,EmaraTax / tax adviser
+VAT036,To scope,VAT,Capital asset scheme register and adjustment history,Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Finance / fixed-asset team
+VAT037,To scope,VAT,Blocked input VAT and employee-expense schedules,Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Finance / HR
+VAT038,To scope,VAT,"Employee contracts, benefits policies and insurance invoices",Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,HR / finance
+VAT039,To scope,VAT,"Supplier due-diligence, TRN and transaction checks",Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Procurement / compliance
+VAT040,To scope,VAT,Unpaid supplier ageing and input VAT reversals,Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Accounts payable
+VAT041,To scope,VAT,Bad-debt relief workings and customer notices,Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Finance / collections
+VAT042,To scope,VAT,Pre-registration input VAT schedule,Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Finance / tax adviser
+VAT043,To scope,VAT,"Deemed supply, gifts, samples and private-use records",Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Operations / finance
+VAT044,To scope,VAT,Business transfer agreements and transfer-of-going-concern analysis,Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Legal / tax adviser
+VAT045,To scope,VAT,Related-party pricing and connected transaction evidence,Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Group finance
+VAT046,To scope,VAT,"Real-estate titles, leases, completion and use records",Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Property / legal
+VAT047,To scope,VAT,"Financial services, insurance or sector-specific workings",Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Sector finance / tax
+VAT048,To scope,VAT,"VAT refund applications, queries and decisions",Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,EmaraTax / finance
+VAT049,To scope,VAT,VAT credit-origin and ageing register,Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Finance / EmaraTax
+VAT050,To scope,VAT,Voluntary disclosures and error-discovery records,Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Tax / EmaraTax
+VAT051,To scope,VAT,Administrative exception / private clarification decisions,Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,FTA correspondence
+VAT052,To scope,VAT,VAT deregistration application and approval,Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,EmaraTax / legal
+VAT053,To scope,VAT,"Tourist, visitor or other special refund scheme evidence",Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Operator / finance
+VAT054,To scope,VAT,E-invoicing scope assessment and turnover evidence,Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Finance / tax / IT
+VAT055,To scope,VAT,"ASP appointment, accreditation check and implementation plan",Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Finance / IT / ASP
+VAT056,To scope,VAT,"Structured invoices, credit notes and transmission logs",Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,ERP / ASP
+VAT057,To scope,VAT,"VAT audit, assessment and penalty notices",Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,EmaraTax / legal
+VAT058,To scope,VAT,"Reconsideration, objections, appeals and settlements",Every VAT period from effective registration; pre-registration where relevant,Not assessed,To obtain / assess,Legal / tax adviser
+CT001,To scope,CT,CT registration application and attachments,Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,EmaraTax / former adviser
+CT002,To scope,CT,CT registration certificate and FTA decision,Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,EmaraTax
+CT003,To scope,CT,First CT period support and portal confirmation,Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,EmaraTax / articles / first accounts
+CT004,To scope,CT,CT tax-period changes and FTA approvals,Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,EmaraTax / board
+CT005,To scope,CT,"CT returns, all schedules and acknowledgements",Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,EmaraTax / tax adviser
+CT006,To scope,CT,Book-profit-to-taxable-income computation,Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,Finance / tax adviser
+CT007,To scope,CT,CT payment receipts and FTA statement of account,Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,EmaraTax / bank
+CT008,To scope,CT,Financial statement accounting basis assessment,Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,Finance / auditor
+CT009,To scope,CT,CT audit requirement assessment and signed audited accounts,Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,Finance / auditor / tax
+CT010,To scope,CT,CT elections register and filed election evidence,Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,Tax / EmaraTax
+CT011,To scope,CT,Small Business Relief eligibility and election evidence,Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,Finance / tax adviser
+CT012,To scope,CT,Realisation-basis election and unrealised gain schedules,Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,Finance / tax adviser
+CT013,To scope,CT,"Transitional opening balance, valuations and elections",Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,Finance / valuers / tax
+CT014,To scope,CT,Exempt dividend and participation income support,Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,Investments / legal / tax
+CT015,To scope,CT,Foreign PE exemption election and attributed results,Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,Overseas finance / tax
+CT016,To scope,CT,"Foreign tax returns, assessments and paid-tax evidence",Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,Overseas adviser / finance
+CT017,To scope,CT,Deductibility schedules and supporting vouchers,Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,Finance / tax adviser
+CT018,To scope,CT,Entertainment expense analysis,Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,Finance / management
+CT019,To scope,CT,"Donations, fines, penalties and prohibited expenditure",Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,Finance / legal
+CT020,To scope,CT,Connected-person remuneration and benefit support,Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,HR / board / finance
+CT021,To scope,CT,Interest limitation and carryforward schedules,Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,Treasury / tax adviser
+CT022,To scope,CT,Related-party register and control chart,Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,Legal / group finance
+CT023,To scope,CT,Intercompany agreements and transaction schedules,Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,Group finance / legal
+CT024,To scope,CT,"Transfer-pricing method, benchmarking and evidence",Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,Tax / transfer-pricing adviser
+CT025,To scope,CT,Related-party and connected-person disclosure schedules,Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,Tax / finance
+CT026,To scope,CT,Transfer-pricing master file and local file,Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,Group tax / adviser
+CT027,To scope,CT,Advance pricing agreements and implementation records,Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,Tax / FTA correspondence
+CT028,To scope,CT,"Tax loss origin, utilisation and carryforward register",Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,Finance / tax
+CT029,To scope,CT,Loss transfers and ownership / continuity evidence,Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,Legal / group tax
+CT030,To scope,CT,"Tax group formation, approvals and member changes",Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,Group tax / EmaraTax
+CT031,To scope,CT,CT group consolidated statements and eliminations,Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,Group finance / auditor
+CT032,To scope,CT,Pre-group losses and group allocation schedules,Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,Group tax
+CT033,To scope,CT,Qualifying Group Relief agreements and elections,Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,Legal / tax
+CT034,To scope,CT,Business Restructuring Relief records and valuations,Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,Legal / tax / valuer
+CT035,To scope,CT,Relief clawback monitoring and subsequent disposals,Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,Legal / tax
+CT036,To scope,CT,"UAE PE, nexus and effective-management analysis",Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,Legal / management / tax
+CT037,To scope,CT,Tax residency certificates and treaty entitlement evidence,Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,Tax / overseas adviser
+CT038,To scope,CT,"Exempt-person application, approval and annual declarations",Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,EmaraTax / governing body
+CT039,To scope,CT,"Investment fund, foundation or partnership records",Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,Legal / administrators / tax
+CT040,To scope,CT,Natural-person business turnover and excluded-income records,Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,Individual / finance
+CT041,To scope,CT,CT voluntary disclosures and corrected computations,Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,Tax / EmaraTax
+CT042,To scope,CT,CT registration penalty relief application and evidence,Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,EmaraTax / tax
+CT043,To scope,CT,CT deregistration and final return evidence,Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,EmaraTax / liquidator
+CT044,To scope,CT,"CT audit, information requests and assessments",Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,Tax / legal / EmaraTax
+CT045,To scope,CT,Private clarifications and technical position papers,Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,Tax / FTA correspondence
+CT046,To scope,CT,Top-up tax / DMTT scope and group revenue assessment,Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,Group tax
+CT047,To scope,CT,"Top-up tax registrations, returns and computations",Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,Group tax / EmaraTax
+CT048,To scope,CT,"CbCR notification, report and filing receipts",Every CT period; pre-CT opening positions where relevant,Not assessed,To obtain / assess,Group tax
+FZ001,To scope,Free Zone / CT,"Applicable zone regulations, circulars and service handbook",Each licence year / financial year and every event,Not assessed,To obtain / assess,Official zone website / portal
+FZ002,To scope,Free Zone / CT,"Renewal applications, receipts and renewed licences",Each licence year / financial year and every event,Not assessed,To obtain / assess,Zone portal
+FZ003,To scope,Free Zone / CT,Annual accounts approval and meeting evidence,Each licence year / financial year and every event,Not assessed,To obtain / assess,Board / company secretary
+FZ004,To scope,Free Zone / CT,Audit / accounts filing receipts and authority queries,Each licence year / financial year and every event,Not assessed,To obtain / assess,Zone portal / auditor
+FZ005,To scope,Free Zone / CT,"Audit exemption, dormancy or extension approvals",Each licence year / financial year and every event,Not assessed,To obtain / assess,Zone authority / tax adviser
+FZ006,To scope,Free Zone / CT,Approved auditor listing / appointment evidence,Each licence year / financial year and every event,Not assessed,To obtain / assess,Zone authority / auditor
+FZ007,To scope,Free Zone / CT,Annual confirmation statements and change filings,Each licence year / financial year and every event,Not assessed,To obtain / assess,Zone / registrar portal
+FZ008,To scope,Free Zone / CT,"Capital deposit, share subscription and capital proof",Each licence year / financial year and every event,Not assessed,To obtain / assess,Bank / company secretary
+FZ009,To scope,Free Zone / CT,"Zone lease, desk, warehouse and facility records",Each licence year / financial year and every event,Not assessed,To obtain / assess,Zone / landlord / operations
+FZ010,To scope,Free Zone / CT,"Operational fitness, health, safety and insurance records",Each licence year / financial year and every event,Not assessed,To obtain / assess,Facilities / zone / insurer
+FZ011,To scope,Free Zone / CT,"Establishment card, immigration file and visa quota records",Each licence year / financial year and every event,Not assessed,To obtain / assess,Zone / immigration / HR
+FZ012,To scope,Free Zone / CT,"Zone inspections, fines, notices and closure letters",Each licence year / financial year and every event,Not assessed,To obtain / assess,Zone portal / management
+FZ013,To scope,Free Zone / CT,QFZP condition assessment by tax period,Each licence year / financial year and every event,Not assessed,To obtain / assess,Tax / finance
+FZ014,To scope,Free Zone / CT,Income segmentation and qualifying / excluded activity analysis,Each licence year / financial year and every event,Not assessed,To obtain / assess,Tax / sales / finance
+FZ015,To scope,Free Zone / CT,Counterparty free-zone status and beneficial-recipient evidence,Each licence year / financial year and every event,Not assessed,To obtain / assess,Customers / sales
+FZ016,To scope,Free Zone / CT,Non-qualifying revenue and de minimis workings,Each licence year / financial year and every event,Not assessed,To obtain / assess,Tax / finance
+FZ017,To scope,Free Zone / CT,"Adequate substance evidence: assets, staff and operating costs",Each licence year / financial year and every event,Not assessed,To obtain / assess,Operations / HR / finance
+FZ018,To scope,Free Zone / CT,"Outsourcing agreements, supervision and location records",Each licence year / financial year and every event,Not assessed,To obtain / assess,Operations / service provider
+FZ019,To scope,Free Zone / CT,Domestic / foreign PE profit attribution,Each licence year / financial year and every event,Not assessed,To obtain / assess,Tax / group finance
+FZ020,To scope,Free Zone / CT,Free-zone immovable-property classification and leases,Each licence year / financial year and every event,Not assessed,To obtain / assess,Property / legal / tax
+FZ021,To scope,Free Zone / CT,Qualifying intellectual-property ownership and nexus records,Each licence year / financial year and every event,Not assessed,To obtain / assess,Legal / R&D / finance
+FZ022,To scope,Free Zone / CT,Election out of QFZP and loss-of-status history,Each licence year / financial year and every event,Not assessed,To obtain / assess,Tax / EmaraTax
+FZ023,To scope,Free Zone / CT,"Designated-zone distribution, delivery and reseller evidence",Each licence year / financial year and every event,Not assessed,To obtain / assess,Logistics / sales / tax
+FZ024,To scope,Free Zone / CT,Financial services permissions and regulatory returns,Each licence year / financial year and every event,Not assessed,To obtain / assess,DFSA / FSRA / regulator
+OTH001,To scope,Other / Labour / Regulatory,"Employee register, employment contracts and amendments",All applicable historical periods and changes,Not assessed,To obtain / assess,HR / competent authority
+OTH002,To scope,Other / Labour / Regulatory,"Work permits, visas and sponsor records",All applicable historical periods and changes,Not assessed,To obtain / assess,HR / immigration / zone
+OTH003,To scope,Other / Labour / Regulatory,"Payroll, payslips and wage payment evidence",All applicable historical periods and changes,Not assessed,To obtain / assess,HR / finance
+OTH004,To scope,Other / Labour / Regulatory,"WPS submissions, acceptance and exemption evidence",All applicable historical periods and changes,Not assessed,To obtain / assess,HR / bank / authority
+OTH005,To scope,Other / Labour / Regulatory,"Leave, overtime and attendance records",All applicable historical periods and changes,Not assessed,To obtain / assess,HR
+OTH006,To scope,Other / Labour / Regulatory,"Gratuity, pension, DEWS or alternative scheme records",All applicable historical periods and changes,Not assessed,To obtain / assess,HR / fund administrator
+OTH007,To scope,Other / Labour / Regulatory,"Termination, final settlement and labour disputes",All applicable historical periods and changes,Not assessed,To obtain / assess,HR / legal
+OTH008,To scope,Other / Labour / Regulatory,Medical / worker insurance and accident records,All applicable historical periods and changes,Not assessed,To obtain / assess,HR / insurer
+OTH009,To scope,Other / Labour / Regulatory,AML scope assessment and supervisory registration,All applicable historical periods and changes,Not assessed,To obtain / assess,Compliance / supervisor
+OTH010,To scope,Other / Labour / Regulatory,"AML risk assessments, policies and compliance appointment",All applicable historical periods and changes,Not assessed,To obtain / assess,Compliance
+OTH011,To scope,Other / Labour / Regulatory,Customer due-diligence and beneficial-owner files,All applicable historical periods and changes,Not assessed,To obtain / assess,Compliance
+OTH012,To scope,Other / Labour / Regulatory,"Sanctions screening, alerts and escalation records",All applicable historical periods and changes,Not assessed,To obtain / assess,Compliance
+OTH013,To scope,Other / Labour / Regulatory,Regulatory AML reporting / inspection records,All applicable historical periods and changes,Not assessed,To obtain / assess,Compliance / legal
+OTH014,To scope,Other / Labour / Regulatory,"Historical ESR notifications, reports and exemptions",All applicable historical periods and changes,Not assessed,To obtain / assess,MoF / FTA / former adviser
+OTH015,To scope,Other / Labour / Regulatory,"Historical ESR substance, assessment and appeal evidence",All applicable historical periods and changes,Not assessed,To obtain / assess,Finance / legal
+OTH016,To scope,Other / Labour / Regulatory,"FATCA / CRS classification, due diligence and filings",All applicable historical periods and changes,Not assessed,To obtain / assess,Compliance / group tax
+OTH017,To scope,Other / Labour / Regulatory,"Excise registration, stock and return records",All applicable historical periods and changes,Not assessed,To obtain / assess,FTA / warehouse / tax
+OTH018,To scope,Other / Labour / Regulatory,"Customs licences, duty assessments and guarantees",All applicable historical periods and changes,Not assessed,To obtain / assess,Customs / logistics
+OTH019,To scope,Other / Labour / Regulatory,"Data-protection registration, records and incident files",All applicable historical periods and changes,Not assessed,To obtain / assess,Data protection / legal
+OTH020,To scope,Other / Labour / Regulatory,Sector permits and regulatory submissions,All applicable historical periods and changes,Not assessed,To obtain / assess,Regulator / operations
+OTH021,To scope,Other / Labour / Regulatory,Document retention policy and archive / backup index,All applicable historical periods and changes,Not assessed,To obtain / assess,Finance / IT / legal
+OTH022,To scope,Other / Labour / Regulatory,Portal access-authority and adviser handover register,All applicable historical periods and changes,Not assessed,To obtain / assess,Management / portal administrator
+OTH023,To scope,Other / Labour / Regulatory,Management completeness confirmation and outstanding requests,All applicable historical periods and changes,Not assessed,To obtain / assess,Management
+OTH024,To scope,Other / Labour / Regulatory,Tax dispute deadline register and service evidence,All applicable historical periods and changes,Not assessed,To obtain / assess,Legal / tax adviser
+,,,,,,,
+Source coverage: 254 VAT PDFs and 75 CT PDFs inventoried; 36 PDFs text-extracted. Selected guidance sections and the supplied VAT handbook consulted.,,,,,,,
+Checklist design only: no full legal audit of the library or client review. Financial free zones and specialist regimes need tailored modules.,,,,,,,
+A filename date is not an effective date. Handbooks guide review; operative legislation and authority decisions govern conclusions.,,,,,,,
+,,,,,,,
+,,,,,,,
+Reference ID,Area / folder,Document / authority,Edition / review basis,Relevant section / limit,Source link,,
+METHOD,AMRG procedure,Risk-based onboarding document request,"Template design, 27 Oct 2026","Document request, not a claim that every item is legally mandatory; verify sector and period rules",AMRG methodology,,
+WEB-BRAND,Brand,AMRG Global UAE and website stylesheet,Website inspected 27 Oct 2026,"Colours #56AD36, #13151B, #05466C; UAE page green #0A7C3B",Open official source,,
+WEB-VATREG,VAT,FTA VAT registration service,Live page checked 27 Oct 2026,Required documents and registration process,Open official source,,
+WEB-CTREG,CT,FTA CT registration service,Live page checked 27 Oct 2026,Required documents and signatory authorisation,Open official source,,
+WEB-DMCC,Free Zone,DMCC licence renewal guidelines,Live page checked 27 Oct 2026,"Premises, insurance, NOCs and renewal requirements; DMCC only",Open official source,,
+WEB-DMCCREG,Free Zone,DMCCA Company Regulations,10 Oct 2024 edition,Articles 73–75; confirm operative historical version,Open official source,,
+WEB-ADGM,Free Zone,ADGM annual accounts obligations,Live page checked 27 Oct 2026,Entity-form-specific accounts and audit evidence,Open official source,,
+WEB-DIFC,Free Zone,DIFC private company handbook,Official handbook located 27 Oct 2026,Use applicable company form; verify current law and exemption conditions,Open official source,,
+WEB-UBO,Corporate,Cabinet Decision 109 of 2023,Official Ministry publication,UBO records; confirm scope and financial-free-zone regime,Open official source,,
+WEB-ESR,Other,MoF ESR reporting amendment,Official announcement,Historical review for applicable years ending on/before 31 Dec 2022,Open official source,,
+WEB-WPS,Labour,MOHRE Wages Protection System resolution,Official publication; applicability to be tested,"Confirm employer jurisdiction, exceptions and operative period",Open official source,,
+WEB-EINV,VAT / systems,MoF electronic invoicing programme,Live page checked 27 Oct 2026,"Phase, appointments, structured invoice and system evidence",Open official source,,
+WEB-CTRET,CT,FTA Corporate Tax Returns Guide,"CTGTXR1, November 2024",Return schedules and evidence categories; check subsequent changes,Open official source,,
+WEB-FZ,CT / Free Zone,FTA Free Zone Persons Guide,"CTGFZP1, May 2024",Condition and evidence framework; later decisions may supersede rules,Open official source,,
+L-VATLAW,VAT docs- uae,10-25_VAT Law - Federal Decree-Law 8 of 2017 and Amendments.pdf,Supplied library; relevant sections consulted,"Arts 72, 78; document and return evidence",Open supplied document,,
+L-VATER,VAT docs- uae,09-26_VAT Executive Regulation - Federal Decree-Law 8 of 2017 and Amendments.pdf,Supplied library; relevant sections consulted,"Arts 55–64, 71–72; periods, invoices and records",Open supplied document,,
+L-VATHB,VAT docs- uae,UAE VAT Compliance Audit and Dispute Handbook.docx,Supplied library; relevant sections consulted,"Chs 2–6, 8–13; supplied secondary working reference, not legislation",Open supplied document,,
+L-CTGEN,CT_docs- uae,11-23_Corporate_Tax_General_Guide_CTGGCT1.pdf,Supplied library; relevant sections consulted,"Tax period, registration, records and compliance sections",Open supplied document,,
+L-CTRET,CT_docs- uae,11-24_Corporate_Tax_Returns_Guide_CTGTXR1.pdf,Supplied library; relevant sections consulted,Contents and schedules; PDF pp 3–5 and relevant topic sections,Open supplied document,,
+L-CTACS,CT_docs- uae,11-23_Accounting_Standards_and_Interaction_with_Corporate_Tax_CTGACS1.pdf,Supplied library; relevant sections consulted,"Accounting basis, elections and transitional records",Open supplied document,,
+L-FZ,CT_docs- uae,05-24_Free_Zone_Persons_CTGFZP1.pdf,Supplied library; relevant sections consulted,"PDF pp 18–25, 79; substance, status and IP evidence",Open supplied document,,
+L-TP,CT_docs- uae,11-23_Transfer_Pricing_Guide_CTGTP1.pdf,Supplied library; relevant sections consulted,PDF pp 80–85; documentation,Open supplied document,,
+L-FIRST,CT_docs- uae,07-24_First_Tax_Period_of_juridical_person_CTP003.pdf,Supplied library; relevant sections consulted,PDF pp 1–3; first period and governing company law,Open supplied document,,
+L-CHANGE,CT_docs- uae,08-25_Change_Corporate_Tax_Period.pdf,Supplied library; relevant sections consulted,"Request details, approval history and certificate sections",Open supplied document,,
+L-GROUP,CT_docs- uae,01-24_Tax_Groups_CTGTGR1.pdf,Supplied library; relevant sections consulted,"Formation, membership, consolidation and loss sections",Open supplied document,,
+L-APPORT,VAT docs- uae,09-25_Input Tax Apportionment Special Methods.pdf,Supplied library; relevant sections consulted,"Method, approval and supporting computation sections",Open supplied document,,
+L-ZONES,VAT docs- uae,10-26_Free Zones and Designated Zones for Tax Purposes - TAXP010.pdf,Supplied library; relevant sections consulted,Separate CT free-zone and VAT designated-zone concepts,Open supplied document,,
