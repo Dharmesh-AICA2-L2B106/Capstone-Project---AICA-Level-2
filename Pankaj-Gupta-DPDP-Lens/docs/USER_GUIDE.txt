@@ -1,0 +1,41 @@
+DPDP LENS - USER GUIDE  (about 20 minutes)
+=========================================
+DPDP Lens is a Windows tool that finds personal data (Aadhaar, PAN, cards, UPI/IFSC, mobile, e-mail - including inside scans
+and photos) across folders you choose, lets you mark each file Keep or Delete, and traces every copy of one person's data when
+consent is withdrawn. It runs fully offline. It is a discovery and evidence aid, not legal advice.
+
+PLEASE READ FIRST
+  - Google Drive Link : https://drive.google.com/drive/folders/1iLCGxJDkDqyShYvLHWSpYA5FLjOOelbb?usp=sharing 
+could not share entire app on GitHub due to size constraints
+  - Test ONLY on the supplied DemoData (15 files, fictitious identifiers). Please do not point it at real personal data:
+    it reads the files in the folders you choose, and a pilot on real data needs proper approval.
+  - Windows 10/11, 64-bit. No Python and no internet needed. About 1 GB of free disk space.
+  - The app is not code-signed. Windows may say "Windows protected your PC": click More info, then Run anyway.
+    If your company antivirus blocks it, ask IT to allow it - do not disable security software yourself.
+  - Licence: paste the code in EVALUATION_LICENCE.txt (inside the app download) or the code in the GitHub README. One trial per computer.
+
+SET UP
+  1. Copy the folder DPDPLens to C:\DPDPLens  (not into a OneDrive/SharePoint synced folder).
+  2. Extract DemoData.zip to C:\  so you have C:\DemoData\C_Laptop, C:\DemoData\OneDrive - DemoCorp and C:\DemoData\USB_Backup.
+  3. Double-click C:\DPDPLens\DPDPLens.exe. Type any name for the application. Paste the licence code, click Activate.
+  4. The DPDPLens folder holds many files (_internal, ocr_worker and others). They are program files. Start ONLY DPDPLens.exe,
+     and do not open, rename, move or delete anything else in that folder or the app will stop working.
+
+TEST STEPS (tick each when it matches)
+  [ ] 1 Storage Map tab > Add folder: the three DemoData folders. Types should read Local disk / Cloud-synced folder / Local disk.
+  [ ] 2 Tick "Read images && scanned PDFs (OCR)" and "Also mobile numbers && e-mails". Click Scan and map (10-20 seconds).
+        Expected: 15 files scanned, 13 with personal data (High 6, Medium 4, Low 3), OCR read 2 file(s).
+  [ ] 3 Dashboard tab: 3 locations, 13 files with personal data, 6 high-risk.
+  [ ] 4 Review && Decide tab: select employee_master.csv > Preview (masked): values must be masked.
+  [ ] 5 Mark one file KEEP (choose a reason) and two stray copies DELETE. Dry-run is ticked: Move DELETE files to quarantine
+        says "Simulated". Untick Dry-run and repeat: "Moved to quarantine". Then Undo last quarantine: "Restored".
+  [ ] 6 Click Erase quarantine permanently, type  delete me  (not DELETE): nothing is deleted. Cancel.
+  [ ] 7 Consent Revocation tab: Name Priya Sharma, E-mail priya.sharma@democorp.example, Mobile 6141707536,
+        Aadhaar 358813998697. Click Find all copies. Expected: 5 files found. Mark all DELETE, Move to quarantine,
+        Export consent-revocation report (save to a folder of your choice).
+  [ ] 8 Audit Log tab > Open data folder: open cases.json in Notepad and search for 6141707536 - it must not appear.
+
+CLEAN UP WHEN DONE
+  Delete C:\DPDPLens, C:\DemoData and the folder %USERPROFILE%\.dpdp_lens   (type that path in the Explorer address bar).
+
+Known limits: PAN, IFSC, UPI and OCR findings need manual verification; Aadhaar and cards use checksums, which are not certainty.
