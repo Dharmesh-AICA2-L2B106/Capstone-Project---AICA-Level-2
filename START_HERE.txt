@@ -1,0 +1,24 @@
+LIFE PLANNER
+1. Extract the ZIP completely. Do not run inside the ZIP.
+2. Double-click Run_Life_Planner.bat on Windows.
+3. Requires Python 3 with Tkinter (included in the standard Windows installer).
+   No pip packages, subscriptions or API keys required.
+4. Add your real tasks and choose date/time, reminder lead and repeat pattern.
+   Work: client follow-up, payroll review, meetings.
+   Daughter / School: homework, activity day, uniform, school bag.
+   Home / Personal: appointments, shopping, family tasks.
+5. Tomorrow is the default view. Today and All active also show relevant tasks;
+   check All active for overdue items. Completed tasks remain in Completed.
+6. Complete a recurring task to create its next future occurrence automatically.
+   Missed occurrences are skipped, not duplicated. Monthly dates are clamped to
+   the last valid day; following months use that clamped date.
+7. Reminders appear with a sound inside desktop popup windows. Keep this app
+   open (minimized is fine), your computer awake, and your clock/time zone correct.
+   There are no mobile, WhatsApp, email or closed-app notifications.
+   Unfinished tasks repeat reminders every 30 minutes. Snooze delays 10 minutes.
+   On reopening, overdue reminders resume. Run only one app window at a time.
+8. Data persists in LOCALAPPDATA\MunazzaLifePlanner\planner.sqlite3 on Windows.
+   CSV exports include all tasks for reference; CSV import is not included.
+   For full recovery, close the app and copy planner.sqlite3 to a safe backup.
+9. This is an offline planner, not an AI scheduling service. No school or work
+   account is connected and no real reminders are configured until you add tasks.
