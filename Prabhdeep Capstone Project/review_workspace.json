@@ -1,0 +1,135 @@
+{
+  "label": "Fictional—For Demonstration Only",
+  "version": 1,
+  "threshold_overrides": {},
+  "files": {
+    "Trial_Balance": "C:\\Users\\Prabhdeep.S\\OneDrive - MCA Management\\Desktop\\Prabhdeep Capstone Project\\Data\\CSV Exports\\Trial_Balance.csv",
+    "Monthly_Sales": "C:\\Users\\Prabhdeep.S\\OneDrive - MCA Management\\Desktop\\Prabhdeep Capstone Project\\Data\\CSV Exports\\Monthly_Sales.csv",
+    "Budget": "C:\\Users\\Prabhdeep.S\\OneDrive - MCA Management\\Desktop\\Prabhdeep Capstone Project\\Data\\CSV Exports\\Budget.csv",
+    "Thresholds": "C:\\Users\\Prabhdeep.S\\OneDrive - MCA Management\\Desktop\\Prabhdeep Capstone Project\\Data\\CSV Exports\\Thresholds.csv"
+  },
+  "findings": {
+    "R01-2025-Sep": {
+      "id": "R01-2025-Sep",
+      "rule": "R01",
+      "area": "Revenue - monthly sales",
+      "title": "Sep 2025 sales up +66.7% on Sep 2024",
+      "description": "Sep 2025 sales AED 2,700,000 vs Sep 2024 AED 1,620,000: change AED 1,080,000 (+66.7%). Threshold > 30%.",
+      "figures": {
+        "Month": "Sep",
+        "Sales FY2025 (AED)": 2700000.0,
+        "Sales FY2024 (AED)": 1620000.0,
+        "Change (AED)": 1080000.0,
+        "Change (%)": 66.67,
+        "Annual sales FY2025 (AED)": 20900000.0,
+        "Annual sales FY2024 (AED)": 18000000.0
+      },
+      "auto": true,
+      "flag_active": true,
+      "stage": "Preliminary",
+      "carried_from": "",
+      "status": "Open",
+      "management_response": "",
+      "evidence_ref": "",
+      "reviewer_notes": "",
+      "ai_draft": "",
+      "ai_reviewed": false,
+      "created": "2026-11-03 12:32",
+      "updated": "2026-11-03 12:32",
+      "history": [
+        "2026-11-03 12:32 Created at Preliminary"
+      ]
+    },
+    "R02-2025": {
+      "id": "R02-2025",
+      "rule": "R02",
+      "area": "Trade receivables",
+      "title": "Receivable days up +19.2 days",
+      "description": "Receivable days FY2025 80.3 vs FY2024 61.1: change +19.2 days. Threshold > 10 days. Receivable days = closing trade receivables (1100) / annual credit sales x 365. Receivables include 5% VAT; credit sales exclude VAT. The workbook basis is retained and is the same in both years, so the trend is comparable.",
+      "figures": {
+        "Trade receivables FY2025 (AED)": 4600000.0,
+        "Trade receivables FY2024 (AED)": 3014550.0,
+        "Credit sales FY2025 (AED)": 20900000.0,
+        "Credit sales FY2024 (AED)": 18000000.0,
+        "Receivable days FY2025": 80.3,
+        "Receivable days FY2024": 61.1,
+        "Change (days)": 19.2,
+        "VAT basis": "Receivables include 5% VAT; credit sales exclude VAT (same basis both years)"
+      },
+      "auto": true,
+      "flag_active": true,
+      "stage": "Preliminary",
+      "carried_from": "",
+      "status": "Open",
+      "management_response": "",
+      "evidence_ref": "",
+      "reviewer_notes": "",
+      "ai_draft": "",
+      "ai_reviewed": false,
+      "created": "2026-11-03 12:32",
+      "updated": "2026-11-03 12:32",
+      "history": [
+        "2026-11-03 12:32 Created at Preliminary"
+      ]
+    },
+    "R03-2025-6450": {
+      "id": "R03-2025-6450",
+      "rule": "R03",
+      "area": "6450 Repairs and maintenance",
+      "title": "Repairs and maintenance up +222.2% on FY2024",
+      "description": "6450 Repairs and maintenance FY2025 AED 145,000 vs FY2024 AED 45,000: change AED 100,000 (+222.2%). Threshold > 50%.",
+      "figures": {
+        "Account": "6450 Repairs and maintenance",
+        "FY2025 (AED)": 145000.0,
+        "FY2024 (AED)": 45000.0,
+        "Change (AED)": 100000.0,
+        "Change (%)": 222.22
+      },
+      "auto": true,
+      "flag_active": true,
+      "stage": "Preliminary",
+      "carried_from": "",
+      "status": "Open",
+      "management_response": "",
+      "evidence_ref": "",
+      "reviewer_notes": "",
+      "ai_draft": "",
+      "ai_reviewed": false,
+      "created": "2026-11-03 12:32",
+      "updated": "2026-11-03 12:32",
+      "history": [
+        "2026-11-03 12:32 Created at Preliminary"
+      ]
+    },
+    "R04-2025-6450": {
+      "id": "R04-2025-6450",
+      "rule": "R04",
+      "area": "6450 Repairs and maintenance",
+      "title": "Repairs and maintenance +190.0% over FY2025 budget",
+      "description": "6450 Repairs and maintenance FY2025 actual AED 145,000 vs budget AED 50,000: variance AED 95,000 (+190.0%). Threshold > 25%.",
+      "figures": {
+        "Account": "6450 Repairs and maintenance",
+        "Actual FY2025 (AED)": 145000.0,
+        "Budget FY2025 (AED)": 50000.0,
+        "Variance (AED)": 95000.0,
+        "Variance (%)": 190.0
+      },
+      "auto": true,
+      "flag_active": true,
+      "stage": "Preliminary",
+      "carried_from": "",
+      "status": "Open",
+      "management_response": "",
+      "evidence_ref": "",
+      "reviewer_notes": "",
+      "ai_draft": "",
+      "ai_reviewed": false,
+      "created": "2026-11-03 12:32",
+      "updated": "2026-11-03 12:32",
+      "history": [
+        "2026-11-03 12:32 Created at Preliminary"
+      ]
+    }
+  },
+  "final_notes": ""
+}

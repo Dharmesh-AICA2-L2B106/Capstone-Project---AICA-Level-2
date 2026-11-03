@@ -1,0 +1,814 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Analytical review for Audit by Prabhdeep</title>
+<!--
+  Self-contained HTML version. Fictional—For Demonstration Only.
+  No external libraries, no network calls, and NO API keys are embedded or requested.
+  Data stays in this browser (localStorage). Use "Export workspace" for a backup.
+-->
+<style>
+:root{
+  --ink:#1e1b4b; --muted:#64748b; --indigo:#4338ca; --violet:#7c3aed; --pink:#db2777;
+  --teal:#0891b2; --green:#059669; --orange:#ea580c; --bg:#f5f3ff; --card:#ffffff; --line:#c7d2fe;
+  --pass:#dcfce7; --fail:#fee2e2; --warn:#fef3c7; --flag:#ffe4e6;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,Roboto,sans-serif;color:var(--ink);background:var(--bg);font-size:14px}
+header{margin:12px;border-radius:14px;padding:16px 20px;color:#fff;display:flex;flex-wrap:wrap;gap:12px;align-items:center;
+  background:linear-gradient(90deg,var(--indigo),var(--violet) 50%,var(--pink))}
+header h1{margin:0;font-size:24px;font-weight:800}
+header p{margin:4px 0 0;font-size:13px;opacity:.95}
+.badge{background:#fde047;color:#713f12;font-weight:800;padding:6px 12px;border-radius:12px;white-space:nowrap}
+.spacer{flex:1}
+nav{display:flex;flex-wrap:wrap;gap:4px;margin:0 12px}
+nav button{background:#e0e7ff;color:#3730a3;border:0;padding:10px 16px;border-radius:10px 10px 0 0;font-weight:600;cursor:pointer;font-size:14px}
+nav button.active{background:linear-gradient(90deg,#6366f1,var(--pink));color:#fff}
+main{margin:0 12px 12px;background:var(--card);border:2px solid var(--line);border-radius:0 10px 10px 10px;padding:14px;min-height:60vh}
+section{display:none} section.active{display:block}
+.btn{background:#6366f1;color:#fff;border:0;border-radius:8px;padding:8px 14px;font-weight:600;cursor:pointer;font-size:13px;margin:2px}
+.btn:hover{filter:brightness(.92)} .btn:disabled{background:#cbd5e1;color:#64748b;cursor:default}
+.btn.green{background:var(--green)} .btn.pink{background:var(--pink)} .btn.teal{background:var(--teal)} .btn.orange{background:var(--orange)}
+.btn.light{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.6)}
+.intro{background:#eef2ff;border-left:5px solid #6366f1;padding:8px 10px;border-radius:6px;margin:8px 0}
+.ok{background:var(--pass);border-left-color:#16a34a} .bad{background:var(--fail);border-left-color:#dc2626}
+.ai-banner{background:#ffedd5;color:#9a3412;border:1px solid #fb923c;border-radius:6px;padding:6px 8px;font-weight:700;margin:6px 0}
+fieldset{border:2px solid var(--line);border-radius:10px;padding:10px;margin:10px 0}
+legend{color:var(--indigo);font-weight:700;padding:0 6px}
+.uploads{display:grid;grid-template-columns:170px 1fr;gap:6px 10px;align-items:center}
+.uploads .st{color:var(--muted);font-size:12px;grid-column:2}
+.tablewrap{overflow-x:auto;margin:8px 0}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{background:#312e81;color:#fff;padding:6px 8px;text-align:left;position:sticky;top:0;white-space:nowrap}
+td{border-bottom:1px solid #e5e7eb;padding:5px 8px;vertical-align:top}
+tr:nth-child(even) td{background:#f8fafc}
+td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.flag td{background:var(--flag)!important;font-weight:600}
+.res{font-weight:800;text-align:center;border-radius:4px}
+.PASS{background:var(--pass)} .FAIL{background:var(--fail)} .WARN{background:var(--warn)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:8px 0}
+.card{border-radius:14px;padding:12px 14px;color:#fff;min-height:110px}
+.card .t{font-weight:600;font-size:13px} .card .v{font-size:26px;font-weight:800;margin:4px 0} .card .s{font-size:12px}
+.c1{background:linear-gradient(135deg,#059669,#0d9488)} .c2{background:linear-gradient(135deg,#7c3aed,#db2777)}
+.c3{background:linear-gradient(135deg,#0891b2,#2563eb)} .c4{background:linear-gradient(135deg,#ea580c,#e11d48)}
+.subnav{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
+.subnav button{background:#f1f5f9;border:1px solid var(--line);border-radius:8px;padding:6px 12px;cursor:pointer;font-weight:600;color:#3730a3}
+.subnav button.active{background:#c7d2fe}
+.sub{display:none} .sub.active{display:block}
+canvas{width:100%;height:380px;display:block;background:#fff;border:1px solid #e5e7eb;border-radius:8px}
+.review{display:grid;grid-template-columns:minmax(280px,5fr) 7fr;gap:12px}
+.review .list tr{cursor:pointer} .review .list tr.sel td{background:#c7d2fe!important}
+.editor label{display:block;font-weight:600;margin:8px 0 3px}
+.editor textarea,.editor input,.editor select{width:100%;border:1px solid #a5b4fc;border-radius:6px;padding:6px;font:inherit}
+.editor textarea{min-height:70px;resize:vertical}
+.editor .ro{background:#f1f5f9}
+.pill{display:inline-block;padding:1px 8px;border-radius:10px;font-size:12px;font-weight:600}
+.s-Open{background:#fecaca} .s-Resolved{background:#bbf7d0} .s-other{background:#fef3c7}
+.summary{font-weight:700;color:var(--pink)}
+.small{font-size:12px;color:var(--muted)}
+input[type=number]{width:110px} select{padding:4px}
+footer{text-align:center;color:var(--muted);font-size:12px;margin:0 0 14px}
+@media (max-width:820px){.review{grid-template-columns:1fr}.uploads{grid-template-columns:1fr}.uploads .st{grid-column:1}}
+@media print{nav,.btn,header .btn{display:none} section{display:block!important}}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Analytical review for Audit by Prabhdeep</h1>
+    <p>Trial balance, monthly sales, budget and threshold analytics | AED, unscaled | Sand Dune General Trading LLC (fictional) | HTML edition</p>
+  </div>
+  <div class="spacer"></div>
+  <span class="badge">Fictional—For Demonstration Only</span>
+  <button class="btn light" onclick="exportFindings()">Export findings CSV</button>
+  <button class="btn light" onclick="exportWorkspace()">Export workspace</button>
+  <label class="btn light" style="display:inline-block">Import workspace<input type="file" accept=".json" hidden onchange="importWorkspace(this)"></label>
+</header>
+
+<nav id="nav"></nav>
+<main>
+<section id="tab-data">
+  <fieldset><legend>Upload the workbook's CSV exports (files are read locally; nothing is uploaded to a server)</legend>
+    <div class="uploads" id="uploads"></div>
+    <p class="small">Or select all four at once (matched by file name): <input type="file" accept=".csv" multiple onchange="loadMany(this.files)"></p>
+  </fieldset>
+  <button class="btn pink" onclick="loadSample()">Load sample data (fictional)</button>
+  <button class="btn green" onclick="runAll()">Run validation &amp; analysis</button>
+  <div id="banner" class="intro">Load the four CSV files, then run validation &amp; analysis.</div>
+  <div class="tablewrap"><table id="validation"></table></div>
+</section>
+
+<section id="tab-thresholds">
+  <div class="intro">Thresholds are read from Thresholds.csv. They are ILLUSTRATIVE, not industry standards. Change them below and click Apply; overrides are saved in this browser.</div>
+  <div class="tablewrap"><table id="thresholds"></table></div>
+  <button class="btn green" onclick="applyThresholds()">Apply thresholds &amp; re-run</button>
+  <button class="btn orange" onclick="resetThresholds()">Reset to CSV values</button>
+</section>
+
+<section id="tab-analytics">
+  <div class="subnav" id="subnav"></div>
+  <div class="sub active" id="sub-ratios">
+    <div class="cards" id="cards"></div>
+    <div class="tablewrap"><table id="ratios"></table></div>
+    <div class="intro" id="vatnote"></div>
+  </div>
+  <div class="sub" id="sub-annual"><div class="tablewrap"><table id="annual"></table></div></div>
+  <div class="sub" id="sub-budget"><div class="tablewrap"><table id="budget"></table></div></div>
+  <div class="sub" id="sub-monthly"><canvas id="chart"></canvas><div class="tablewrap"><table id="monthly"></table></div></div>
+</section>
+
+<section id="tab-Preliminary"></section>
+<section id="tab-Substantive/Interim"></section>
+<section id="tab-Final"></section>
+
+<section id="tab-help">
+  <h2>HTML edition: what works and its limitations</h2>
+  <ul>
+    <li><b>Works offline</b> in any modern browser: CSV upload, validation, calculations, threshold changes, ratio cards, monthly sales chart, three review stages, carry-forward and CSV export.</li>
+    <li><b>Storage:</b> findings and notes are saved in this browser's <i>localStorage</i> for this file location. They are lost if browser data is cleared, are not shared with other browsers or people, and private/incognito windows may not keep them. Use <b>Export workspace</b> regularly and <b>Import workspace</b> to restore.</li>
+    <li><b>No direct AI calls:</b> a web page cannot keep an API key secret, so this file never asks for or embeds one. Use <b>Copy AI prompt</b> to copy a prompt containing only the verified figures for use in an approved AI assistant, then paste the reply into the draft box. It stays labelled "Draft—Subject to Auditor Review". The Python desktop app can call the AI directly, with the key stored outside the source code.</li>
+    <li><b>Single user:</b> there is no audit trail of who made changes beyond the history log in each finding.</li>
+    <li>Calculations mirror the Python app: same sign conventions, checks, ratios and threshold rules.</li>
+  </ul>
+  <p>This tool highlights movements for auditor follow-up. It does not give an audit opinion and does not reach conclusions about fraud or misstatement.</p>
+</section>
+</main>
+<footer>Fictional—For Demonstration Only · Analytical review for Audit by Prabhdeep · AI commentary: Draft—Subject to Auditor Review</footer>
+
+<script>
+"use strict";
+const DEMO_LABEL = "Fictional—For Demonstration Only";
+const AI_LABEL = "Draft—Subject to Auditor Review";
+const UNVERIFIED = "Possible explanations — UNVERIFIED. Auditor must corroborate before use.";
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const SCHEMAS = {
+  Trial_Balance: ["Year","Account_Code","Account_Name","Category","Debit","Credit"],
+  Monthly_Sales: ["Year","Month","Sales","Credit_Sales"],
+  Budget: ["Year","Account_Code","Budget_Amount"],
+  Thresholds: ["Rule_ID","Metric","Comparison","Threshold","Unit","Rationale"],
+};
+const DEBIT_NORMAL = ["Current Assets","Non-Current Assets","Cost of Sales","Operating Expenses","Finance Costs","Tax Expense"];
+const CREDIT_NORMAL = ["Current Liabilities","Non-Current Liabilities","Equity","Revenue"];
+const CATEGORIES = DEBIT_NORMAL.concat(CREDIT_NORMAL);
+const PL = ["Revenue","Cost of Sales","Operating Expenses","Finance Costs","Tax Expense"];
+const TOL = 0.01;
+const VAT_NOTE = "Receivable days = closing trade receivables (1100) / annual credit sales x 365. Receivables include 5% VAT; credit sales exclude VAT. The workbook basis is retained and is the same in both years, so the trend is comparable.";
+const DEFAULT_T = {
+  R01:{Metric:"Same-month sales growth vs prior year",Comparison:">",Threshold:30,Unit:"%"},
+  R02:{Metric:"Debtor days change vs prior year",Comparison:">",Threshold:10,Unit:"days"},
+  R03:{Metric:"Operating expense account change vs prior year",Comparison:">",Threshold:50,Unit:"%"},
+  R04:{Metric:"Operating expense account variance vs budget",Comparison:">",Threshold:25,Unit:"%"},
+};
+const OPS = {">":(a,b)=>a>b, ">=":(a,b)=>a>=b, "<":(a,b)=>a<b, "<=":(a,b)=>a<=b};
+const STAGES = ["Preliminary","Substantive/Interim","Final"];
+const STATUSES = ["Open","Awaiting management response","Awaiting evidence","Explained - evidence obtained","Escalated to engagement lead","Resolved"];
+const STD = {
+  R01:["Obtain the sales listing for the month and trace large invoices to delivery notes.","Check invoices either side of the month end for cut-off.","Inquire about new customers, promotions or one-off orders in the month.","Review credit notes issued in the following months."],
+  R02:["Obtain the aged receivables listing and agree it to account 1100.","Review receipts after the year end for the largest balances.","Inquire about changes in credit terms or customer disputes.","Consider confirmations for material or overdue balances."],
+  R03:["Obtain the account ledger and review the largest entries.","Vouch a sample of entries to invoices and approvals.","Consider whether any amounts are capital in nature.","Inquire about one-off events (e.g. major repairs, new contracts)."],
+  R04:["Compare the budget assumptions with actual activity.","Obtain management's explanation for the overspend and corroborate it.","Vouch the largest entries to supporting documents.","Check whether costs were misclassified from other accounts."],
+};
+const AI_SYSTEM = "You assist a financial statement auditor performing analytical review on FICTIONAL demonstration data. You receive one analytical-review flag with verified figures. Write possible business explanations for the movement and the audit evidence that would corroborate or contradict each one.\nRules:\n- Use only the figures provided. Do not invent, estimate or recalculate other numbers.\n- Every explanation is a hypothesis. Label the section 'Possible explanations (UNVERIFIED)'.\n- Do not give an audit opinion, a conclusion on misstatement, or any conclusion about fraud or intent. Do not say the matter is resolved.\n- Be concise: 3-5 possible explanations, then 3-5 suggested corroborating procedures or inquiries of management. Plain text, short bullet points.";
+
+// Embedded fictional sample data (same as the sample_data CSV files)
+const SAMPLE = {
+Trial_Balance:`Year,Account_Code,Account_Name,Category,Debit,Credit
+2024,1000,Cash at bank,Current Assets,1630235,0
+2024,1100,Trade receivables,Current Assets,3014550,0
+2024,1200,Inventory,Current Assets,2400000,0
+2024,1300,Prepayments,Current Assets,120000,0
+2024,1500,"Property, plant and equipment - cost",Non-Current Assets,1320000,0
+2024,1590,Accumulated depreciation,Non-Current Assets,0,420000
+2024,2000,Trade payables,Current Liabilities,0,3059000
+2024,2100,Accrued expenses,Current Liabilities,0,120000
+2024,2200,VAT payable,Current Liabilities,0,30785
+2024,2300,Corporate tax payable,Current Liabilities,0,81000.00
+2024,2410,Term loan - current portion,Current Liabilities,0,200000
+2024,2400,Term loan - non-current portion,Non-Current Liabilities,0,600000
+2024,2500,Gratuity provision,Non-Current Liabilities,0,160000
+2024,3000,Share capital,Equity,0,2000000
+2024,3100,Retained earnings - opening,Equity,0,920000
+2024,3200,Dividends paid,Equity,300000,0
+2024,4000,Sales revenue,Revenue,0,18000000
+2024,5000,Cost of goods sold,Cost of Sales,14400000,0
+2024,6000,Salaries,Operating Expenses,1020000,0
+2024,6100,Rent,Operating Expenses,360000,0
+2024,6200,Utilities,Operating Expenses,96000,0
+2024,6300,Delivery,Operating Expenses,270000,0
+2024,6400,Marketing,Operating Expenses,96000,0
+2024,6450,Repairs and maintenance,Operating Expenses,45000,0
+2024,6500,Administration,Operating Expenses,108000,0
+2024,6600,Insurance,Operating Expenses,60000,0
+2024,6700,Gratuity expense,Operating Expenses,60000,0
+2024,6800,Depreciation,Operating Expenses,120000,0
+2024,6900,Interest expense,Finance Costs,90000,0
+2024,7000,Corporate tax expense,Tax Expense,81000.00,0
+2025,1000,Cash at bank,Current Assets,1229950.00,0
+2025,1100,Trade receivables,Current Assets,4600000,0
+2025,1200,Inventory,Current Assets,2600000,0
+2025,1300,Prepayments,Current Assets,120000,0
+2025,1500,"Property, plant and equipment - cost",Non-Current Assets,1500000,0
+2025,1590,Accumulated depreciation,Non-Current Assets,0,552000
+2025,2000,Trade payables,Current Liabilities,0,3311000
+2025,2100,Accrued expenses,Current Liabilities,0,120000
+2025,2200,VAT payable,Current Liabilities,0,37450
+2025,2300,Corporate tax payable,Current Liabilities,0,135765.00
+2025,2410,Term loan - current portion,Current Liabilities,0,200000
+2025,2400,Term loan - non-current portion,Non-Current Liabilities,0,400000
+2025,2500,Gratuity provision,Non-Current Liabilities,0,232000
+2025,3000,Share capital,Equity,0,2000000
+2025,3100,Retained earnings - opening,Equity,0,1814000.00
+2025,3200,Dividends paid,Equity,500000,0
+2025,4000,Sales revenue,Revenue,0,20900000
+2025,5000,Cost of goods sold,Cost of Sales,16302000,0
+2025,6000,Salaries,Operating Expenses,1140000,0
+2025,6100,Rent,Operating Expenses,420000,0
+2025,6200,Utilities,Operating Expenses,108000,0
+2025,6300,Delivery,Operating Expenses,313500,0
+2025,6400,Marketing,Operating Expenses,120000,0
+2025,6450,Repairs and maintenance,Operating Expenses,145000,0
+2025,6500,Administration,Operating Expenses,120000,0
+2025,6600,Insurance,Operating Expenses,72000,0
+2025,6700,Gratuity expense,Operating Expenses,72000,0
+2025,6800,Depreciation,Operating Expenses,132000,0
+2025,6900,Interest expense,Finance Costs,72000,0
+2025,7000,Corporate tax expense,Tax Expense,135765.00,0`,
+Monthly_Sales:`Year,Month,Sales,Credit_Sales
+2024,Jan,1260000,1260000
+2024,Feb,1260000,1260000
+2024,Mar,1440000,1440000
+2024,Apr,1440000,1440000
+2024,May,1440000,1440000
+2024,Jun,1440000,1440000
+2024,Jul,1440000,1440000
+2024,Aug,1440000,1440000
+2024,Sep,1620000,1620000
+2024,Oct,1620000,1620000
+2024,Nov,1800000,1800000
+2024,Dec,1800000,1800000
+2025,Jan,1400000,1400000
+2025,Feb,1400000,1400000
+2025,Mar,1600000,1600000
+2025,Apr,1600000,1600000
+2025,May,1600000,1600000
+2025,Jun,1600000,1600000
+2025,Jul,1600000,1600000
+2025,Aug,1600000,1600000
+2025,Sep,2700000,2700000
+2025,Oct,1800000,1800000
+2025,Nov,2000000,2000000
+2025,Dec,2000000,2000000`,
+Budget:`Year,Account_Code,Budget_Amount
+2025,4000,20000000
+2025,5000,15600000
+2025,6000,1140000
+2025,6100,420000
+2025,6200,108000
+2025,6300,300000
+2025,6400,120000
+2025,6450,50000
+2025,6500,120000
+2025,6600,72000
+2025,6700,72000
+2025,6800,132000
+2025,6900,72000
+2025,7000,127710.00`,
+Thresholds:`Rule_ID,Metric,Comparison,Threshold,Unit,Rationale
+R01,Same-month sales growth vs prior year,>,30,%,"Flags any month whose sales exceed the same month of the prior year by more than 30%. Underlying trend growth is about 11%, so 30% isolates unusual months. Illustrative—not an industry standard."
+R02,Debtor days change vs prior year,>,10,days,Debtor days = closing trade receivables / annual credit sales x 365. An increase of more than 10 days indicates slower collection. Illustrative—not an industry standard.
+R03,Operating expense account change vs prior year,>,50,%,Flags an operating expense account that rises more than 50% year on year. Applied to every account in category Operating Expenses. Illustrative—not an industry standard.
+R04,Operating expense account variance vs budget,>,25,%,Flags an operating expense account whose current-year actual exceeds budget by more than 25%. Applied to every budgeted Operating Expenses account. Illustrative—not an industry standard.`
+};
+
+// ---------------------------------------------------------------- helpers
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmtAED = (v,d=0) => v==null ? "n/a" : v.toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d});
+const fmtPct = (v,d=1,signed=true) => v==null ? "n/a" : (signed && v>=0 ? "+" : "") + v.toFixed(d) + "%";
+const fmtNum = (v,d=2) => v==null ? "n/a" : v.toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d});
+const nowText = () => { const d=new Date(), p=n=>String(n).padStart(2,"0"); return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`; };
+const short = (a,n=6) => a.length ? a.slice(0,n).join("; ") + (a.length>n ? `; ... (+${a.length-n} more)` : "") : "";
+
+function parseCSV(text){
+  text = text.replace(/^﻿/, "");
+  const rows = []; let row = [], field = "", q = false;
+  for (let i=0;i<text.length;i++){
+    const c = text[i];
+    if (q){ if (c === '"'){ if (text[i+1] === '"'){ field += '"'; i++; } else q = false; } else field += c; }
+    else if (c === '"') q = true;
+    else if (c === ","){ row.push(field); field = ""; }
+    else if (c === "\n" || c === "\r"){ if (c === "\r" && text[i+1] === "\n") i++; row.push(field); rows.push(row); row = []; field = ""; }
+    else field += c;
+  }
+  if (field !== "" || row.length){ row.push(field); rows.push(row); }
+  const header = (rows.shift() || []).map(h => h.trim());
+  const data = rows.filter(r => r.some(v => v.trim() !== "")).map(r => {
+    const o = {}; header.forEach((h,i) => o[h] = (r[i] ?? "").trim()); return o; });
+  return {columns: header, rows: data};
+}
+function parseNumber(t){
+  if (t == null || String(t).trim() === "") return [null, "blank"];
+  let s = String(t).trim().replace(/,/g,"").replace("AED","").trim();
+  const neg = s.startsWith("(") && s.endsWith(")"); if (neg) s = s.slice(1,-1);
+  if (!/^[-+]?(\d+\.?\d*|\.\d+)([eE][-+]?\d+)?$/.test(s)) return [null, `not a number ('${t}')`];
+  const v = Number(s); return [neg ? -v : v, null];
+}
+const parseIntSafe = t => { const [v,e] = parseNumber(t); return (e || v==null || !Number.isInteger(v)) ? null : v; };
+const normCode = t => { const v = parseIntSafe(t); return v != null ? String(v) : String(t ?? "").trim(); };
+
+// ---------------------------------------------------------------- validation
+function buildData(tables){
+  const d = {tb:new Map(), sales:new Map(), budget:new Map(), budgetYear:null, thresholds:{}, years:[], py:null, cy:null, checks:[]};
+  const add = (area, check, ok, detail="", warnOnly=false) => d.checks.push({area, check, result: ok ? "PASS" : (warnOnly ? "WARN" : "FAIL"), detail});
+  const usable = {};
+  for (const [name, req] of Object.entries(SCHEMAS)){
+    const t = tables[name];
+    if (!t){ add(name, "File uploaded", false, "Not uploaded yet"); continue; }
+    const missing = req.filter(c => !t.columns.includes(c));
+    add(name, "Required columns present", !missing.length, missing.length ? "Missing: " + missing.join(", ") : `${t.rows.length} data rows`);
+    if (!missing.length) usable[name] = t;
+  }
+  if (usable.Trial_Balance){
+    const inv=[], neg=[], both=[], dup=[], badCat=[], badKey=[];
+    usable.Trial_Balance.rows.forEach((r,i) => {
+      const line = i+2, year = parseIntSafe(r.Year), code = normCode(r.Account_Code);
+      if (year == null || !code){ badKey.push(`line ${line}`); return; }
+      const [dr,e1] = parseNumber(r.Debit), [cr,e2] = parseNumber(r.Credit);
+      if (e1) inv.push(`line ${line} ${code}/${year} Debit ${e1}`);
+      if (e2) inv.push(`line ${line} ${code}/${year} Credit ${e2}`);
+      if ((dr||0) < 0 || (cr||0) < 0) neg.push(`line ${line} ${code}/${year}`);
+      if ((dr||0) > 0 && (cr||0) > 0) both.push(`line ${line} ${code}/${year}`);
+      const cat = (r.Category||"").trim();
+      if (!CATEGORIES.includes(cat)) badCat.push(`line ${line} ${code} '${cat}'`);
+      const key = year + "|" + code;
+      if (d.tb.has(key)){ dup.push(`line ${line} ${code}/${year}`); return; }
+      d.tb.set(key, {year, code, name:(r.Account_Name||"").trim(), category:cat, debit:dr, credit:cr});
+    });
+    add("Trial_Balance","Year and account code readable",!badKey.length, short(badKey) || "All rows");
+    add("Trial_Balance","Debit/Credit amounts present and numeric",!inv.length, short(inv) || "All amounts valid");
+    add("Trial_Balance","No negative amounts",!neg.length, short(neg) || "None");
+    add("Trial_Balance","No rows with both debit and credit",!both.length, short(both) || "None");
+    add("Trial_Balance","No duplicate account-year rows",!dup.length, dup.length ? short(dup) + " (first occurrence kept)" : "None");
+    add("Trial_Balance","Categories recognised",!badCat.length, short(badCat) || "All recognised");
+    const catBy = {}, incons = new Set();
+    for (const r of d.tb.values()){ if (catBy[r.code] && catBy[r.code] !== r.category) incons.add(r.code); catBy[r.code] = catBy[r.code] || r.category; }
+    add("Trial_Balance","One category per account code",!incons.size, short([...incons]) || "Consistent");
+    d.years = [...new Set([...d.tb.values()].map(r => r.year))].sort();
+    if (d.years.length){ d.cy = d.years[d.years.length-1]; d.py = d.cy - 1; }
+    const hasBoth = d.years.includes(d.py) && d.years.includes(d.cy);
+    add("Trial_Balance","Prior and current year present",hasBoth, `Years found: ${d.years.join(", ") || "none"}` + (hasBoth ? ` (PY ${d.py}, CY ${d.cy})` : ""));
+    for (const y of d.years){
+      const recs = [...d.tb.values()].filter(r => r.year === y);
+      if (recs.some(r => r.debit == null || r.credit == null)){ add("Trial_Balance",`FY${y} trial balance balances`,false,"Cannot confirm: blank or invalid amounts"); continue; }
+      const dr = recs.reduce((s,r)=>s+r.debit,0), cr = recs.reduce((s,r)=>s+r.credit,0), diff = Math.round((dr-cr)*100)/100;
+      add("Trial_Balance",`FY${y} trial balance balances`,Math.abs(diff) < TOL, `Debits ${fmtAED(dr,2)} | Credits ${fmtAED(cr,2)} | Difference ${fmtAED(diff,2)}`);
+    }
+  }
+  if (usable.Monthly_Sales){
+    const inv=[], neg=[], dup=[], badM=[], over=[];
+    usable.Monthly_Sales.rows.forEach((r,i) => {
+      const line = i+2, year = parseIntSafe(r.Year);
+      const raw = (r.Month||"").trim().slice(0,3); const m = raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase();
+      if (!MONTHS.includes(m) || year == null){ badM.push(`line ${line} '${r.Year}/${r.Month}'`); return; }
+      const [s,e1] = parseNumber(r.Sales), [c,e2] = parseNumber(r.Credit_Sales);
+      if (e1) inv.push(`line ${line} ${m}-${year} Sales ${e1}`);
+      if (e2) inv.push(`line ${line} ${m}-${year} Credit_Sales ${e2}`);
+      if ((s||0) < 0 || (c||0) < 0) neg.push(`line ${line} ${m}-${year}`);
+      if (s != null && c != null && c - s > TOL) over.push(`${m}-${year}`);
+      const key = year + "|" + m;
+      if (d.sales.has(key)){ dup.push(`line ${line} ${m}-${year}`); return; }
+      d.sales.set(key, {sales:s, credit:c});
+    });
+    add("Monthly_Sales","Valid year and month labels",!badM.length, short(badM) || "All valid");
+    add("Monthly_Sales","Sales amounts present and numeric",!inv.length, short(inv) || "All amounts valid");
+    add("Monthly_Sales","No negative amounts",!neg.length, short(neg) || "None");
+    add("Monthly_Sales","No duplicate year-month rows",!dup.length, dup.length ? short(dup) + " (first occurrence kept)" : "None");
+    add("Monthly_Sales","Credit sales do not exceed sales",!over.length, short(over) || "None");
+    const ys = [...new Set([...d.sales.keys()].map(k => +k.split("|")[0]))].sort();
+    for (const y of ys){
+      const missing = MONTHS.filter(m => !d.sales.has(y+"|"+m)), count = 12 - missing.length;
+      add("Monthly_Sales",`FY${y} has 12 months`,count === 12, `${count} months` + (missing.length ? `; missing ${missing.join(", ")}` : ""));
+    }
+  }
+  if (usable.Budget){
+    const inv=[], neg=[], dup=[], years=new Set();
+    usable.Budget.rows.forEach((r,i) => {
+      const line = i+2, y = parseIntSafe(r.Year), code = normCode(r.Account_Code), [v,e] = parseNumber(r.Budget_Amount);
+      if (y != null) years.add(y);
+      if (e) inv.push(`line ${line} ${code} ${e}`); else if (v < 0) neg.push(`line ${line} ${code}`);
+      if (d.budget.has(code)){ dup.push(`line ${line} ${code}`); return; }
+      d.budget.set(code, v);
+    });
+    d.budgetYear = years.size ? Math.max(...years) : null;
+    add("Budget","Budget amounts present and numeric",!inv.length, short(inv) || "All valid");
+    add("Budget","No negative budget amounts",!neg.length, short(neg) || "None");
+    add("Budget","No duplicate budget rows",!dup.length, dup.length ? short(dup) + " (first occurrence kept)" : "None");
+    add("Budget","Single budget year",years.size === 1, "Years: " + [...years].sort().join(", "));
+  }
+  d.thresholds = JSON.parse(JSON.stringify(DEFAULT_T));
+  if (!usable.Thresholds) add("Thresholds","Thresholds read from CSV",false,"Using built-in illustrative defaults (30% / 10 days / 50% / 25%)",true);
+  else {
+    const probs = [], seen = new Set();
+    usable.Thresholds.rows.forEach((r,i) => {
+      const rule = (r.Rule_ID||"").trim().toUpperCase();
+      if (!DEFAULT_T[rule]){ probs.push(`line ${i+2} unknown rule '${rule}'`); return; }
+      const [v,e] = parseNumber(r.Threshold), comp = (r.Comparison||"").trim();
+      if (e || v == null || v <= 0){ probs.push(`${rule} threshold ${e || "must be > 0"} (default kept)`); return; }
+      if (!OPS[comp]){ probs.push(`${rule} comparison '${comp}' invalid (default kept)`); return; }
+      seen.add(rule);
+      Object.assign(d.thresholds[rule], {Metric:r.Metric || d.thresholds[rule].Metric, Comparison:comp, Threshold:v, Unit:r.Unit || d.thresholds[rule].Unit, Rationale:r.Rationale || ""});
+    });
+    const miss = Object.keys(DEFAULT_T).filter(k => !seen.has(k));
+    if (miss.length) probs.push("missing rules " + miss.join(", ") + " (defaults used)");
+    add("Thresholds","Rules R01-R04 valid",!probs.length, short(probs) || "4 rules read", true);
+  }
+  if (d.tb.size && d.sales.size){
+    for (const y of d.years){
+      const rev = categoryTotal(d, y, "Revenue"), ms = MONTHS.map(m => (d.sales.get(y+"|"+m) || {}).sales);
+      if (rev == null || ms.some(v => v == null)){ add("Reconciliation",`FY${y} monthly sales = TB revenue`,false,"Cannot reconcile: missing or invalid amounts"); continue; }
+      const tot = ms.reduce((a,b)=>a+b,0), diff = Math.round((tot-rev)*100)/100;
+      add("Reconciliation",`FY${y} monthly sales = TB revenue`,Math.abs(diff) < TOL, `Monthly total ${fmtAED(tot,2)} | TB revenue ${fmtAED(rev,2)} | Difference ${fmtAED(diff,2)}`);
+    }
+  }
+  if (d.tb.size && d.budget.size){
+    const cy = d.budgetYear ?? d.cy;
+    const tbCodes = new Set([...d.tb.values()].filter(r => r.year === cy).map(r => r.code));
+    const noTb = [...d.budget.keys()].filter(c => !tbCodes.has(c)).sort();
+    add("Reconciliation","Every budget account exists in the TB",!noTb.length, short(noTb) || `All ${d.budget.size} budget accounts found in FY${cy}`);
+    const unb = [...d.tb.values()].filter(r => r.year === cy && PL.includes(r.category) && !d.budget.has(r.code)).map(r => r.code).sort();
+    add("Reconciliation","Every P&L account has a budget",!unb.length, short(unb) || "All P&L accounts budgeted");
+    add("Reconciliation","Budget year is the current year",cy === d.cy, `Budget FY${cy} | TB current year FY${d.cy}`);
+  }
+  d.hasFailures = d.checks.some(c => c.result === "FAIL");
+  return d;
+}
+
+// ---------------------------------------------------------------- calculations
+function signed(r){ if (!r || r.debit == null || r.credit == null) return null; return CREDIT_NORMAL.includes(r.category) ? r.credit - r.debit : r.debit - r.credit; }
+function categoryTotal(d, y, cat){
+  const recs = [...d.tb.values()].filter(r => r.year === y && r.category === cat);
+  if (!recs.length) return null; const vals = recs.map(signed);
+  return vals.some(v => v == null) ? null : vals.reduce((a,b)=>a+b,0);
+}
+function safeDiv(n, den){ if (n == null || den == null) return [null,"n/a - missing data"]; if (Math.abs(den) < 1e-9) return [null,"n/a - zero denominator"]; return [n/den,""]; }
+function pctChange(cur, pri){ const [v,n] = safeDiv(cur==null||pri==null ? null : cur-pri, pri==null ? null : Math.abs(pri)); return [v==null ? null : v*100, n]; }
+function ratios(d, y){
+  const rev = categoryTotal(d,y,"Revenue"), cos = categoryTotal(d,y,"Cost of Sales");
+  const gp = rev!=null && cos!=null ? rev-cos : null, ca = categoryTotal(d,y,"Current Assets"), cl = categoryTotal(d,y,"Current Liabilities");
+  const rec = signed(d.tb.get(y+"|1100")), cr = MONTHS.map(m => (d.sales.get(y+"|"+m)||{}).credit);
+  const cs = cr.some(v => v == null) ? null : cr.reduce((a,b)=>a+b,0);
+  const [gpm,gn] = safeDiv(gp,rev), [crt,cn] = safeDiv(ca,cl), [rd,rn] = safeDiv(rec,cs);
+  return {revenue:rev, cost_of_sales:cos, gross_profit:gp, gross_margin_pct: gpm==null?null:gpm*100, gross_margin_note:gn,
+    current_assets:ca, current_liabilities:cl, current_ratio:crt, current_ratio_note:cn,
+    trade_receivables:rec, credit_sales:cs, receivable_days: rd==null?null:rd*365, receivable_days_note:rn};
+}
+const cmp = (rule, v, T) => v != null && OPS[T[rule].Comparison](v, T[rule].Threshold);
+const tText = (rule, T) => `${T[rule].Comparison} ${T[rule].Threshold}${T[rule].Unit === "%" ? "%" : " " + T[rule].Unit}`;
+
+function analyse(d, T){
+  const a = {py:d.py, cy:d.cy, ratios:{}, annual:[], budget:[], monthly:[], flags:[]};
+  if (d.cy == null) return a;
+  const py = d.py, cy = d.cy;
+  a.ratios[py] = ratios(d,py); a.ratios[cy] = ratios(d,cy);
+  const codes = [...new Set([...d.tb.values()].filter(r => r.year===py || r.year===cy).map(r => r.code))].sort((x,y)=>x.length-y.length || x.localeCompare(y));
+  for (const code of codes){
+    const c = d.tb.get(cy+"|"+code), p = d.tb.get(py+"|"+code), r = c || p;
+    const cur = c ? signed(c) : null, pri = p ? signed(p) : null;
+    let [pct, note] = pctChange(cur, pri);
+    if (!c || !p) note = "n/a - account missing in FY" + (!c ? cy : py);
+    a.annual.push({code, name:r.name, category:r.category, py:pri, cy:cur, change: cur!=null&&pri!=null ? cur-pri : null, pct, note});
+  }
+  for (const [code, bud] of [...d.budget.entries()].sort()){
+    const r = d.tb.get(cy+"|"+code), act = r ? signed(r) : null, v = act!=null&&bud!=null ? act-bud : null;
+    let [pct, note] = pctChange(act, bud); if (!r) note = "n/a - no TB account";
+    const cat = r ? r.category : "";
+    const dir = v==null || Math.abs(v) < TOL ? "-" : cat === "Revenue" ? (v>0?"Favourable":"Adverse") : (v>0?"Adverse":"Favourable");
+    a.budget.push({code, name: r ? r.name : "(not in TB)", category:cat, actual:act, budget:bud, variance:v, pct, note, direction:dir});
+  }
+  for (const m of MONTHS){
+    const cur = (d.sales.get(cy+"|"+m)||{}).sales ?? null, pri = (d.sales.get(py+"|"+m)||{}).sales ?? null;
+    const [pct, note] = pctChange(cur, pri);
+    a.monthly.push({month:m, py:pri, cy:cur, change: cur!=null&&pri!=null ? cur-pri : null, pct, note, flag: cmp("R01",pct,T)});
+  }
+  // flags
+  const rp = a.ratios[py], rc = a.ratios[cy], f = a.flags, r2 = x => Math.round(x*100)/100;
+  for (const m of a.monthly) if (m.flag) f.push({id:`R01-${cy}-${m.month}`, rule:"R01", area:"Revenue - monthly sales",
+    title:`${m.month} ${cy} sales up ${fmtPct(m.pct)} on ${m.month} ${py}`,
+    description:`${m.month} ${cy} sales AED ${fmtAED(m.cy)} vs ${m.month} ${py} AED ${fmtAED(m.py)}: change AED ${fmtAED(m.change)} (${fmtPct(m.pct)}). Threshold ${tText("R01",T)}.`,
+    figures:{"Month":m.month, [`Sales FY${cy} (AED)`]:m.cy, [`Sales FY${py} (AED)`]:m.py, "Change (AED)":m.change, "Change (%)":r2(m.pct), [`Annual sales FY${cy} (AED)`]:rc.revenue, [`Annual sales FY${py} (AED)`]:rp.revenue}});
+  if (rp.receivable_days != null && rc.receivable_days != null){
+    const dl = rc.receivable_days - rp.receivable_days;
+    if (cmp("R02", dl, T)) f.push({id:`R02-${cy}`, rule:"R02", area:"Trade receivables", title:`Receivable days up ${dl>=0?"+":""}${dl.toFixed(1)} days`,
+      description:`Receivable days FY${cy} ${rc.receivable_days.toFixed(1)} vs FY${py} ${rp.receivable_days.toFixed(1)}: change ${dl>=0?"+":""}${dl.toFixed(1)} days. Threshold ${tText("R02",T)}. ${VAT_NOTE}`,
+      figures:{[`Trade receivables FY${cy} (AED)`]:rc.trade_receivables, [`Trade receivables FY${py} (AED)`]:rp.trade_receivables, [`Credit sales FY${cy} (AED)`]:rc.credit_sales, [`Credit sales FY${py} (AED)`]:rp.credit_sales,
+        [`Receivable days FY${cy}`]:Math.round(rc.receivable_days*10)/10, [`Receivable days FY${py}`]:Math.round(rp.receivable_days*10)/10, "Change (days)":Math.round(dl*10)/10,
+        "VAT basis":"Receivables include 5% VAT; credit sales exclude VAT (same basis both years)"}});
+  }
+  for (const r of a.annual) if (r.category === "Operating Expenses" && cmp("R03", r.pct, T)) f.push({id:`R03-${cy}-${r.code}`, rule:"R03", area:`${r.code} ${r.name}`,
+    title:`${r.name} up ${fmtPct(r.pct)} on FY${py}`,
+    description:`${r.code} ${r.name} FY${cy} AED ${fmtAED(r.cy)} vs FY${py} AED ${fmtAED(r.py)}: change AED ${fmtAED(r.change)} (${fmtPct(r.pct)}). Threshold ${tText("R03",T)}.`,
+    figures:{"Account":`${r.code} ${r.name}`, [`FY${cy} (AED)`]:r.cy, [`FY${py} (AED)`]:r.py, "Change (AED)":r.change, "Change (%)":r2(r.pct)}});
+  for (const r of a.budget) if (r.category === "Operating Expenses" && cmp("R04", r.pct, T)) f.push({id:`R04-${cy}-${r.code}`, rule:"R04", area:`${r.code} ${r.name}`,
+    title:`${r.name} ${fmtPct(r.pct)} over FY${cy} budget`,
+    description:`${r.code} ${r.name} FY${cy} actual AED ${fmtAED(r.actual)} vs budget AED ${fmtAED(r.budget)}: variance AED ${fmtAED(r.variance)} (${fmtPct(r.pct)}). Threshold ${tText("R04",T)}.`,
+    figures:{"Account":`${r.code} ${r.name}`, [`Actual FY${cy} (AED)`]:r.actual, [`Budget FY${cy} (AED)`]:r.budget, "Variance (AED)":r.variance, "Variance (%)":r2(r.pct)}});
+  return a;
+}
+
+// ---------------------------------------------------------------- workspace
+const STORE_KEY = "analytical_review_prabhdeep_v1";
+let ws = {label:DEMO_LABEL, version:1, threshold_overrides:{}, findings:{}, final_notes:""};
+let tables = {Trial_Balance:null, Monthly_Sales:null, Budget:null, Thresholds:null};
+let data = null, analysis = null, T = JSON.parse(JSON.stringify(DEFAULT_T));
+const selected = {};
+let storageOK = true;
+
+function loadStore(){
+  try { const raw = localStorage.getItem(STORE_KEY); if (raw) ws = Object.assign(ws, JSON.parse(raw)); }
+  catch(e){ storageOK = false; }
+}
+function persist(){
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(ws)); }
+  catch(e){ if (storageOK){ storageOK = false; alert("This browser is not saving data (private mode or storage blocked). Use 'Export workspace' to keep your work."); } }
+}
+function blankFinding(id, rule, area, title, description, figures, auto=true){
+  return {id, rule, area, title, description, figures: figures || {}, auto, flag_active:true, stage:"Preliminary", carried_from:"", status:"Open",
+    management_response:"", evidence_ref:"", reviewer_notes:"", ai_draft:"", ai_reviewed:false, created:nowText(), updated:nowText(), history:[`${nowText()} Created at Preliminary`]};
+}
+function mergeFlags(flags){
+  const active = new Set();
+  for (const fl of flags){
+    active.add(fl.id); const ex = ws.findings[fl.id];
+    if (ex){ if (ex.flag_active === false) ex.history.push(`${nowText()} Flag triggered again`);
+      Object.assign(ex, {rule:fl.rule, area:fl.area, title:fl.title, description:fl.description, figures:fl.figures, flag_active:true}); }
+    else ws.findings[fl.id] = blankFinding(fl.id, fl.rule, fl.area, fl.title, fl.description, fl.figures);
+  }
+  for (const [id,f] of Object.entries(ws.findings)) if (f.auto && !active.has(id) && f.flag_active !== false){ f.flag_active = false; f.history.push(`${nowText()} No longer flagged at current thresholds`); }
+}
+const unresolved = f => f.status !== "Resolved";
+
+// ---------------------------------------------------------------- UI: navigation
+const TABS = [["data","1 Data & Validation"],["thresholds","2 Thresholds"],["analytics","3 Analytics"],["Preliminary","4 Preliminary review"],["Substantive/Interim","5 Substantive / Interim"],["Final","6 Final review"],["help","Help & limitations"]];
+function showTab(id){
+  document.querySelectorAll("nav button").forEach(b => b.classList.toggle("active", b.dataset.tab === id));
+  document.querySelectorAll("main > section").forEach(s => s.classList.toggle("active", s.id === "tab-" + id));
+  // only one review editor exists at a time, so its field ids stay unique
+  STAGES.filter(s => s !== id).forEach(s => $("tab-" + s).innerHTML = "");
+  if (STAGES.includes(id)) renderReview(id);
+  if (id === "analytics") drawChart();
+}
+$("nav").innerHTML = TABS.map(([id,l]) => `<button data-tab="${id}">${l}</button>`).join("");
+$("nav").addEventListener("click", e => { if (e.target.dataset.tab) showTab(e.target.dataset.tab); });
+const SUBS = [["ratios","Ratios"],["annual","Annual variances"],["budget","Actual vs budget"],["monthly","Monthly sales chart"]];
+$("subnav").innerHTML = SUBS.map(([id,l],i) => `<button data-sub="${id}" class="${i?"":"active"}">${l}</button>`).join("");
+$("subnav").addEventListener("click", e => { const s = e.target.dataset.sub; if (!s) return;
+  document.querySelectorAll("#subnav button").forEach(b => b.classList.toggle("active", b.dataset.sub === s));
+  document.querySelectorAll(".sub").forEach(x => x.classList.toggle("active", x.id === "sub-" + s));
+  if (s === "monthly") drawChart(); });
+
+// ---------------------------------------------------------------- UI: data tab
+$("uploads").innerHTML = Object.keys(SCHEMAS).map(n => `<b>${n}.csv</b><input type="file" accept=".csv" data-name="${n}"><span class="st" id="st-${n}">Not loaded</span>`).join("");
+$("uploads").addEventListener("change", e => { const n = e.target.dataset.name; if (n && e.target.files[0]) readFile(n, e.target.files[0]); });
+function setTable(name, text, label){
+  try { tables[name] = parseCSV(text); $("st-"+name).textContent = `${label} (${tables[name].rows.length} rows)`; $("st-"+name).style.color = "#047857"; }
+  catch(e){ tables[name] = null; $("st-"+name).textContent = "Could not read: " + e.message; $("st-"+name).style.color = "#b91c1c"; }
+}
+function readFile(name, file){ const r = new FileReader(); r.onload = () => setTable(name, r.result, file.name); r.readAsText(file); }
+function loadMany(files){
+  let pending = 0;
+  for (const file of files){
+    const stem = file.name.replace(/\.csv$/i,"").toLowerCase();
+    const name = Object.keys(SCHEMAS).find(n => stem === n.toLowerCase()) || Object.keys(SCHEMAS).find(n => stem.includes(n.toLowerCase()));
+    if (!name) continue; pending++;
+    const r = new FileReader(); r.onload = () => { setTable(name, r.result, file.name); if (--pending === 0) runAll(); }; r.readAsText(file);
+  }
+}
+function loadSample(){ for (const n of Object.keys(SAMPLE)) setTable(n, SAMPLE[n], "Embedded sample (fictional)"); runAll(); }
+
+function effectiveThresholds(){
+  const base = JSON.parse(JSON.stringify(data ? data.thresholds : DEFAULT_T));
+  for (const [rule, o] of Object.entries(ws.threshold_overrides || {})) if (base[rule]) Object.assign(base[rule], o, {Source:"User override"});
+  return base;
+}
+function runAll(){
+  data = buildData(tables); T = effectiveThresholds(); analysis = analyse(data, T);
+  renderValidation(); renderThresholds(); renderAnalytics();
+  if (analysis.cy != null && !data.hasFailures) mergeFlags(analysis.flags);
+  persist();
+}
+function renderValidation(){
+  const c = {PASS:0, FAIL:0, WARN:0}; data.checks.forEach(x => c[x.result]++);
+  $("validation").innerHTML = "<tr><th>Result</th><th>Area</th><th>Check</th><th>Detail</th></tr>" +
+    data.checks.map(x => `<tr><td class="res ${x.result}">${x.result}</td><td>${esc(x.area)}</td><td>${esc(x.check)}</td><td>${esc(x.detail)}</td></tr>`).join("");
+  const b = $("banner");
+  if (c.FAIL){ b.className = "intro bad"; b.textContent = `${c.FAIL} check(s) FAILED, ${c.WARN} warning(s). Figures are NOT verified: findings were not updated and AI prompts are disabled until the data is corrected. Calculations that depend on missing values show 'n/a'.`; }
+  else { b.className = "intro ok"; b.textContent = `All ${c.PASS} checks passed (${c.WARN} warning(s)). Figures verified for analysis. ${DEMO_LABEL}. ${analysis.flags.length} flag(s) at current thresholds.`; }
+}
+
+// ---------------------------------------------------------------- UI: thresholds
+function renderThresholds(){
+  const csvT = data ? data.thresholds : DEFAULT_T;
+  $("thresholds").innerHTML = "<tr><th>Rule</th><th>Metric</th><th>Comparison</th><th>Threshold</th><th>Unit</th><th>Source</th><th>Rationale</th></tr>" +
+    Object.keys(T).sort().map(r => { const t = T[r], src = t.Source || (tables.Thresholds ? "Thresholds.csv" : "Built-in default");
+      return `<tr><td><b>${r}</b></td><td>${esc(t.Metric)}</td><td><select id="cmp-${r}">${Object.keys(OPS).map(o => `<option${o===t.Comparison?" selected":""}>${esc(o)}</option>`).join("")}</select></td>
+      <td><input type="number" step="0.01" min="0.01" id="thr-${r}" value="${t.Threshold}"></td><td>${esc(t.Unit)}</td>
+      <td style="background:${src==="User override"?"#fde68a":"#dbeafe"}">${src}</td><td class="small">${esc(t.Rationale || (csvT[r]||{}).Rationale || "")}</td></tr>`; }).join("");
+}
+function applyThresholds(){
+  const csvT = data ? data.thresholds : DEFAULT_T, o = {};
+  for (const r of Object.keys(T)){
+    const comp = $("cmp-"+r).value, v = Number($("thr-"+r).value);
+    if (!(v > 0)){ alert(`${r}: threshold must be a number greater than 0.`); return; }
+    if (comp !== csvT[r].Comparison || Math.abs(v - csvT[r].Threshold) > 1e-9) o[r] = {Comparison:comp, Threshold:v};
+  }
+  ws.threshold_overrides = o; runAll();
+}
+function resetThresholds(){ ws.threshold_overrides = {}; runAll(); }
+
+// ---------------------------------------------------------------- UI: analytics
+function renderAnalytics(){
+  const a = analysis; if (a.cy == null){ $("cards").innerHTML = ""; return; }
+  const py = a.py, cy = a.cy, rp = a.ratios[py], rc = a.ratios[cy];
+  const dlt = (c,p,f) => c!=null && p!=null ? f(c-p) : "n/a";
+  const r02 = a.flags.some(f => f.rule === "R02");
+  $("cards").innerHTML = [
+    ["c1","Revenue (AED)", fmtAED(rc.revenue), `FY${py}: ${fmtAED(rp.revenue)}`],
+    ["c2","Gross profit margin", rc.gross_margin_pct!=null ? fmtPct(rc.gross_margin_pct,1,false) : rc.gross_margin_note, `FY${py}: ${fmtPct(rp.gross_margin_pct,1,false)} | change ${dlt(rc.gross_margin_pct,rp.gross_margin_pct,v=>(v>=0?"+":"")+v.toFixed(1)+" pts")}`],
+    ["c3","Current ratio", rc.current_ratio!=null ? rc.current_ratio.toFixed(2)+"x" : rc.current_ratio_note, `FY${py}: ${fmtNum(rp.current_ratio)}x | change ${dlt(rc.current_ratio,rp.current_ratio,v=>(v>=0?"+":"")+v.toFixed(2))}`],
+    ["c4","Receivable days", rc.receivable_days!=null ? rc.receivable_days.toFixed(1)+" days" : rc.receivable_days_note, `FY${py}: ${fmtNum(rp.receivable_days,1)} | change ${dlt(rc.receivable_days,rp.receivable_days,v=>(v>=0?"+":"")+v.toFixed(1)+" days")}${r02?" | FLAGGED (R02)":""}`],
+  ].map(([c,t,v,s]) => `<div class="card ${c}"><div class="t">${t}</div><div class="v">${esc(v)}</div><div class="s">${esc(s)}</div></div>`).join("");
+  const M = [["Revenue (AED)","revenue",fmtAED,""],["Cost of sales (AED)","cost_of_sales",fmtAED,""],["Gross profit (AED)","gross_profit",fmtAED,""],
+    ["Gross profit margin %","gross_margin_pct",v=>fmtPct(v,1,false),"gross_margin_note"],["Current assets (AED)","current_assets",fmtAED,""],
+    ["Current liabilities (AED)","current_liabilities",fmtAED,""],["Current ratio (x)","current_ratio",v=>fmtNum(v),"current_ratio_note"],
+    ["Trade receivables 1100 (AED, incl. VAT)","trade_receivables",fmtAED,""],["Annual credit sales (AED, excl. VAT)","credit_sales",fmtAED,""],
+    ["Receivable days","receivable_days",v=>fmtNum(v,1),"receivable_days_note"]];
+  $("ratios").innerHTML = `<tr><th>Measure</th><th>FY${py}</th><th>FY${cy}</th><th>Change</th><th>Note</th></tr>` + M.map(([l,k,f,n]) => {
+    const p = rp[k], c = rc[k], ch = p!=null&&c!=null ? c-p : null, notes = [...new Set([n?rp[n]:"", n?rc[n]:""].filter(Boolean))].join("; ");
+    return `<tr><td><b>${l}</b></td><td class="num">${p!=null?f(p):"n/a"}</td><td class="num">${c!=null?f(c):"n/a"}</td><td class="num">${ch!=null?f(ch):"n/a"}</td><td>${esc(notes)}</td></tr>`; }).join("");
+  $("vatnote").textContent = VAT_NOTE;
+  const ids = new Set(a.flags.map(f => f.id));
+  $("annual").innerHTML = `<tr><th>Code</th><th>Account</th><th>Category</th><th>FY${py}</th><th>FY${cy}</th><th>Change (AED)</th><th>Change %</th><th>Flag / note</th></tr>` +
+    a.annual.map(r => { const fl = ids.has(`R03-${cy}-${r.code}`);
+      return `<tr class="${fl?"flag":""}"><td>${r.code}</td><td>${esc(r.name)}</td><td>${esc(r.category)}</td><td class="num">${fmtAED(r.py)}</td><td class="num">${fmtAED(r.cy)}</td><td class="num">${fmtAED(r.change)}</td><td class="num">${fmtPct(r.pct)}</td><td>${fl ? "FLAG R03 ("+tText("R03",T)+")" : esc(r.note)}</td></tr>`; }).join("");
+  $("budget").innerHTML = `<tr><th>Code</th><th>Account</th><th>Category</th><th>Actual FY${cy}</th><th>Budget FY${cy}</th><th>Variance (AED)</th><th>Variance %</th><th>Direction</th><th>Flag / note</th></tr>` +
+    a.budget.map(r => { const fl = ids.has(`R04-${cy}-${r.code}`), col = r.direction==="Favourable" ? "#047857" : r.direction==="Adverse" ? "#b91c1c" : "inherit";
+      return `<tr class="${fl?"flag":""}"><td>${r.code}</td><td>${esc(r.name)}</td><td>${esc(r.category)}</td><td class="num">${fmtAED(r.actual)}</td><td class="num">${fmtAED(r.budget)}</td><td class="num">${fmtAED(r.variance)}</td><td class="num">${fmtPct(r.pct)}</td><td style="color:${col};font-weight:700">${r.direction}</td><td>${fl ? "FLAG R04 ("+tText("R04",T)+")" : esc(r.note)}</td></tr>`; }).join("");
+  $("monthly").innerHTML = `<tr><th>Month</th><th>FY${py}</th><th>FY${cy}</th><th>Change (AED)</th><th>Change %</th><th>Flag / note</th></tr>` +
+    a.monthly.map(m => `<tr class="${m.flag?"flag":""}"><td>${m.month}</td><td class="num">${fmtAED(m.py)}</td><td class="num">${fmtAED(m.cy)}</td><td class="num">${fmtAED(m.change)}</td><td class="num">${fmtPct(m.pct)}</td><td>${m.flag ? "FLAG R01 ("+tText("R01",T)+")" : esc(m.note)}</td></tr>`).join("");
+  drawChart();
+}
+
+function drawChart(){
+  const cv = $("chart"); if (!analysis || analysis.cy == null || !cv.offsetWidth) return;
+  const dpr = window.devicePixelRatio || 1, W = cv.offsetWidth, H = cv.offsetHeight;
+  cv.width = W*dpr; cv.height = H*dpr; const g = cv.getContext("2d"); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,W,H);
+  const m = analysis.monthly, L = 90, R = 60, Tp = 46, B = 40, pw = W-L-R, ph = H-Tp-B;
+  const maxV = Math.max(1, ...m.map(x => Math.max(x.py||0, x.cy||0))) * 1.12;
+  const pcts = m.map(x => x.pct).filter(v => v != null), thr = T.R01.Threshold;
+  const pMax = Math.max(thr, ...pcts, 0) * 1.25 + 5, pMin = Math.min(0, ...pcts) * 1.25;
+  const y = v => Tp + ph - v/maxV*ph, y2 = v => Tp + ph - (v-pMin)/(pMax-pMin)*ph, slot = pw/12, bw = slot*0.36;
+  g.font = "11px Segoe UI, sans-serif"; g.strokeStyle = "#e5e7eb"; g.fillStyle = "#64748b"; g.textAlign = "right";
+  for (let i=0;i<=5;i++){ const v = maxV/5*i, yy = y(v); g.beginPath(); g.moveTo(L,yy); g.lineTo(L+pw,yy); g.stroke(); g.fillText(Math.round(v).toLocaleString("en-US"), L-6, yy+4); }
+  g.textAlign = "left"; for (let i=0;i<=4;i++){ const v = pMin + (pMax-pMin)/4*i; g.fillText(v.toFixed(0)+"%", L+pw+6, y2(v)+4); }
+  m.forEach((x,i) => { const cx = L + slot*i + slot/2;
+    g.fillStyle = "#38bdf8"; g.fillRect(cx-bw, y(x.py||0), bw, Tp+ph-y(x.py||0));
+    g.fillStyle = x.flag ? "#ef4444" : "#7c3aed"; g.fillRect(cx, y(x.cy||0), bw, Tp+ph-y(x.cy||0));
+    g.fillStyle = "#1e1b4b"; g.textAlign = "center"; g.fillText(x.month, cx, Tp+ph+16); });
+  g.strokeStyle = "#dc2626"; g.setLineDash([6,4]); g.beginPath(); g.moveTo(L, y2(thr)); g.lineTo(L+pw, y2(thr)); g.stroke(); g.setLineDash([]);
+  g.strokeStyle = "#f59e0b"; g.lineWidth = 2; g.beginPath(); let started = false;
+  m.forEach((x,i) => { if (x.pct == null){ started = false; return; } const px = L+slot*i+slot/2, py = y2(x.pct); started ? g.lineTo(px,py) : g.moveTo(px,py); started = true; }); g.stroke(); g.lineWidth = 1;
+  m.forEach((x,i) => { if (x.pct == null) return; const px = L+slot*i+slot/2, py = y2(x.pct);
+    g.fillStyle = "#f59e0b"; g.beginPath(); g.arc(px,py,4,0,7); g.fill();
+    if (x.flag){ g.fillStyle = "#b91c1c"; g.font = "bold 12px Segoe UI, sans-serif"; g.textAlign = "center"; g.fillText(fmtPct(x.pct), px, py-9); g.font = "11px Segoe UI, sans-serif"; } });
+  g.fillStyle = "#312e81"; g.font = "bold 14px Segoe UI, sans-serif"; g.textAlign = "left";
+  g.fillText(`Monthly sales FY${analysis.py} vs FY${analysis.cy} (red = flagged)`, L, 18);
+  g.font = "11px Segoe UI, sans-serif";
+  const leg = [["#38bdf8",`FY${analysis.py}`],["#7c3aed",`FY${analysis.cy}`],["#ef4444","Flagged month"],["#f59e0b","Growth % vs PY (right axis)"],["#dc2626",`R01 threshold ${tText("R01",T)}`]];
+  let lx = L; leg.forEach(([c,t]) => { g.fillStyle = c; g.fillRect(lx, 28, 10, 10); g.fillStyle = "#334155"; g.fillText(t, lx+14, 37); lx += g.measureText(t).width + 30; });
+  g.fillStyle = "#9ca3af"; g.textAlign = "right"; g.fillText(DEMO_LABEL + " | AED, unscaled", W-6, H-6);
+}
+window.addEventListener("resize", () => drawChart());
+
+// ---------------------------------------------------------------- UI: review stages
+const INTRO = {
+  "Preliminary":"Preliminary analytical review: flags generated from the thresholds appear here. Record initial notes, then move each finding to Substantive/Interim.",
+  "Substantive/Interim":"Substantive / interim work: record management responses, evidence references and reviewer notes, and update the status as evidence is obtained.",
+  "Final":"Final review: findings moved to Final plus every UNRESOLVED finding from earlier stages (carried forward automatically). Use 'Carry forward unresolved' to log the move formally."
+};
+function visible(stage){
+  return Object.values(ws.findings).filter(f => stage === "Final" ? (f.stage === "Final" || unresolved(f)) : f.stage === stage).sort((a,b) => a.id.localeCompare(b.id));
+}
+function renderReview(stage){
+  const sec = $("tab-" + stage), rows = visible(stage), un = rows.filter(unresolved).length;
+  let f = ws.findings[selected[stage]]; if (f && !rows.includes(f)) f = null;
+  const next = stage !== "Final" ? STAGES[STAGES.indexOf(stage)+1] : null;
+  const pill = s => `<span class="pill ${s==="Open"?"s-Open":s==="Resolved"?"s-Resolved":"s-other"}">${esc(s)}</span>`;
+  sec.innerHTML = `<div class="intro">${INTRO[stage]}</div>
+    <div><span class="summary">${rows.length} finding(s) | ${un} unresolved</span>
+      ${stage==="Preliminary" ? '<button class="btn teal" onclick="addManual()">+ Add manual finding</button>' : ""}
+      ${stage==="Final" ? '<button class="btn pink" onclick="carryForward()">Carry forward unresolved</button>' : ""}
+      <button class="btn green" onclick="exportFindings()">Export findings register (CSV)</button></div>
+    <div class="review"><div class="tablewrap list"><table><tr><th>ID</th><th>Title</th><th>Status</th><th>Stage</th><th>Carried from</th><th>Flag</th></tr>
+      ${rows.map(x => { const car = stage==="Final" && x.stage!=="Final" ? `Pending (${x.stage})` : (x.carried_from||"");
+        return `<tr data-id="${esc(x.id)}" class="${f && f.id===x.id ? "sel" : ""}"><td><b>${esc(x.id)}</b></td><td>${esc(x.title)}</td><td>${pill(x.status)}</td><td>${esc(x.stage)}</td><td style="${car?"background:#fce7f3":""}">${esc(car)}</td><td style="color:${x.flag_active!==false?"#b91c1c":"#64748b"}">${x.flag_active!==false?"Active":"Below threshold"}</td></tr>`; }).join("") || '<tr><td colspan="6" class="small">No findings at this stage. Run the analysis on the Data tab.</td></tr>'}
+    </table></div>
+    <div class="editor">${f ? `
+      <h3 style="margin:4px 0;color:#312e81">${esc(f.id)} - ${esc(f.title)}</h3>
+      <label>Verified analytical figures</label><textarea class="ro" readonly>${esc(f.description + (f.flag_active===false ? "\n[No longer flagged at the current thresholds - figures shown are from the last flag.]" : ""))}</textarea>
+      <label>Status</label><select id="e-status">${STATUSES.map(s => `<option${s===f.status?" selected":""}>${esc(s)}</option>`).join("")}</select>
+      <label>Evidence reference</label><input id="e-evidence" value="${esc(f.evidence_ref)}" placeholder="e.g. WP C3.2, invoice INV-0912">
+      <label>Management response</label><textarea id="e-mgmt" placeholder="Management's explanation, as received">${esc(f.management_response)}</textarea>
+      <label>Reviewer notes</label><textarea id="e-notes" placeholder="Procedures performed, conclusion on this finding">${esc(f.reviewer_notes)}</textarea>
+      <fieldset><legend>Draft explanation assistant (optional)</legend>
+        <div class="ai-banner">${AI_LABEL} | Possible explanations are UNVERIFIED and require auditor review. They are not audit evidence.</div>
+        <textarea id="e-ai" style="min-height:120px" placeholder="Paste the AI assistant's reply here, or insert standard prompts.">${esc(f.ai_draft)}</textarea>
+        <button class="btn orange" onclick="copyPrompt('${stage}')">Copy AI prompt (verified figures only)</button>
+        <button class="btn teal" onclick="insertStd('${stage}')">Insert standard inquiry prompts (no AI)</button>
+        <label style="font-weight:400"><input type="checkbox" id="e-reviewed" style="width:auto" ${f.ai_reviewed?"checked":""}> I have reviewed this draft; it is unverified and not audit evidence</label>
+      </fieldset>
+      <button class="btn green" onclick="saveFinding('${stage}')">Save finding</button>
+      ${next ? `<button class="btn" onclick="moveNext('${stage}')">Save and move to ${next}</button>` : ""}
+      <label>History</label><textarea class="ro small" readonly>${esc((f.history||[]).join("\n"))}</textarea>`
+      : '<p class="small">Select a finding from the list.</p>'}
+      ${stage==="Final" ? `<fieldset><legend>Overall final review notes</legend><textarea id="final-notes" placeholder="Summary of the final analytical review (no audit opinion)">${esc(ws.final_notes||"")}</textarea>
+        <button class="btn green" onclick="saveFinal()">Save final notes</button></fieldset>` : ""}
+    </div></div>`;
+  sec.querySelectorAll("tr[data-id]").forEach(tr => tr.onclick = () => { selected[stage] = tr.dataset.id; renderReview(stage); });
+}
+function saveFinding(stage, quiet){
+  const f = ws.findings[selected[stage]]; if (!f) return;
+  const old = f.status, ai = $("e-ai").value.trim();
+  Object.assign(f, {status:$("e-status").value, evidence_ref:$("e-evidence").value.trim(), management_response:$("e-mgmt").value.trim(),
+    reviewer_notes:$("e-notes").value.trim(), ai_draft:ai, ai_reviewed: !!ai && $("e-reviewed").checked, updated:nowText()});
+  if (old !== f.status) f.history.push(`${nowText()} Status '${old}' -> '${f.status}' (${stage} tab)`);
+  persist(); if (!quiet) renderReview(stage);
+}
+function moveNext(stage){
+  const f = ws.findings[selected[stage]]; if (!f) return; saveFinding(stage, true);
+  const nxt = STAGES[STAGES.indexOf(f.stage)+1] || "Final";
+  f.history.push(`${nowText()} Moved from ${f.stage} to ${nxt}`); f.stage = nxt; selected[stage] = null; persist(); renderReview(stage);
+}
+function addManual(){
+  const title = prompt("Manual finding - short title:"); if (!title || !title.trim()) return;
+  const desc = prompt("Description:") || "";
+  const n = 1 + Object.keys(ws.findings).filter(k => k.startsWith("M-")).length, id = "M-" + String(n).padStart(3,"0");
+  ws.findings[id] = blankFinding(id, "Manual", "Manual", title.trim(), desc.trim(), {}, false); selected.Preliminary = id; persist(); renderReview("Preliminary");
+}
+function carryForward(){
+  let moved = 0;
+  for (const f of Object.values(ws.findings)) if (unresolved(f) && f.stage !== "Final"){
+    f.carried_from = f.stage; f.history.push(`${nowText()} Carried forward from ${f.stage} to Final (unresolved)`); f.stage = "Final"; f.updated = nowText(); moved++; }
+  persist(); renderReview("Final"); alert(`${moved} unresolved finding(s) carried into Final review.`);
+}
+function saveFinal(){ ws.final_notes = $("final-notes").value.trim(); persist(); }
+function insertStd(stage){
+  const f = ws.findings[selected[stage]]; if (!f) return; const steps = STD[f.rule];
+  const text = steps ? "[Standard inquiry prompts - not AI generated. Auditor judgement required.]\n" + steps.map(s => "- " + s).join("\n") : "[No standard prompts for manual findings.]";
+  const box = $("e-ai"); box.value = (box.value.trim() ? box.value.trim() + "\n\n" : "") + text;
+}
+function copyPrompt(stage){
+  const f = ws.findings[selected[stage]]; if (!f) return;
+  if (!data || data.hasFailures || f.flag_active === false || !Object.keys(f.figures||{}).length){
+    alert("AI prompt not available: figures are not verified (validation failures, flag no longer active, or a manual finding)."); return; }
+  const lines = [`Flag: ${f.title}`, `Rule: ${f.rule}`, `Area: ${f.area}`, "Verified figures (AED unless stated):"];
+  for (const [k,v] of Object.entries(f.figures)) lines.push(`- ${k}: ${typeof v === "number" ? fmtAED(v, Number.isInteger(v)?0:2) : v}`);
+  lines.push("Company context: fictional UAE general trader, calendar financial year, all invoices on 45-day credit terms.");
+  const text = `${AI_SYSTEM}\n\n---\n${lines.join("\n")}`;
+  const done = () => { const box = $("e-ai"); if (!box.value.trim()) box.value = `[${AI_LABEL}]\n[${UNVERIFIED}]\n[Paste the assistant's reply below]\n\n`;
+    alert("Prompt copied. Paste it into your organisation's approved AI assistant, then paste the reply into the draft box. The draft stays labelled 'Draft—Subject to Auditor Review'."); };
+  if (navigator.clipboard && window.isSecureContext !== false) navigator.clipboard.writeText(text).then(done, () => fallbackCopy(text, done));
+  else fallbackCopy(text, done);
+}
+function fallbackCopy(text, done){ const t = document.createElement("textarea"); t.value = text; document.body.appendChild(t); t.select();
+  try { document.execCommand("copy"); done(); } catch(e){ prompt("Copy this prompt:", text); } t.remove(); }
+
+// ---------------------------------------------------------------- export / import
+function download(name, text, type){ const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([text], {type})); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); }
+function exportFindings(){
+  const list = Object.values(ws.findings).sort((a,b) => a.id.localeCompare(b.id));
+  if (!list.length){ alert("There are no findings to export yet."); return; }
+  const cols = ["Data_Label","Finding_ID","Rule","Area","Title","Description","Stage","Carried_From","Status","Unresolved","Flag_Active_At_Current_Thresholds","Management_Response","Evidence_Reference","Reviewer_Notes","AI_Draft_Label","AI_Draft","AI_Draft_Reviewed_By_Auditor","Created","Updated","History"];
+  const q = v => { const s = String(v ?? ""); return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s; };
+  const rows = list.map(f => [DEMO_LABEL, f.id, f.rule, f.area, f.title, f.description, f.stage, f.carried_from||"", f.status, unresolved(f)?"Yes":"No", f.flag_active!==false?"Yes":"No",
+    f.management_response, f.evidence_ref, f.reviewer_notes, f.ai_draft ? AI_LABEL : "", f.ai_draft, f.ai_reviewed?"Yes":"No", f.created, f.updated, (f.history||[]).join(" | ")].map(q).join(","));
+  download("findings_register.csv", "﻿" + [cols.join(","), ...rows].join("\r\n"), "text/csv;charset=utf-8");
+}
+function exportWorkspace(){ download("review_workspace.json", JSON.stringify(ws, null, 2), "application/json"); }
+function importWorkspace(input){
+  const file = input.files[0]; if (!file) return; const r = new FileReader();
+  r.onload = () => { try { const w = JSON.parse(r.result); if (!w || typeof w.findings !== "object") throw new Error("not a workspace file");
+      if (!confirm("Replace the findings in this browser with the imported workspace?")) return;
+      ws = Object.assign({label:DEMO_LABEL, version:1, threshold_overrides:{}, findings:{}, final_notes:""}, w); persist();
+      if (data) runAll(); alert(`Imported ${Object.keys(ws.findings).length} finding(s).`); }
+    catch(e){ alert("Could not import: " + e.message); } input.value = ""; };
+  r.readAsText(file);
+}
+
+// ---------------------------------------------------------------- start
+loadStore();
+showTab("data");
+</script>
+</body>
+</html>

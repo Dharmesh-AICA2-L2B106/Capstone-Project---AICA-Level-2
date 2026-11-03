@@ -1,0 +1,5 @@
+﻿Rule_ID,Metric,Comparison,Threshold,Unit,Rationale
+R01,Same-month sales growth vs prior year,>,30,%,"Flags any month whose sales exceed the same month of the prior year by more than 30%. Underlying trend growth is about 11%, so 30% isolates unusual months. Illustrative—not an industry standard."
+R02,Debtor days change vs prior year,>,10,days,Debtor days = closing trade receivables / annual credit sales x 365. An increase of more than 10 days indicates slower collection. Illustrative—not an industry standard.
+R03,Operating expense account change vs prior year,>,50,%,Flags an operating expense account that rises more than 50% year on year. Applied to every account in category Operating Expenses. Illustrative—not an industry standard.
+R04,Operating expense account variance vs budget,>,25,%,Flags an operating expense account whose current-year actual exceeds budget by more than 25%. Applied to every budgeted Operating Expenses account. Illustrative—not an industry standard.

@@ -1,0 +1,62 @@
+Year,Account_Code,Account_Name,Category,Debit,Credit
+2024,1000,Cash at bank,Current Assets,1630235,0
+2024,1100,Trade receivables,Current Assets,3014550,0
+2024,1200,Inventory,Current Assets,2400000,0
+2024,1300,Prepayments,Current Assets,120000,0
+2024,1500,"Property, plant and equipment - cost",Non-Current Assets,1320000,0
+2024,1590,Accumulated depreciation,Non-Current Assets,0,420000
+2024,2000,Trade payables,Current Liabilities,0,3059000
+2024,2100,Accrued expenses,Current Liabilities,0,120000
+2024,2200,VAT payable,Current Liabilities,0,30785
+2024,2300,Corporate tax payable,Current Liabilities,0,81000.00
+2024,2410,Term loan - current portion,Current Liabilities,0,200000
+2024,2400,Term loan - non-current portion,Non-Current Liabilities,0,600000
+2024,2500,Gratuity provision,Non-Current Liabilities,0,160000
+2024,3000,Share capital,Equity,0,2000000
+2024,3100,Retained earnings - opening,Equity,0,920000
+2024,3200,Dividends paid,Equity,300000,0
+2024,4000,Sales revenue,Revenue,0,18000000
+2024,5000,Cost of goods sold,Cost of Sales,14400000,0
+2024,6000,Salaries,Operating Expenses,1020000,0
+2024,6100,Rent,Operating Expenses,360000,0
+2024,6200,Utilities,Operating Expenses,96000,0
+2024,6300,Delivery,Operating Expenses,270000,0
+2024,6400,Marketing,Operating Expenses,96000,0
+2024,6450,Repairs and maintenance,Operating Expenses,45000,0
+2024,6500,Administration,Operating Expenses,108000,0
+2024,6600,Insurance,Operating Expenses,60000,0
+2024,6700,Gratuity expense,Operating Expenses,60000,0
+2024,6800,Depreciation,Operating Expenses,120000,0
+2024,6900,Interest expense,Finance Costs,90000,0
+2024,7000,Corporate tax expense,Tax Expense,81000.00,0
+2025,1000,Cash at bank,Current Assets,1229950.00,0
+2025,1100,Trade receivables,Current Assets,4600000,0
+2025,1200,Inventory,Current Assets,2600000,0
+2025,1300,Prepayments,Current Assets,120000,0
+2025,1500,"Property, plant and equipment - cost",Non-Current Assets,1500000,0
+2025,1590,Accumulated depreciation,Non-Current Assets,0,552000
+2025,2000,Trade payables,Current Liabilities,0,3311000
+2025,2100,Accrued expenses,Current Liabilities,0,120000
+2025,2200,VAT payable,Current Liabilities,0,37450
+2025,2300,Corporate tax payable,Current Liabilities,0,135765.00
+2025,2410,Term loan - current portion,Current Liabilities,0,200000
+2025,2400,Term loan - non-current portion,Non-Current Liabilities,0,400000
+2025,2500,Gratuity provision,Non-Current Liabilities,0,232000
+2025,3000,Share capital,Equity,0,2000000
+2025,3100,Retained earnings - opening,Equity,0,1814000.00
+2025,3200,Dividends paid,Equity,500000,0
+2025,4000,Sales revenue,Revenue,0,20900000
+2025,5000,Cost of goods sold,Cost of Sales,16302000,0
+2025,6000,Salaries,Operating Expenses,1140000,0
+2025,6100,Rent,Operating Expenses,420000,0
+2025,6200,Utilities,Operating Expenses,108000,0
+2025,6300,Delivery,Operating Expenses,313500,0
+2025,6400,Marketing,Operating Expenses,12O000,0
+2025,6450,Repairs and maintenance,Operating Expenses,145000,0
+2025,6450,Repairs and maintenance,Operating Expenses,145000,0
+2025,6500,Administration,Operating Expenses,,0
+2025,6600,Insurance,Operating Expenses,72000,0
+2025,6700,Gratuity expense,Operating Expenses,72000,0
+2025,6800,Depreciation,Operating Expenses,132000,0
+2025,6900,Interest expense,Finance Costs,72000,0
+2025,7000,Corporate tax expense,Tax Expense,135765.00,0
