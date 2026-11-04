@@ -1,0 +1,160 @@
+{
+  "_note": "Federal calendar layer used when the holidays/emirate_profiles tables hold no FEDERAL rows. Status pending_verification until Stage 8 (holidays/work weeks entered and signed off). ISO weekdays 1=Mon..7=Sun.",
+  "status": "pending_verification",
+  "work_weeks": [
+    {
+      "level": "federal",
+      "off_days": [
+        5,
+        6
+      ],
+      "half_days": {},
+      "effective_from": "2018-01-01",
+      "effective_to": "2021-12-31",
+      "source": "Fri/Sat weekend in force until 31-Dec-2021 (docs/holiday_sources.md)"
+    },
+    {
+      "level": "federal",
+      "off_days": [
+        6,
+        7
+      ],
+      "half_days": {
+        "5": "12:00"
+      },
+      "effective_from": "2022-01-01",
+      "effective_to": null,
+      "source": "Sat/Sun weekend and Friday half day (12:00) from 1-Jan-2022 (docs/holiday_sources.md; SPEC JE criteria)"
+    }
+  ],
+  "holidays": [
+    {
+      "date": "2021-12-01",
+      "name": "Commemoration Day",
+      "scope": "FEDERAL",
+      "emirate": null,
+      "status": "confirmed",
+      "source": "docs/holiday_sources.md (FY21/22 context; MoHRE 24 Nov 2021)"
+    },
+    {
+      "date": "2021-12-02",
+      "name": "UAE National Day",
+      "scope": "FEDERAL",
+      "emirate": null,
+      "status": "confirmed",
+      "source": "docs/holiday_sources.md (FY21/22 context; MoHRE 24 Nov 2021)"
+    },
+    {
+      "date": "2021-12-03",
+      "name": "UAE National Day",
+      "scope": "FEDERAL",
+      "emirate": null,
+      "status": "confirmed",
+      "source": "docs/holiday_sources.md (FY21/22 context; MoHRE 24 Nov 2021)"
+    },
+    {
+      "date": "2022-01-01",
+      "name": "New Year's Day",
+      "scope": "FEDERAL",
+      "emirate": null,
+      "status": "confirmed",
+      "source": "docs/holiday_sources.md (FY21/22 context; MoHRE 24 Nov 2021)"
+    },
+    {
+      "date": "2025-01-01",
+      "name": "New Year's Day",
+      "scope": "FEDERAL",
+      "emirate": null,
+      "status": "confirmed",
+      "source": "data/uae_holidays_2025.csv; docs/holiday_sources.md"
+    },
+    {
+      "date": "2025-03-30",
+      "name": "Eid Al Fitr",
+      "scope": "FEDERAL",
+      "emirate": null,
+      "status": "confirmed",
+      "source": "data/uae_holidays_2025.csv; docs/holiday_sources.md"
+    },
+    {
+      "date": "2025-03-31",
+      "name": "Eid Al Fitr",
+      "scope": "FEDERAL",
+      "emirate": null,
+      "status": "confirmed",
+      "source": "data/uae_holidays_2025.csv; docs/holiday_sources.md"
+    },
+    {
+      "date": "2025-04-01",
+      "name": "Eid Al Fitr",
+      "scope": "FEDERAL",
+      "emirate": null,
+      "status": "confirmed",
+      "source": "data/uae_holidays_2025.csv; docs/holiday_sources.md"
+    },
+    {
+      "date": "2025-06-05",
+      "name": "Arafat Day",
+      "scope": "FEDERAL",
+      "emirate": null,
+      "status": "confirmed",
+      "source": "data/uae_holidays_2025.csv; docs/holiday_sources.md"
+    },
+    {
+      "date": "2025-06-06",
+      "name": "Eid Al Adha",
+      "scope": "FEDERAL",
+      "emirate": null,
+      "status": "confirmed",
+      "source": "data/uae_holidays_2025.csv; docs/holiday_sources.md"
+    },
+    {
+      "date": "2025-06-07",
+      "name": "Eid Al Adha",
+      "scope": "FEDERAL",
+      "emirate": null,
+      "status": "confirmed",
+      "source": "data/uae_holidays_2025.csv; docs/holiday_sources.md"
+    },
+    {
+      "date": "2025-06-08",
+      "name": "Eid Al Adha",
+      "scope": "FEDERAL",
+      "emirate": null,
+      "status": "confirmed",
+      "source": "data/uae_holidays_2025.csv; docs/holiday_sources.md"
+    },
+    {
+      "date": "2025-06-27",
+      "name": "Hijri New Year",
+      "scope": "FEDERAL",
+      "emirate": null,
+      "status": "confirmed",
+      "source": "data/uae_holidays_2025.csv; docs/holiday_sources.md"
+    },
+    {
+      "date": "2025-09-05",
+      "name": "Prophet Muhammad's Birthday",
+      "scope": "FEDERAL",
+      "emirate": null,
+      "status": "confirmed",
+      "source": "data/uae_holidays_2025.csv; docs/holiday_sources.md"
+    },
+    {
+      "date": "2025-12-01",
+      "name": "UAE National Day (Eid Al Etihad)",
+      "scope": "FEDERAL",
+      "emirate": null,
+      "status": "confirmed",
+      "source": "data/uae_holidays_2025.csv; docs/holiday_sources.md"
+    },
+    {
+      "date": "2025-12-02",
+      "name": "UAE National Day (Eid Al Etihad)",
+      "scope": "FEDERAL",
+      "emirate": null,
+      "status": "confirmed",
+      "source": "data/uae_holidays_2025.csv; docs/holiday_sources.md"
+    }
+  ]
+}

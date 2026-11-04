@@ -1,0 +1,937 @@
+From b5d2f77cd93838db7181602915c7fb805be7d8c0 Mon Sep 17 00:00:00 2001
+From: "Grok Bot (AuditSmart build for Savio Jose)"
+ <auditsmart-build@localhost>
+Date: Tue, 3 Nov 2026 17:25:11 +0000
+Subject: [PATCH] Stage 5 step 2b: clear import/mapping errors (D56), engine
+ 0.2.2
+
+---
+ docs/DEPLOY_DEV.md                         |   2 +-
+ docs/STAGE5_STATUS.md                      |  41 +++++
+ docs/lovable/README.md                     |   2 +-
+ docs/lovable/engine_openapi.json           |  16 +-
+ engine/SPEC.md                             |   6 +
+ engine/app/api/v1/datasets.py              |   6 +-
+ engine/app/schemas/datasets.py             |  11 +-
+ engine/app/services/datasets.py            |  89 +++++++--
+ engine/app/services/importer.py            | 130 +++++++++++++-
+ engine/app/services/jobs.py                |  16 +-
+ engine/app/version.py                      |   2 +-
+ engine/pyproject.toml                      |   2 +-
+ engine/tests/api/test_datasets_api.py      |   3 +-
+ engine/tests/api/test_import_errors_api.py | 199 +++++++++++++++++++++
+ engine/tests/unit/test_mapping_override.py | 113 ++++++++++++
+ plans/DECISIONS.md                         |   1 +
+ 16 files changed, 604 insertions(+), 35 deletions(-)
+ create mode 100644 engine/tests/api/test_import_errors_api.py
+ create mode 100644 engine/tests/unit/test_mapping_override.py
+
+diff --git a/docs/DEPLOY_DEV.md b/docs/DEPLOY_DEV.md
+index bd367e0..d5e1fe5 100644
+--- a/docs/DEPLOY_DEV.md
++++ b/docs/DEPLOY_DEV.md
+@@ -190,7 +190,7 @@ Type them comma-separated with no spaces:
+    `https://auditsmart-engine.onrender.com` (Render may add a few letters to the name).
+ 2. Open `<that address>/v1/health` in your browser. You should see:
+    ```json
+-   {"status":"ok","service":"auditsmart-engine","version":"0.2.1","environment":"development","db":"ok","queue":"in-process"}
++   {"status":"ok","service":"auditsmart-engine","version":"0.2.2","environment":"development","db":"ok","queue":"in-process"}
+    ```
+    - The first visit after a quiet period takes about a minute (the free service is waking).
+    - `"db":"ok"` means the database is connected.
+diff --git a/docs/STAGE5_STATUS.md b/docs/STAGE5_STATUS.md
+index f7e2f17..d21172f 100644
+--- a/docs/STAGE5_STATUS.md
++++ b/docs/STAGE5_STATUS.md
+@@ -74,3 +74,44 @@ was pushed by the AI; no Lovable credits were used.
+ 1. Copy the zip contents into `C:\Projects\auditsmart`, commit, push; check `/v1/health` shows 0.2.1.
+ 2. Paste `docs/lovable/5.2_engine_connect.md` (block only) into the Lovable project (~8–12 credits).
+ 3. Send back Lovable's report: roles table, firm_id storage, JWT `alg` (header only).
++
++---
++
++# Stage 5 – Step 2b: clearer import errors (engine 0.2.2)
++
++Date: 3 Nov 2026. Builds on step 2 (`1c95785`). Approved by Savio ("A"). Nothing was pushed by
++the AI; no Lovable credits were used. AI is not involved in any calculation.
++
++## Problem
++A parse job failed with only "ValueError: the job failed. Check the file and try again."
++`dummy_gl.csv` itself parses cleanly (3,000 rows). The only plain `ValueError` in the parse
++path was a mapping override key that is not an engine field name (e.g. `Posting Date`,
++`date`). `PUT /v1/datasets/{id}/mapping` queued the job without checking, and the job runner
++replaced the reason with the generic text.
++
++## What changed (D56)
++| Item | Change |
++|---|---|
++| `importer.normalise_override` | Field names, labels and synonyms as keys; reversed `{header: field}`; `""`/`null` unmaps; header values matched exactly or case/space-insensitively; all problems listed in one message (`MappingError`, a `ValueError` with `.message`) |
++| All upload routes + `PUT .../mapping` | Mapping checked against the file's headers before a job is queued → 422 with the reason (multipart was 400). Dataset status unchanged, no job created; chunked uploads keep their chunks so `complete` can be retried |
++| Parse job | Errors stored as plain reasons (mapping, "The file is not UTF-8 text …", unreadable CSV / Excel). Old queued jobs with label keys are normalised too |
++| `jobs.job_error_text` | Keeps `.message`, or `str(exc)` for `user_facing` errors; others stay generic (no stack trace) |
++| Schemas | `mapping_override` values typed `Any` in OpenAPI so a wrong type gets the engine's plain message, not a schema error list; Lovable contract re-exported |
++| Version | 0.2.2 (`/v1/health`) |
++
++Example messages (exact text):
++- `Mapping problem: Unknown field 'Posting Dt' in the mapping. Allowed fields: line_id, entry_date, posting_date, …, closing_balance.`
++- `Mapping problem: Column 'Txn Date' (mapped to posting_date) is not in the file. Columns in the file: line_id, entry_date, posting_date, ….`
++- `Mapping problem: The value for 'debit' must be a column header (text), or "" to leave the field unmapped; got a number.`
++- `The file is not UTF-8 text (a character near byte 1234 could not be read). In Excel use Save As > 'CSV UTF-8', or upload the .xlsx file, then try again.`
++
++## Verification (box)
++- 379 tests pass (361 before + 18 new: `tests/unit/test_mapping_override.py`, `tests/api/test_import_errors_api.py`), on SQLite and on PostgreSQL; coverage 99.13% (gate 90%).
++- ruff clean; `mypy` (app) and `mypy --strict app` clean; the two new test files are `--strict` clean.
++- `dummy_gl.csv` with a six-field override (labels, synonyms or reversed) parses all 3,000 rows.
++
++## Waiting for Savio
++1. Copy / `git am` the zip into `C:\Projects\auditsmart`, commit, push; check `/v1/health` shows **0.2.2**
++   (the 5.2 prompt's "0.2.1" check is superseded; the Engine status card shows whatever the engine reports).
++2. Re-run the upload of `dummy_gl.csv`. If it fails again, the job error now says why; send that text.
++3. Optional later: Windows-1252 fallback for non-UTF-8 CSVs (D56, not done).
+diff --git a/docs/lovable/README.md b/docs/lovable/README.md
+index d9309e2..dc7fc9d 100644
+--- a/docs/lovable/README.md
++++ b/docs/lovable/README.md
+@@ -14,7 +14,7 @@ Prepared 1 Nov 2026. Sources: Build Guide v2.0 (prompts 4.1 to 4.5, Appendix A),
+ | 4.5_rules_library.md | Rules Library (lean, manual mode, corrected roles) |
+ | 4.3_ux_and_fixes.md | UX pass plus the B3 batch-fix list, one message |
+ | 5.2_engine_connect.md | **Stage 5.2**: engine-proxy edge function, remove mocks, roles/firm into the token, engagement sync (`PUT /v1/engagements/{id}`), Engine status card. Paste after the engine 0.2.1 is deployed (~8–12 credits) |
+-| engine_openapi.json | Full OpenAPI contract, exported from the committed engine 0.2.1 |
++| engine_openapi.json | Full OpenAPI contract, exported from the committed engine 0.2.2 |
+ | engine_endpoints.txt / engine_endpoints_compact.txt | Endpoint lists (long and compact). The compact list is inside 4.1 |
+ | export_contract.py | Regenerates the three files above: `engine/.venv/bin/python docs/lovable/export_contract.py` |
+ 
+diff --git a/docs/lovable/engine_openapi.json b/docs/lovable/engine_openapi.json
+index 095a3d2..b270768 100644
+--- a/docs/lovable/engine_openapi.json
++++ b/docs/lovable/engine_openapi.json
+@@ -3,7 +3,7 @@
+   "info": {
+     "title": "AuditSmart Engine",
+     "description": "Calculation engine for AuditSmart (CLA Emirates). All numbers are computed deterministically in Python with Decimal; AI is never used for calculations.",
+-    "version": "0.2.1"
++    "version": "0.2.2"
+   },
+   "paths": {
+     "/v1/health": {
+@@ -5666,11 +5666,10 @@
+       "MappingUpdate": {
+         "properties": {
+           "mapping_override": {
+-            "additionalProperties": {
+-              "type": "string"
+-            },
++            "additionalProperties": true,
+             "type": "object",
+-            "title": "Mapping Override"
++            "title": "Mapping Override",
++            "description": "{field: column header}. Field names, labels or synonyms are accepted ('posting_date', 'Posting Date', 'date'); {column header: field} also works. \"\" or null leaves a field unmapped. Unknown names are refused with 422."
+           }
+         },
+         "additionalProperties": false,
+@@ -6521,16 +6520,15 @@
+           "mapping_override": {
+             "anyOf": [
+               {
+-                "additionalProperties": {
+-                  "type": "string"
+-                },
++                "additionalProperties": true,
+                 "type": "object"
+               },
+               {
+                 "type": "null"
+               }
+             ],
+-            "title": "Mapping Override"
++            "title": "Mapping Override",
++            "description": "{field: column header}. Field names, labels or synonyms are accepted ('posting_date', 'Posting Date', 'date'); {column header: field} also works. \"\" or null leaves a field unmapped. Unknown names are refused with 422."
+           },
+           "sha256": {
+             "anyOf": [
+diff --git a/engine/SPEC.md b/engine/SPEC.md
+index cca1b42..c9c3d28 100644
+--- a/engine/SPEC.md
++++ b/engine/SPEC.md
+@@ -413,3 +413,9 @@ golden_results.xlsx – Population | Totals, counts, Dr/Cr check
+ - **Authorisation (D51):** firm from the token only, must be registered (`POST /v1/firms`; otherwise 403). Create: app role Manager / Partner / TaxPartner / Admin. Update: team member with engagement role Manager / Partner / TaxPartner, or the firm Admin. Other firm's engagement → 403; other firm's client id → 404; client or engagement not linked to a firm → 409; an engagement never moves to another client → 409; client_code unique per firm (D52, migration 0010) → 409.
+ - **Audit:** `client_sync_create/update`, `engagement_sync_create/update` with old/new values (members and firm_id included), only when something changed.
+ - **STALE (D53):** a changed `fye` marks every current sample, JE run and input-VAT run of the engagement STALE (`stale` rows, reason "year end changed A -> B"); a changed client emirate re-checks the client's JE runs against the calendar (hash comparison, D33). Materiality, framework, status and team changes are audit-only (materiality feeds no engine calculation).
++
++### 5.3 Import mapping overrides and error text (Stage 5, D56, engine 0.2.2)
++- **Where:** `mapping_override` on `POST /v1/datasets` (form field, JSON), `POST /v1/uploads/{id}/complete` and `PUT /v1/datasets/{id}/mapping`. All three run `importer.normalise_override` against the file's header row **before** any job is queued.
++- **Accepted:** `{field: header}` with canonical field names, labels or synonyms as keys (`posting_date`, `Posting Date`, `date`, `GL Date`; `Dr` → debit); the reversed `{header: field}` when the key is a column of the file and the value names a field (an exact field name when the key could itself be a field, e.g. `{"Dr": "debit"}`); header values matched exactly, then by a unique case/space-insensitive match; `""` or `null` unmaps a field. Fields not in the override keep the automatic suggestion.
++- **Refused (422, `detail` is one plain-English string, every problem listed):** unknown keys (with the allowed field list), a header not in the file (with the file's columns, first 40), non-text values, a field mapped twice, a non-object override. The dataset keeps its status and no job is created; a chunked upload keeps its chunks so `complete` can be retried. A file whose header block is not UTF-8 is refused at upload (422).
++- **Parse job errors:** `importer`/`ValueError` failures become a `DatasetError` with the reason (mapping problem, "The file is not UTF-8 text …", CSV/Excel unreadable, first line of any other `ValueError`, max 200 chars). `jobs.job_error_text` keeps `.message`, or `str(exc)` for errors marked `user_facing`; anything else stays generic. No stack trace or row values are stored.
+diff --git a/engine/app/api/v1/datasets.py b/engine/app/api/v1/datasets.py
+index 75c041b..e033c26 100644
+--- a/engine/app/api/v1/datasets.py
++++ b/engine/app/api/v1/datasets.py
+@@ -139,13 +139,15 @@ def upload_dataset(
+     mapping_override: Annotated[str | None, Form(description="JSON {field: header}")] = None,
+ ) -> DatasetAccepted:
+     check_membership(db, user, engagement_id, UPLOADERS)
+-    override = None
++    override: object = None
+     if mapping_override:
+         try:
+             override = json.loads(mapping_override)
+             assert isinstance(override, dict)
+         except (ValueError, AssertionError):
+-            raise HTTPException(422, "mapping_override must be a JSON object.") from None
++            raise HTTPException(422, 'mapping_override must be a JSON object of {field: column '
++                                     'header}, for example {"posting_date": "Posting Date"}.'
++                                ) from None
+     try:
+         ds, job_id = svc.upload_stream(engagement_id, file.filename or "", file.file, kind,
+                                        user.user_id, override)
+diff --git a/engine/app/schemas/datasets.py b/engine/app/schemas/datasets.py
+index acef4b9..1a222b4 100644
+--- a/engine/app/schemas/datasets.py
++++ b/engine/app/schemas/datasets.py
+@@ -17,13 +17,20 @@ class UploadStart(Strict):
+     kind: Literal["GL", "TB"] = "GL"
+ 
+ 
++# D56: values are checked by the engine (importer.normalise_override) so a wrong type gets a
++# plain-English 422 naming the field instead of a schema error list.
++MAPPING_DOC = ("{field: column header}. Field names, labels or synonyms are accepted "
++               "('posting_date', 'Posting Date', 'date'); {column header: field} also works. "
++               "\"\" or null leaves a field unmapped. Unknown names are refused with 422.")
++
++
+ class UploadComplete(Strict):
+-    mapping_override: dict[str, str] | None = None
++    mapping_override: dict[str, Any] | None = Field(default=None, description=MAPPING_DOC)
+     sha256: str | None = Field(default=None, pattern=r"^[0-9a-fA-F]{64}$")
+ 
+ 
+ class MappingUpdate(Strict):
+-    mapping_override: dict[str, str]
++    mapping_override: dict[str, Any] = Field(description=MAPPING_DOC)
+ 
+ 
+ class ValidateRequest(Strict):
+diff --git a/engine/app/services/datasets.py b/engine/app/services/datasets.py
+index 0b9dea3..0aa3107 100644
+--- a/engine/app/services/datasets.py
++++ b/engine/app/services/datasets.py
+@@ -6,7 +6,9 @@ Status flow: uploading -> uploaded -> parsing -> parsed -> validated | blocked
+ 
+ from __future__ import annotations
+ 
++import csv
+ import shutil
++import zipfile
+ from pathlib import Path
+ from typing import Any, BinaryIO
+ 
+@@ -19,7 +21,9 @@ from app.models import Dataset
+ from app.models import ValidationError as ValidationErrorRow
+ from app.services import jobs
+ from app.services.importer import (
++    MappingError,
+     copy_stream,
++    normalise_override,
+     parse_to_parquet,
+     read_headers,
+     sha256_file,
+@@ -45,6 +49,43 @@ class DatasetBlocked(DatasetError):
+     pass
+ 
+ 
++def _headers(path: Path) -> list[str]:
++    """The file's header row; an unreadable file is a 422 with a plain reason (D56)."""
++    try:
++        return read_headers(path)
++    except Exception as exc:
++        raise DatasetError(_read_error(exc), 422) from None
++
++
++def _checked_override(headers: list[str], override: object) -> dict[str, str] | None:
++    """D56: validate a mapping override against the file's headers before any job starts."""
++    if override is None:
++        return None
++    try:
++        return normalise_override(override, headers)
++    except MappingError as exc:
++        raise DatasetError(exc.message, 422) from None
++
++
++def _read_error(exc: BaseException) -> str:
++    """Plain-English reason a file could not be read (D56). No stack trace, no row values."""
++    if isinstance(exc, MappingError):
++        return exc.message
++    if isinstance(exc, UnicodeDecodeError):
++        return ("The file is not UTF-8 text (a character near byte "
++                f"{exc.start} could not be read). In Excel use Save As > 'CSV UTF-8', "
++                "or upload the .xlsx file, then try again.")
++    if isinstance(exc, csv.Error):
++        return f"The CSV file could not be read ({exc}). Check the quotes and separators."
++    if isinstance(exc, zipfile.BadZipFile) or type(exc).__name__ == "InvalidFileException":
++        return "The Excel file could not be opened. Save it again as .xlsx (or CSV UTF-8)."
++    if isinstance(exc, ValueError):
++        first = (str(exc).splitlines() or [""])[0][:200]
++        return f"The file could not be read: {first or type(exc).__name__}."
++    return (f"{type(exc).__name__}: the file could not be read. Check the file and try "
++            "again.")
++
++
+ def _root() -> Path:
+     return get_settings().storage_path
+ 
+@@ -122,7 +163,7 @@ def put_chunk(dataset_id: str, index: int, data: bytes) -> int:
+     return count
+ 
+ 
+-def complete_upload(dataset_id: str, *, user_id: str, mapping_override: dict[str, str] | None,
++def complete_upload(dataset_id: str, *, user_id: str, mapping_override: object,
+                     expected_sha256: str | None = None) -> tuple[Dataset, str]:
+     ds = get_dataset(dataset_id)
+     if ds.status != "uploading":
+@@ -148,15 +189,22 @@ def complete_upload(dataset_id: str, *, user_id: str, mapping_override: dict[str
+         dest.unlink()
+         raise DatasetError("The file changed in transit (SHA-256 does not match). Upload again.",
+                            409)
++    try:  # D56: a bad mapping is refused before the chunks go, so complete can be retried
++        headers = _headers(dest)
++        override = _checked_override(headers, mapping_override)
++    except DatasetError:
++        dest.unlink()
++        raise
+     shutil.rmtree(d, ignore_errors=True)
+     _update(dataset_id, sha256=digest, storage_ref=str(dest), status="uploaded",
+-            mapping=suggest_mapping(read_headers(dest), mapping_override))
+-    job_id = start_parse(dataset_id, user_id=user_id, mapping_override=mapping_override)
++            mapping=suggest_mapping(headers, override))
++    job_id = start_parse(dataset_id, user_id=user_id, mapping_override=override,
++                         prevalidated=True)
+     return get_dataset(dataset_id), job_id
+ 
+ 
+ def upload_stream(engagement_id: str, file_name: str, stream: BinaryIO, kind: str,
+-                  user_id: str, mapping_override: dict[str, str] | None) -> tuple[Dataset, str]:
++                  user_id: str, mapping_override: object) -> tuple[Dataset, str]:
+     """Single-request upload (multipart) – streamed to storage in 1 MB chunks."""
+     name = _check_name(file_name)
+     with session_factory()() as s:
+@@ -170,38 +218,55 @@ def upload_stream(engagement_id: str, file_name: str, stream: BinaryIO, kind: st
+     except ValueError as exc:
+         _update(ds.id, status="failed")
+         raise DatasetError(str(exc), 413) from None
++    try:
++        headers = _headers(dest)
++        override = _checked_override(headers, mapping_override)
++    except DatasetError:  # D56: nothing half-made is left behind
++        dest.unlink(missing_ok=True)
++        _update(ds.id, status="failed", size_bytes=size, sha256=digest)
++        raise
+     _update(ds.id, sha256=digest, size_bytes=size, storage_ref=str(dest), status="uploaded",
+-            mapping=suggest_mapping(read_headers(dest), mapping_override))
++            mapping=suggest_mapping(headers, override))
+     log_event("upload.completed", dataset_id=ds.id, bytes=size, sha256=digest)
+-    job_id = start_parse(ds.id, user_id=user_id, mapping_override=mapping_override)
++    job_id = start_parse(ds.id, user_id=user_id, mapping_override=override, prevalidated=True)
+     return get_dataset(ds.id), job_id
+ 
+ 
+ # ---------------------------------------------------------------- parse / validate jobs
+-def start_parse(dataset_id: str, *, user_id: str | None,
+-                mapping_override: dict[str, str] | None) -> str:
++def start_parse(dataset_id: str, *, user_id: str | None, mapping_override: object,
++                prevalidated: bool = False) -> str:
++    """Start the parse job. The override is checked against the file first (D56), so a bad
++    mapping is a synchronous 422 and the dataset keeps its status."""
+     ds = get_dataset(dataset_id)
+     if ds.storage_ref is None:
+         raise DatasetError("The file has not been uploaded yet.", 409)
++    if not prevalidated and mapping_override is not None:
++        mapping_override = _checked_override(_headers(Path(ds.storage_ref)), mapping_override)
+     _update(dataset_id, status="parsing")
+     return jobs.enqueue("parse", {"dataset_id": dataset_id, "mapping_override": mapping_override},
+                         engagement_id=ds.engagement_id, created_by=user_id)
+ 
+ 
+ @jobs.task("parse")
+-def parse_task(job_id: str, *, dataset_id: str,
+-               mapping_override: dict[str, str] | None = None) -> str:
++def parse_task(job_id: str, *, dataset_id: str, mapping_override: object = None) -> str:
+     ds = get_dataset(dataset_id)
+     src = Path(ds.storage_ref or "")
+     est_rows = max(1, src.stat().st_size // 110) if src.exists() else 1  # ~110 bytes per line
+     try:
++        # idempotent for an already checked override; catches jobs queued before 0.2.2 (D56)
++        override = (None if mapping_override is None
++                    else normalise_override(mapping_override, read_headers(src)))
+         res = parse_to_parquet(
+             src, parquet_path(dataset_id), kind=ds.kind,
+-            override=mapping_override, chunk_rows=get_settings().parse_chunk_rows,
++            override=override, chunk_rows=get_settings().parse_chunk_rows,
+             progress=lambda rows: jobs.set_progress(job_id, min(95, 5 + 90 * rows // est_rows)))
+-    except Exception:
++    except jobs.JobCancelled:
+         _update(dataset_id, status="failed")
+         raise
++    except Exception as exc:  # D56: the job error says why, in plain English
++        _update(dataset_id, status="failed")
++        log_event("dataset.parse_failed", dataset_id=dataset_id, error_type=type(exc).__name__)
++        raise DatasetError(_read_error(exc), 422) from None
+     _update(dataset_id, status="parsed", rows=res.rows, total_dr=res.total_dr,
+             total_cr=res.total_cr, parquet_ref=str(parquet_path(dataset_id)),
+             mapping=res.mapping, profile=res.profile())
+diff --git a/engine/app/services/importer.py b/engine/app/services/importer.py
+index cb264f5..3625d03 100644
+--- a/engine/app/services/importer.py
++++ b/engine/app/services/importer.py
+@@ -88,9 +88,135 @@ for _canon, _syns in SYNONYMS.items():
+         _SYN_LOOKUP.setdefault(norm_header(_s), _canon)
+ 
+ 
++ALLOWED_FIELDS = tuple(SYNONYMS)
++_MAX_LISTED_HEADERS = 40
++
++
++class MappingError(ValueError):
++    """A mapping override the engine cannot use (D56). ``message`` is plain English and safe
++    to show the user; the API returns it as a 422 and a parse job stores it as its error."""
++
++    user_facing = True
++
++    def __init__(self, message: str) -> None:
++        super().__init__(message)
++        self.message = message
++
++
++def canonical_field(name: str) -> str | None:
++    """'posting_date', 'Posting Date', 'date', 'GL Date' -> 'posting_date'; None if unknown."""
++    if name in SYNONYMS:
++        return name
++    return _SYN_LOOKUP.get(norm_header(name))
++
++
++def _allowed_text() -> str:
++    return "Allowed fields: " + ", ".join(ALLOWED_FIELDS) + "."
++
++
++def _headers_text(headers: Sequence[str]) -> str:
++    shown = [h.lstrip("\ufeff") for h in headers[:_MAX_LISTED_HEADERS]]
++    more = len(headers) - len(shown)
++    return "Columns in the file: " + (", ".join(shown) or "(none)") + (
++        f" (+{more} more)." if more > 0 else ".")
++
++
++def _find_header(name: str, headers: Sequence[str]) -> str | None:
++    """Exact header first, then a single header equal after normalising (case, spaces)."""
++    if name in headers:
++        return name
++    stripped = [h for h in headers if h.lstrip("\ufeff").strip() == name.strip()]
++    if len(stripped) == 1:
++        return stripped[0]
++    key = norm_header(name)
++    loose = [h for h in headers if key and norm_header(h) == key]
++    return loose[0] if len(loose) == 1 else None
++
++
++def _type_name(v: object) -> str:
++    if isinstance(v, bool):
++        return "true/false"
++    if isinstance(v, int | float):
++        return "a number"
++    if isinstance(v, list):
++        return "a list"
++    if isinstance(v, dict):
++        return "an object"
++    return type(v).__name__
++
++
++def normalise_override(override: object, headers: Sequence[str]) -> dict[str, str] | None:
++    """Check and normalise a user mapping override against the file's headers (D56).
++
++    Accepts {field: header} with field names, labels or synonyms ('Posting Date', 'date',
++    'Dr'), and the reversed direction {header: field} when the key is a column of the file
++    and the value names a field. Values are column headers, '' (or null) to unmap a field.
++    Returns {canonical_field: exact_header_or_''}; raises ``MappingError`` listing every
++    problem at once. No value is guessed: an unknown name is an error, never dropped.
++    """
++    if override is None:
++        return None
++    if not isinstance(override, dict):
++        raise MappingError(
++            "mapping_override must be a JSON object of {field: column header}, for example "
++            '{"posting_date": "Posting Date"}. ' + _allowed_text())
++    headers = list(headers)
++    out: dict[str, str] = {}
++    origin: dict[str, str] = {}
++    unknown: list[str] = []
++    problems: list[str] = []
++    for raw_key, raw_val in override.items():
++        key = str(raw_key)
++        if raw_val is None:
++            raw_val = ""
++        if not isinstance(raw_val, str):
++            problems.append(f"The value for '{key}' must be a column header (text), or \"\" "
++                            f"to leave the field unmapped; got {_type_name(raw_val)}.")
++            continue
++        val = raw_val.strip()
++        canon = canonical_field(key)
++        field_name: str | None = None
++        header: str | None = None
++        if canon is not None and (val == "" or _find_header(val, headers) is not None):
++            field_name, header = canon, (_find_header(val, headers) if val else "")
++        else:
++            # {header: field}: when the key could itself be a field ('Dr'), the value must be
++            # an exact field name ('debit'), so {"posting_date": "Txn Date"} is not reversed.
++            rev_field = (val if val in SYNONYMS else None) if canon is not None else (
++                canonical_field(val) if val else None)
++            rev_header = _find_header(key, headers)
++            if rev_field is not None and rev_header is not None:
++                field_name, header = rev_field, rev_header  # {header: field}
++            elif canon is not None:
++                problems.append(f"Column '{raw_val}' (mapped to {canon}) is not in the file.")
++                continue
++            else:
++                unknown.append(key)
++                continue
++        assert header is not None
++        if field_name in out and out[field_name] != header:
++            problems.append(f"{field_name} is mapped twice ('{origin[field_name]}' and "
++                            f"'{key}'); map each field once.")
++            continue
++        out[field_name], origin[field_name] = header, key
++    if unknown:
++        names = ", ".join(f"'{u}'" for u in unknown)
++        problems.insert(0, f"Unknown field{'s' if len(unknown) > 1 else ''} {names} in the "
++                           f"mapping. {_allowed_text()}")
++    if problems:
++        if any("is not in the file" in p for p in problems):
++            problems.append(_headers_text(headers))
++        raise MappingError("Mapping problem: " + " ".join(problems))
++    return out
++
++
+ def suggest_mapping(headers: Iterable[str], override: dict[str, str] | None = None
+                     ) -> dict[str, str]:
+-    """Return {canonical_field: source_header}. ``override`` wins and may map to ''."""
++    """Return {canonical_field: source_header}. ``override`` wins and may map to ''.
++
++    ``override`` keys must be canonical field names; run ``normalise_override`` first to
++    accept labels, synonyms or the reversed direction.
++    """
+     mapping: dict[str, str] = {}
+     for h in headers:
+         canon = _SYN_LOOKUP.get(norm_header(h))
+@@ -98,7 +224,7 @@ def suggest_mapping(headers: Iterable[str], override: dict[str, str] | None = No
+             mapping[canon] = h
+     for canon, src in (override or {}).items():
+         if canon not in SYNONYMS:
+-            raise ValueError(f"Unknown target field '{canon}' in the mapping override.")
++            raise MappingError(f"Unknown field '{canon}' in the mapping. {_allowed_text()}")
+         if src:
+             mapping[canon] = src
+         else:
+diff --git a/engine/app/services/jobs.py b/engine/app/services/jobs.py
+index e8c7843..93f7005 100644
+--- a/engine/app/services/jobs.py
++++ b/engine/app/services/jobs.py
+@@ -131,6 +131,18 @@ def _finish(job_id: str, status: str, *, ref: str | None = None,
+         s.commit()
+ 
+ 
++def job_error_text(exc: BaseException) -> str:
++    """The error stored on a failed job (D56). Our own errors carry a plain-English
++    ``.message`` (DatasetError, JobError, MappingError ...) or set ``user_facing = True``;
++    anything else gets a generic text so no internal detail or stack trace is shown."""
++    msg = getattr(exc, "message", None)
++    if isinstance(msg, str) and msg:
++        return msg
++    if getattr(exc, "user_facing", False) is True and str(exc):
++        return str(exc)
++    return f"{type(exc).__name__}: the job failed. Check the file and try again."
++
++
+ def _run(job_id: str, fn: JobFn) -> None:
+     with session_factory()() as s:
+         job = s.get(Job, job_id)
+@@ -150,9 +162,7 @@ def _run(job_id: str, fn: JobFn) -> None:
+         log_event("job.cancelled", job_id=job_id)
+         return
+     except Exception as exc:
+-        msg = getattr(exc, "message", None)  # our own user-facing errors carry .message
+-        _finish(job_id, "failed", error=msg if isinstance(msg, str) else
+-                f"{type(exc).__name__}: the job failed. Check the file and try again.")
++        _finish(job_id, "failed", error=job_error_text(exc))
+         log_event("job.failed", job_id=job_id, error_type=type(exc).__name__)
+         return
+     _finish(job_id, "succeeded", ref=ref)
+diff --git a/engine/app/version.py b/engine/app/version.py
+index a420f27..05c84e2 100644
+--- a/engine/app/version.py
++++ b/engine/app/version.py
+@@ -1,4 +1,4 @@
+ """Single source of the engine version (returned by /v1/health and stored with every result)."""
+ 
+ ENGINE_NAME = "auditsmart-engine"
+-ENGINE_VERSION = "0.2.1"
++ENGINE_VERSION = "0.2.2"
+diff --git a/engine/pyproject.toml b/engine/pyproject.toml
+index 03b8abb..4447a45 100644
+--- a/engine/pyproject.toml
++++ b/engine/pyproject.toml
+@@ -1,6 +1,6 @@
+ [project]
+ name = "auditsmart-engine"
+-version = "0.2.1"
++version = "0.2.2"
+ description = "AuditSmart calculation engine (CLA Emirates) – FastAPI + Decimal"
+ requires-python = ">=3.11,<3.12"
+ 
+diff --git a/engine/tests/api/test_datasets_api.py b/engine/tests/api/test_datasets_api.py
+index 487f0bf..c045967 100644
+--- a/engine/tests/api/test_datasets_api.py
++++ b/engine/tests/api/test_datasets_api.py
+@@ -170,7 +170,8 @@ def test_mapping_override_and_reparse(client: TestClient, token: Callable[..., s
+     assert form.json()["mapping_suggestion"]["line_id"] == "Ref"
+     assert _multipart(client, tok, engagement, csv, mapping_override="[1]").status_code == 422
+     bad = _multipart(client, tok, engagement, csv, mapping_override='{"zzz": "Ref"}')
+-    assert bad.status_code == 400
++    assert bad.status_code == 422  # D56: was 400; a bad mapping is now a 422 with a reason
++    assert "Unknown field 'zzz'" in bad.json()["detail"]
+ 
+ 
+ def test_tb_comparison(client: TestClient, token: Callable[..., str], engagement: str) -> None:
+diff --git a/engine/tests/api/test_import_errors_api.py b/engine/tests/api/test_import_errors_api.py
+new file mode 100644
+index 0000000..a919e51
+--- /dev/null
++++ b/engine/tests/api/test_import_errors_api.py
+@@ -0,0 +1,199 @@
++"""D56: clear import errors - bad mappings are a synchronous 422 on every route, and a
++parse job that fails stores the real reason instead of a generic ValueError."""
++
++from __future__ import annotations
++
++import json
++from collections.abc import Callable
++from typing import Any
++
++from fastapi.testclient import TestClient
++
++from tests.conftest import DATA, auth
++
++DUMMY = (DATA / "dummy_gl.csv").read_bytes()
++SIX = {"posting_date": "posting_date", "voucher_no": "voucher_no",
++       "account_code": "account_code", "debit": "debit", "credit": "credit",
++       "narration": "narration"}
++LABELS = b"Ref,Posting Date,Voucher No,Account,Dr,Cr\n1,2025-01-05,J1,6100,10,0\n" \
++         b"2,2025-01-05,J1,2010,0,10\n"
++
++
++def _multipart(client: TestClient, tok: str, eng: str, data: bytes,
++               override: Any = None, name: str = "gl.csv") -> Any:
++    form = {"engagement_id": eng}
++    if override is not None:
++        form["mapping_override"] = override if isinstance(override, str) else json.dumps(
++            override)
++    return client.post("/v1/datasets", headers=auth(tok), data=form,
++                       files={"file": (name, data)})
++
++
++def _chunked(client: TestClient, tok: str, eng: str, data: bytes) -> str:
++    r = client.post("/v1/uploads", headers=auth(tok),
++                    json={"engagement_id": eng, "file_name": "gl.csv", "size_bytes": len(data)})
++    sid: str = r.json()["dataset_id"]
++    assert client.put(f"/v1/uploads/{sid}/chunks/0", headers=auth(tok),
++                      content=data).status_code == 200
++    return sid
++
++
++def _job(client: TestClient, tok: str, job_id: str) -> dict[str, Any]:
++    out: dict[str, Any] = client.get(f"/v1/jobs/{job_id}", headers=auth(tok)).json()
++    return out
++
++
++def test_dummy_gl_with_six_field_mapping_succeeds(client: TestClient,
++                                                  token: Callable[..., str],
++                                                  engagement: str) -> None:
++    tok = token()
++    r = _multipart(client, tok, engagement, DUMMY, SIX, name="dummy_gl.csv")
++    assert r.status_code == 202, r.text
++    body = r.json()
++    assert body["status"] == "parsed" and body["profile"]["rows"] == 3000
++    assert body["mapping_suggestion"]["line_id"] == "line_id"  # still auto-matched
++    assert _job(client, tok, body["job_id"])["status"] == "succeeded"
++    did = body["dataset_id"]
++    # the same mapping through the re-map route, as labels and reversed: same result
++    for override in (SIX, {"Posting Date": "posting_date", "Voucher No": "voucher_no",
++                           "Account Code": "account_code", "Dr": "debit", "Cr": "credit",
++                           "Narration": "narration"},
++                     {v: k for k, v in SIX.items()}):
++        m = client.put(f"/v1/datasets/{did}/mapping", headers=auth(tok),
++                       json={"mapping_override": override})
++        assert m.status_code == 202, m.text
++        assert _job(client, tok, m.json()["job_id"])["status"] == "succeeded"
++        ds = client.get(f"/v1/datasets/{did}", headers=auth(tok)).json()
++        assert ds["rows"] == 3000 and ds["mapping"]["posting_date"] == "posting_date"
++
++
++def test_label_keys_on_upload(client: TestClient, token: Callable[..., str],
++                              engagement: str) -> None:
++    tok = token()
++    r = _multipart(client, tok, engagement, LABELS,
++                   {"line_id": "Ref", "Posting Date": "Posting Date", "voucher": "Voucher No"})
++    assert r.status_code == 202, r.text
++    m = r.json()["mapping_suggestion"]
++    assert m["line_id"] == "Ref" and m["posting_date"] == "Posting Date"
++    assert m["voucher_no"] == "Voucher No" and m["debit"] == "Dr"
++
++
++def test_put_mapping_prevalidates(client: TestClient, token: Callable[..., str],
++                                  engagement: str) -> None:
++    tok = token()
++    did = _multipart(client, tok, engagement, LABELS).json()["dataset_id"]
++    before = client.get(f"/v1/datasets/{did}", headers=auth(tok)).json()
++    jobs_before = client.get("/v1/jobs", headers=auth(tok),
++                             params={"engagement_id": engagement}).json()
++    bad = client.put(f"/v1/datasets/{did}/mapping", headers=auth(tok),
++                     json={"mapping_override": {"Posting Dt": "Posting Date", "zzz": "Ref"}})
++    assert bad.status_code == 422
++    detail = bad.json()["detail"]
++    assert detail.startswith("Mapping problem: Unknown fields 'Posting Dt', 'zzz' in the "
++                             "mapping. Allowed fields: line_id, entry_date, posting_date")
++    missing = client.put(f"/v1/datasets/{did}/mapping", headers=auth(tok),
++                         json={"mapping_override": {"posting_date": "Txn Date"}})
++    assert missing.status_code == 422
++    assert ("Column 'Txn Date' (mapped to posting_date) is not in the file. Columns in the "
++            "file: Ref, Posting Date, Voucher No, Account, Dr, Cr.") in missing.json()["detail"]
++    typed = client.put(f"/v1/datasets/{did}/mapping", headers=auth(tok),
++                       json={"mapping_override": {"debit": 4}})
++    assert typed.status_code == 422 and isinstance(typed.json()["detail"], str)
++    assert "The value for 'debit' must be a column header (text)" in typed.json()["detail"]
++    assert client.put(f"/v1/datasets/{did}/mapping", headers=auth(tok),
++                      json={"mapping_override": ["x"]}).status_code == 422  # schema
++    # nothing was queued and the dataset kept its status and mapping
++    after = client.get(f"/v1/datasets/{did}", headers=auth(tok)).json()
++    assert after["status"] == before["status"] and after["mapping"] == before["mapping"]
++    assert client.get("/v1/jobs", headers=auth(tok),
++                      params={"engagement_id": engagement}).json() == jobs_before
++
++
++def test_multipart_bad_mapping_422(client: TestClient, token: Callable[..., str],
++                                   engagement: str) -> None:
++    tok = token()
++    r = _multipart(client, tok, engagement, LABELS, {"debit": ["Dr"]})
++    assert r.status_code == 422 and "got a list" in r.json()["detail"]
++    r2 = _multipart(client, tok, engagement, LABELS, "[1]")
++    assert r2.status_code == 422 and "must be a JSON object" in r2.json()["detail"]
++    r3 = _multipart(client, tok, engagement, LABELS, {"Dr Amt": "Dr"})
++    assert r3.status_code == 422 and "Unknown field 'Dr Amt'" in r3.json()["detail"]
++
++
++def test_chunked_complete_prevalidates_and_can_retry(client: TestClient,
++                                                     token: Callable[..., str],
++                                                     engagement: str) -> None:
++    tok = token()
++    sid = _chunked(client, tok, engagement, LABELS)
++    bad = client.post(f"/v1/uploads/{sid}/complete", headers=auth(tok),
++                      json={"mapping_override": {"line_id": "Row"}})
++    assert bad.status_code == 422 and "Column 'Row'" in bad.json()["detail"]
++    typed = client.post(f"/v1/uploads/{sid}/complete", headers=auth(tok),
++                        json={"mapping_override": {"line_id": 1}})
++    assert typed.status_code == 422 and "got a number" in typed.json()["detail"]
++    ok = client.post(f"/v1/uploads/{sid}/complete", headers=auth(tok),
++                     json={"mapping_override": {"Ref": "line_id"}})  # reversed
++    assert ok.status_code == 202, ok.text
++    assert ok.json()["status"] == "parsed" and ok.json()["mapping_suggestion"]["line_id"] == "Ref"
++
++
++def test_parse_job_failure_message_is_the_real_reason(client: TestClient,
++                                                      token: Callable[..., str],
++                                                      engagement: str) -> None:
++    from app.services import datasets, jobs
++
++    tok = token()
++    did = _multipart(client, tok, engagement, LABELS).json()["dataset_id"]
++    # an old-style queued job (raw label keys, e.g. from before 0.2.2) now says why it failed
++    jid = jobs.enqueue("parse", {"dataset_id": did,
++                                 "mapping_override": {"Posting Dt": "Posting Date"}},
++                       engagement_id=engagement, created_by="user-1")
++    job = _job(client, tok, jid)
++    assert job["status"] == "failed"
++    assert job["error"].startswith("Mapping problem: Unknown field 'Posting Dt' in the "
++                                   "mapping. Allowed fields: line_id, entry_date,")
++    assert "the job failed" not in job["error"]
++    assert client.get(f"/v1/datasets/{did}", headers=auth(tok)).json()["status"] == "failed"
++
++    # a file that is not UTF-8: refused at upload when the first block is unreadable ...
++    head = b"line_id,posting_date,voucher_no,account_code,debit,credit,narration\n"
++    small = _multipart(client, tok, engagement, head + b"1,2025-01-05,J1,6100,10,0,Caf\xe9\n")
++    assert small.status_code == 422
++    assert small.json()["detail"].startswith("The file is not UTF-8 text (a character near "
++                                             "byte ")
++    # ... and when the bad byte comes later, the parse job says so
++    rows = b"".join(b"%d,2025-01-05,J1,6100,10,0,ok\n" % i for i in range(1, 2000))
++    r = _multipart(client, tok, engagement, head + rows + b"2000,2025-01-05,J1,6100,10,0,"
++                   b"Caf\xe9\n")
++    assert r.status_code == 202 and r.json()["status"] == "failed"
++    err = _job(client, tok, r.json()["job_id"])["error"]
++    assert err.startswith("The file is not UTF-8 text") and "CSV UTF-8" in err
++    assert "Traceback" not in err and "codec" not in err
++
++    assert jobs.job_error_text(ValueError("x")) == (
++        "ValueError: the job failed. Check the file and try again.")
++    assert jobs.job_error_text(datasets.DatasetError("plain words")) == "plain words"
++
++    class Shown(ValueError):
++        user_facing = True
++
++    assert jobs.job_error_text(Shown("our own reason")) == "our own reason"
++
++
++def test_read_error_texts() -> None:
++    import csv
++    import zipfile
++
++    from app.services.datasets import _read_error
++    from app.services.importer import MappingError
++
++    assert _read_error(MappingError("m")) == "m"
++    assert _read_error(csv.Error("field larger than field limit")) == (
++        "The CSV file could not be read (field larger than field limit). Check the quotes "
++        "and separators.")
++    assert _read_error(zipfile.BadZipFile("bad")).startswith("The Excel file could not be")
++    assert _read_error(ValueError("line one\nline two")) == (
++        "The file could not be read: line one.")
++    assert _read_error(ValueError("")) == "The file could not be read: ValueError."
++    assert _read_error(OSError("disk")) == (
++        "OSError: the file could not be read. Check the file and try again.")
+diff --git a/engine/tests/unit/test_mapping_override.py b/engine/tests/unit/test_mapping_override.py
+new file mode 100644
+index 0000000..7b81ea4
+--- /dev/null
++++ b/engine/tests/unit/test_mapping_override.py
+@@ -0,0 +1,113 @@
++"""D56: mapping overrides are normalised and checked against the file before a parse job."""
++
++from __future__ import annotations
++
++from typing import Any
++
++import pytest
++
++from app.services.importer import (
++    ALLOWED_FIELDS,
++    MappingError,
++    canonical_field,
++    normalise_override,
++    suggest_mapping,
++)
++
++HEADERS = ["\ufeffPosting Date", "Voucher No", "Account", "Dr", "Cr", "Narration", "Line ID"]
++
++
++def _err(override: Any, headers: list[str] = HEADERS) -> str:
++    with pytest.raises(MappingError) as ei:
++        normalise_override(override, headers)
++    assert str(ei.value) == ei.value.message
++    return ei.value.message
++
++
++def test_canonical_field() -> None:
++    assert canonical_field("posting_date") == "posting_date"
++    assert canonical_field("Posting Date") == "posting_date"
++    assert canonical_field("date") == "posting_date"
++    assert canonical_field("Dr") == "debit"
++    assert canonical_field("Voucher-No") == "voucher_no"
++    assert canonical_field("zzz") is None
++    assert "posting_date" in ALLOWED_FIELDS and "closing_balance" in ALLOWED_FIELDS
++
++
++def test_canonical_keys_pass_through() -> None:
++    assert normalise_override(None, HEADERS) is None
++    assert normalise_override({}, HEADERS) == {}
++    out = normalise_override({"posting_date": "\ufeffPosting Date", "narration": ""}, HEADERS)
++    assert out == {"posting_date": "\ufeffPosting Date", "narration": ""}
++
++
++def test_label_and_synonym_keys() -> None:
++    out = normalise_override({"Posting Date": "Posting Date", "Voucher No": "Voucher No",
++                              "date ": "Posting Date", "Dr": "Dr", "CR": "Cr",
++                              "account": "Account"}, HEADERS)
++    # header values are resolved to the exact header (here with its BOM)
++    assert out == {"posting_date": "\ufeffPosting Date", "voucher_no": "Voucher No",
++                   "debit": "Dr", "credit": "Cr", "account_code": "Account"}
++
++
++def test_header_value_matched_loosely_when_unique() -> None:
++    out = normalise_override({"posting_date": "posting date", "voucher_no": "VOUCHER_NO"},
++                             HEADERS)
++    assert out == {"posting_date": "\ufeffPosting Date", "voucher_no": "Voucher No"}
++    two = ["Posting Date", "posting-date"]
++    assert "not in the file" in _err({"posting_date": "postingdate"}, two)
++
++
++def test_reversed_direction() -> None:
++    out = normalise_override({"Posting Date": "posting_date", "Account": "account_code",
++                              "Line ID": "line_id", "Dr": "debit"}, HEADERS)
++    assert out == {"posting_date": "\ufeffPosting Date", "account_code": "Account",
++                   "line_id": "Line ID", "debit": "Dr"}
++    odd = ["Fecha", "Importe"]  # headers that are no synonym at all
++    assert normalise_override({"Fecha": "posting_date", "Importe": "Amount"}, odd) == {
++        "posting_date": "Fecha", "amount": "Importe"}
++
++
++def test_unknown_keys_listed_with_allowed_fields() -> None:
++    msg = _err({"zzz": "Dr", "Fecha": "Dr"})
++    assert msg.startswith("Mapping problem: Unknown fields 'zzz', 'Fecha' in the mapping.")
++    assert "Allowed fields: line_id, entry_date, posting_date," in msg
++    one = _err({"zzz": "Dr"})
++    assert "Unknown field 'zzz' in the mapping." in one
++
++
++def test_header_not_in_file() -> None:
++    msg = _err({"posting_date": "Txn Date"})
++    assert ("Column 'Txn Date' (mapped to posting_date) is not in the file. Columns in the "
++            "file: Posting Date, Voucher No, Account, Dr, Cr, Narration, Line ID.") in msg
++    many = [f"c{i}" for i in range(45)]
++    assert "(+5 more)." in _err({"debit": "nope"}, many)
++
++
++def test_values_must_be_text() -> None:
++    assert "The value for 'debit' must be a column header (text)" in _err({"debit": 5})
++    assert "got a number" in _err({"debit": 5.5})
++    assert "got true/false" in _err({"debit": True})
++    assert "got a list" in _err({"debit": ["Dr"]})
++    assert "got an object" in _err({"debit": {"h": "Dr"}})
++    assert normalise_override({"debit": None}, HEADERS) == {"debit": ""}  # null = unmap
++    assert "must be a JSON object" in _err(["posting_date"])
++    assert "must be a JSON object" in _err("posting_date=Posting Date")
++
++
++def test_field_mapped_twice() -> None:
++    msg = _err({"debit": "Dr", "Dr Amount": "Cr"})
++    assert "debit is mapped twice ('debit' and 'Dr Amount')" in msg
++    assert normalise_override({"debit": "Dr", "Dr": "Dr"}, HEADERS) == {"debit": "Dr"}
++
++
++def test_problems_reported_together() -> None:
++    msg = _err({"zzz": "x", "credit": 0, "debit": "Nope"})
++    assert "Unknown field 'zzz'" in msg and "'credit'" in msg and "'Nope'" in msg
++
++
++def test_suggest_mapping_still_refuses_non_canonical_keys() -> None:
++    with pytest.raises(MappingError, match="Unknown field 'Posting Date'"):
++        suggest_mapping(HEADERS, {"Posting Date": "x"})
++    with pytest.raises(ValueError):  # MappingError stays a ValueError for older callers
++        suggest_mapping(HEADERS, {"nonsense": "x"})
+diff --git a/plans/DECISIONS.md b/plans/DECISIONS.md
+index fd31a55..c5c84af 100644
+--- a/plans/DECISIONS.md
++++ b/plans/DECISIONS.md
+@@ -60,3 +60,4 @@ Savio was offline from 27 Oct 2026, 18:24. Each open decision below defaults to
+ | D53 | Which sync changes make results STALE | All changes; or only inputs the engine uses | **Year end → every current sample / JE run / input-VAT run of the engagement STALE** (period and rule dates depend on it); **emirate → JE calendar re-check** of the client's runs (D33 hash). Materiality, framework, status and team: audit only (no engine calculation uses them; WP headers show the values at generation; locked WPs never change) | Firm review policy |
+ | D54 | Value formats from the front end | Strict; or tolerant | **Roles normalised** with the token rules (`tax_partner`, `TAXPARTNER` → TaxPartner; unknown → 422); **emirate codes** DXB/AUH/AD/SHJ/AJM/UAQ/RAK/FUJ → names; status lower-cased; money as Decimal strings, max 2 decimals | n/a |
+ | D55 | Telling the user the redeploy worked | Check the commit on Render; or the version | **Engine version 0.2.1** (`/v1/health`), shown by the Lovable "Engine status" card | n/a |
++| D56 | Bad import mappings and job error text (Stage 5, engine 0.2.2) | Leave the mapping to the parse job (generic "ValueError: the job failed"); or check it first | **Check every mapping override against the file's header row before a job is queued, on all three routes** (multipart upload, chunked complete, `PUT /v1/datasets/{id}/mapping`). Keys may be field names, labels or synonyms; the reversed `{header: field}` is accepted; `""`/`null` unmaps. Unknown keys, headers not in the file, non-text values or a field mapped twice → **422** with one message listing every problem and the allowed fields / file columns (the multipart route returned 400 before). Parse-job failures store the real reason (mapping, non-UTF-8, unreadable CSV/Excel) instead of the type name; other internal errors stay generic. No value is guessed: an unknown name is refused, never dropped. Not done: no automatic fallback to Windows-1252 for non-UTF-8 CSVs (would change what is read; the message tells the user to save as CSV UTF-8) | Savio: whether to add a Windows-1252 fallback later |
+-- 
+2.47.3
+

@@ -1,0 +1,33 @@
+AuditSmart Stage 5 step 2 + step 2b (import error fix) - files to copy into C:\Projects\auditsmart (same relative paths)
+Base: GitHub Savio2358/AuditSmart at ab59111 (Stage 5 step 1, already pushed). Local commits: 1c95785 (step 2, engagement sync) + b5d2f77 (step 2b, D56).
+A = added (new file), M = modified (replace the existing file). Nothing is deleted.
+Do NOT copy patches/, patches_since_1c95785/ or this COPY_LIST.txt into the repo (optional alternative: git am patches/*.patch; if 1c95785 is already applied, git am patches_since_1c95785/*.patch only).
+After pushing, Render redeploys; https://auditsmart-engine.onrender.com/v1/health must show "version":"0.2.2".
+
+modified  docs/DEPLOY_DEV.md
+modified  docs/MULTI_FIRM_APPROVAL.md
+modified  docs/STAGE5_STATUS.md
+added     docs/lovable/5.2_engine_connect.md
+modified  docs/lovable/README.md
+modified  docs/lovable/engine_endpoints.txt
+modified  docs/lovable/engine_endpoints_compact.txt
+modified  docs/lovable/engine_openapi.json
+modified  engine/SPEC.md
+added     engine/alembic/versions/0010_code_unique_per_firm.py
+modified  engine/app/api/v1/datasets.py
+added     engine/app/api/v1/engagements.py
+modified  engine/app/api/v1/router.py
+modified  engine/app/models/__init__.py
+modified  engine/app/schemas/datasets.py
+added     engine/app/schemas/engagements.py
+modified  engine/app/services/datasets.py
+added     engine/app/services/engagements.py
+modified  engine/app/services/importer.py
+modified  engine/app/services/jobs.py
+modified  engine/app/version.py
+modified  engine/pyproject.toml
+modified  engine/tests/api/test_datasets_api.py
+added     engine/tests/api/test_engagements_api.py
+added     engine/tests/api/test_import_errors_api.py
+added     engine/tests/unit/test_mapping_override.py
+modified  plans/DECISIONS.md

@@ -1,0 +1,116 @@
+file,line_id,voucher_no,feature,description
+dummy_gl.csv,L00014,PC-2025-00001,credit_note,"Purchase credit note - credit line in expense account (excluded from debit population, listed)"
+dummy_gl.csv,L00159,PI-2025-00024,top_stratum,Expense debit line >= sampling interval J (95% and 90%)
+dummy_gl.csv,L00166,PC-2025-00002,credit_note,"Purchase credit note - credit line in expense account (excluded from debit population, listed)"
+dummy_gl.csv,L00201,SC-2025-00001,credit_note,Sales credit note - debit to revenue with negative net/VAT
+dummy_gl.csv,L00248,PI-2025-00036,top_stratum,Expense debit line >= sampling interval J (95% and 90%)
+dummy_gl.csv,L00297,SC-2025-00002,credit_note,Sales credit note - debit to revenue with negative net/VAT
+dummy_gl.csv,L00409,SC-2025-00003,credit_note,Sales credit note - debit to revenue with negative net/VAT
+dummy_gl.csv,L00536,PC-2025-00003,credit_note,"Purchase credit note - credit line in expense account (excluded from debit population, listed)"
+dummy_gl.csv,L00612,SC-2025-00004,credit_note,Sales credit note - debit to revenue with negative net/VAT
+dummy_gl.csv,L00621,SC-2025-00005,credit_note,Sales credit note - debit to revenue with negative net/VAT
+dummy_gl.csv,L00680,SC-2025-00006,credit_note,Sales credit note - debit to revenue with negative net/VAT
+dummy_gl.csv,L00702,SC-2025-00007,credit_note,Sales credit note - debit to revenue with negative net/VAT
+dummy_gl.csv,L00757,PC-2025-00004,credit_note,"Purchase credit note - credit line in expense account (excluded from debit population, listed)"
+dummy_gl.csv,L00782,SC-2025-00008,credit_note,Sales credit note - debit to revenue with negative net/VAT
+dummy_gl.csv,L00806,SC-2025-00009,credit_note,Sales credit note - debit to revenue with negative net/VAT
+dummy_gl.csv,L00895,SC-2025-00010,credit_note,Sales credit note - debit to revenue with negative net/VAT
+dummy_gl.csv,L00932,PI-2025-00125,top_stratum,Expense debit line >= sampling interval J (95% and 90%)
+dummy_gl.csv,L00947,PC-2025-00005,credit_note,"Purchase credit note - credit line in expense account (excluded from debit population, listed)"
+dummy_gl.csv,L00953,PC-2025-00006,credit_note,"Purchase credit note - credit line in expense account (excluded from debit population, listed)"
+dummy_gl.csv,L00990,PI-2025-00135,top_stratum,Expense debit line >= sampling interval J (95% and 90%)
+dummy_gl.csv,L01003,SC-2025-00011,credit_note,Sales credit note - debit to revenue with negative net/VAT
+dummy_gl.csv,L01019,PI-2025-00139,top_stratum,Expense debit line >= sampling interval J (95% and 90%)
+dummy_gl.csv,L01038,PC-2025-00007,credit_note,"Purchase credit note - credit line in expense account (excluded from debit population, listed)"
+dummy_gl.csv,L01164,SC-2025-00012,credit_note,Sales credit note - debit to revenue with negative net/VAT
+dummy_gl.csv,L01172,PI-2025-00164,top_stratum,Expense debit line >= sampling interval J (95% and 90%)
+dummy_gl.csv,L01408,SC-2025-00013,credit_note,Sales credit note - debit to revenue with negative net/VAT
+dummy_gl.csv,L01468,SC-2025-00014,credit_note,Sales credit note - debit to revenue with negative net/VAT
+dummy_gl.csv,L01512,SC-2025-00015,credit_note,Sales credit note - debit to revenue with negative net/VAT
+dummy_gl.csv,L01604,SC-2025-00016,credit_note,Sales credit note - debit to revenue with negative net/VAT
+dummy_gl.csv,L01714,PC-2025-00008,credit_note,"Purchase credit note - credit line in expense account (excluded from debit population, listed)"
+dummy_gl.csv,L01808,SC-2025-00017,credit_note,Sales credit note - debit to revenue with negative net/VAT
+dummy_gl.csv,L01833,PC-2025-00009,credit_note,"Purchase credit note - credit line in expense account (excluded from debit population, listed)"
+dummy_gl.csv,L02142,PC-2025-00010,credit_note,"Purchase credit note - credit line in expense account (excluded from debit population, listed)"
+dummy_gl.csv,L02238,SC-2025-00018,credit_note,Sales credit note - debit to revenue with negative net/VAT
+dummy_gl.csv,L02291,PC-2025-00011,credit_note,"Purchase credit note - credit line in expense account (excluded from debit population, listed)"
+dummy_gl.csv,L02332,PC-2025-00012,credit_note,"Purchase credit note - credit line in expense account (excluded from debit population, listed)"
+dummy_gl.csv,L02382,SC-2025-00019,credit_note,Sales credit note - debit to revenue with negative net/VAT
+dummy_gl.csv,L02429,PC-2025-00013,credit_note,"Purchase credit note - credit line in expense account (excluded from debit population, listed)"
+dummy_gl.csv,L02440,PC-2025-00014,credit_note,"Purchase credit note - credit line in expense account (excluded from debit population, listed)"
+dummy_gl.csv,L02492,PC-2025-00015,credit_note,"Purchase credit note - credit line in expense account (excluded from debit population, listed)"
+dummy_gl.csv,L02494,PI-2025-00351,top_stratum,Expense debit line >= sampling interval J (95% and 90%)
+dummy_gl.csv,L02599,PC-2025-00016,credit_note,"Purchase credit note - credit line in expense account (excluded from debit population, listed)"
+dummy_gl.csv,L02602,PC-2025-00017,credit_note,"Purchase credit note - credit line in expense account (excluded from debit population, listed)"
+dummy_gl.csv,L02779,PC-2025-00018,credit_note,"Purchase credit note - credit line in expense account (excluded from debit population, listed)"
+dummy_gl.csv,L02870,PC-2025-00019,credit_note,"Purchase credit note - credit line in expense account (excluded from debit population, listed)"
+dummy_gl.csv,L02877,PI-2025-00400,top_stratum,Expense debit line >= sampling interval J (95% and 90%)
+dummy_gl.csv,L02884,PC-2025-00020,credit_note,"Purchase credit note - credit line in expense account (excluded from debit population, listed)"
+dummy_gl.csv,L02930,SC-2025-00020,credit_note,Sales credit note - debit to revenue with negative net/VAT
+fy2021_2022.csv,F00001,RV-FY-00001,working_day_control,Sunday 2021-12-05 - normal working day before the change (must NOT be flagged)
+fy2021_2022.csv,F00002,RV-FY-00001,working_day_control,Sunday 2021-12-05 - normal working day before the change (must NOT be flagged)
+fy2021_2022.csv,F00003,PV-FY-00001,working_day_control,Sunday 2021-12-05 - normal working day before the change (must NOT be flagged)
+fy2021_2022.csv,F00004,PV-FY-00001,working_day_control,Sunday 2021-12-05 - normal working day before the change (must NOT be flagged)
+fy2021_2022.csv,F00005,RV-FY-00002,working_day_control,Sunday 2021-12-05 - normal working day before the change (must NOT be flagged)
+fy2021_2022.csv,F00006,RV-FY-00002,working_day_control,Sunday 2021-12-05 - normal working day before the change (must NOT be flagged)
+fy2021_2022.csv,F00007,PV-FY-00002,working_day_control,Sunday 2021-12-05 - normal working day before the change (must NOT be flagged)
+fy2021_2022.csv,F00008,PV-FY-00002,working_day_control,Sunday 2021-12-05 - normal working day before the change (must NOT be flagged)
+fy2021_2022.csv,F00053,PV-FY-00013,working_day_control,Sunday 2021-12-12 - normal working day before the change (must NOT be flagged)
+fy2021_2022.csv,F00054,PV-FY-00013,working_day_control,Sunday 2021-12-12 - normal working day before the change (must NOT be flagged)
+fy2021_2022.csv,F00055,PV-FY-00014,working_day_control,Sunday 2021-12-12 - normal working day before the change (must NOT be flagged)
+fy2021_2022.csv,F00056,PV-FY-00014,working_day_control,Sunday 2021-12-12 - normal working day before the change (must NOT be flagged)
+fy2021_2022.csv,F00057,JV-FY-00006,working_day_control,Sunday 2021-12-12 - normal working day before the change (must NOT be flagged)
+fy2021_2022.csv,F00058,JV-FY-00006,working_day_control,Sunday 2021-12-12 - normal working day before the change (must NOT be flagged)
+fy2021_2022.csv,F00059,RV-FY-00010,working_day_control,Sunday 2021-12-12 - normal working day before the change (must NOT be flagged)
+fy2021_2022.csv,F00060,RV-FY-00010,working_day_control,Sunday 2021-12-12 - normal working day before the change (must NOT be flagged)
+fy2021_2022.csv,F00061,PV-FY-00015,working_day_control,Sunday 2021-12-12 - normal working day before the change (must NOT be flagged)
+fy2021_2022.csv,F00062,PV-FY-00015,working_day_control,Sunday 2021-12-12 - normal working day before the change (must NOT be flagged)
+fy2021_2022.csv,F00063,RV-FY-00011,working_day_control,Sunday 2021-12-12 - normal working day before the change (must NOT be flagged)
+fy2021_2022.csv,F00064,RV-FY-00011,working_day_control,Sunday 2021-12-12 - normal working day before the change (must NOT be flagged)
+fy2021_2022.csv,F00105,RV-FY-00019,working_day_control,Sunday 2021-12-19 - normal working day before the change (must NOT be flagged)
+fy2021_2022.csv,F00106,RV-FY-00019,working_day_control,Sunday 2021-12-19 - normal working day before the change (must NOT be flagged)
+fy2021_2022.csv,F00107,RV-FY-00020,working_day_control,Sunday 2021-12-19 - normal working day before the change (must NOT be flagged)
+fy2021_2022.csv,F00108,RV-FY-00020,working_day_control,Sunday 2021-12-19 - normal working day before the change (must NOT be flagged)
+fy2021_2022.csv,F00109,JV-FY-00012,working_day_control,Sunday 2021-12-19 - normal working day before the change (must NOT be flagged)
+fy2021_2022.csv,F00110,JV-FY-00012,working_day_control,Sunday 2021-12-19 - normal working day before the change (must NOT be flagged)
+fy2021_2022.csv,F00151,PV-FY-00033,working_day_control,Sunday 2021-12-26 - normal working day before the change (must NOT be flagged)
+fy2021_2022.csv,F00152,PV-FY-00033,working_day_control,Sunday 2021-12-26 - normal working day before the change (must NOT be flagged)
+fy2021_2022.csv,F00153,RV-FY-00028,working_day_control,Sunday 2021-12-26 - normal working day before the change (must NOT be flagged)
+fy2021_2022.csv,F00154,RV-FY-00028,working_day_control,Sunday 2021-12-26 - normal working day before the change (must NOT be flagged)
+fy2021_2022.csv,F00279,RV-FY-00049,working_day_control,Friday 2022-01-07 before 12:00 - Friday half day after the change (must NOT be flagged)
+fy2021_2022.csv,F00280,RV-FY-00049,working_day_control,Friday 2022-01-07 before 12:00 - Friday half day after the change (must NOT be flagged)
+fy2021_2022.csv,F00281,PV-FY-00060,working_day_control,Friday 2022-01-07 before 12:00 - Friday half day after the change (must NOT be flagged)
+fy2021_2022.csv,F00282,PV-FY-00060,working_day_control,Friday 2022-01-07 before 12:00 - Friday half day after the change (must NOT be flagged)
+fy2021_2022.csv,F00297,PV-FY-00064,working_day_control,Friday 2022-01-14 before 12:00 - Friday half day after the change (must NOT be flagged)
+fy2021_2022.csv,F00298,PV-FY-00064,working_day_control,Friday 2022-01-14 before 12:00 - Friday half day after the change (must NOT be flagged)
+fy2021_2022.csv,F00299,PV-FY-00065,working_day_control,Friday 2022-01-14 before 12:00 - Friday half day after the change (must NOT be flagged)
+fy2021_2022.csv,F00300,PV-FY-00065,working_day_control,Friday 2022-01-14 before 12:00 - Friday half day after the change (must NOT be flagged)
+fy2021_2022.csv,F00301,RV-FY-00052,working_day_control,Friday 2022-01-14 before 12:00 - Friday half day after the change (must NOT be flagged)
+fy2021_2022.csv,F00302,RV-FY-00052,working_day_control,Friday 2022-01-14 before 12:00 - Friday half day after the change (must NOT be flagged)
+fy2021_2022.csv,F00303,PV-FY-00066,working_day_control,Friday 2022-01-14 before 12:00 - Friday half day after the change (must NOT be flagged)
+fy2021_2022.csv,F00304,PV-FY-00066,working_day_control,Friday 2022-01-14 before 12:00 - Friday half day after the change (must NOT be flagged)
+fy2021_2022.csv,F00305,JV-FY-00035,working_day_control,Friday 2022-01-14 before 12:00 - Friday half day after the change (must NOT be flagged)
+fy2021_2022.csv,F00306,JV-FY-00035,working_day_control,Friday 2022-01-14 before 12:00 - Friday half day after the change (must NOT be flagged)
+fy2021_2022.csv,F00327,RV-FY-00057,working_day_control,Friday 2022-01-21 before 12:00 - Friday half day after the change (must NOT be flagged)
+fy2021_2022.csv,F00328,RV-FY-00057,working_day_control,Friday 2022-01-21 before 12:00 - Friday half day after the change (must NOT be flagged)
+fy2021_2022.csv,F00329,RV-FY-00058,working_day_control,Friday 2022-01-21 before 12:00 - Friday half day after the change (must NOT be flagged)
+fy2021_2022.csv,F00330,RV-FY-00058,working_day_control,Friday 2022-01-21 before 12:00 - Friday half day after the change (must NOT be flagged)
+fy2021_2022.csv,F00331,RV-FY-00059,working_day_control,Friday 2022-01-21 before 12:00 - Friday half day after the change (must NOT be flagged)
+fy2021_2022.csv,F00332,RV-FY-00059,working_day_control,Friday 2022-01-21 before 12:00 - Friday half day after the change (must NOT be flagged)
+fy2021_2022.csv,F00367,JV-FY-00041,working_day_control,Friday 2022-01-28 before 12:00 - Friday half day after the change (must NOT be flagged)
+fy2021_2022.csv,F00368,JV-FY-00041,working_day_control,Friday 2022-01-28 before 12:00 - Friday half day after the change (must NOT be flagged)
+fy2021_2022.csv,F00369,RV-FY-00067,working_day_control,Friday 2022-01-28 before 12:00 - Friday half day after the change (must NOT be flagged)
+fy2021_2022.csv,F00370,RV-FY-00067,working_day_control,Friday 2022-01-28 before 12:00 - Friday half day after the change (must NOT be flagged)
+fy2021_2022.csv,F00371,PV-FY-00078,working_day_control,Friday 2022-01-28 before 12:00 - Friday half day after the change (must NOT be flagged)
+fy2021_2022.csv,F00372,PV-FY-00078,working_day_control,Friday 2022-01-28 before 12:00 - Friday half day after the change (must NOT be flagged)
+fy2021_2022.csv,F00373,JV-FY-00042,working_day_control,Friday 2022-01-28 before 12:00 - Friday half day after the change (must NOT be flagged)
+fy2021_2022.csv,F00374,JV-FY-00042,working_day_control,Friday 2022-01-28 before 12:00 - Friday half day after the change (must NOT be flagged)
+fy2021_2022.csv,F00375,PV-FY-00079,working_day_control,Friday 2022-01-28 before 12:00 - Friday half day after the change (must NOT be flagged)
+fy2021_2022.csv,F00376,PV-FY-00079,working_day_control,Friday 2022-01-28 before 12:00 - Friday half day after the change (must NOT be flagged)
+edge_cases.csv,E0016,EV-008,parse_ok_date,dd/mm/yyyy date 15/03/2025 must parse to 2025-03-15
+edge_cases.csv,E0018,EV-009,parse_ok_date,Excel serial date 45731 must parse to 2025-03-15
+edge_cases.csv,E0020,EV-010,parse_ok_amount,"Amount '1,234.50' with thousands separator must parse to 1234.50"
+edge_cases.csv,E0023,EV-011,parse_ok_amount,Bracketed amount '(500.00)' must parse to -500.00; voucher then balances
+edge_cases.csv,E0026,EV-012,parse_ok_amount,Trailing-minus amount '750.00-' must parse to -750.00; voucher then balances
+edge_cases.csv,E0028,EV-013,parse_warning_amount,Currency prefix 'AED 500' - strip prefix and warn (or reject) - firm to decide
+edge_cases.csv,E0041,EV-019,valid_trn_control,TRN '100549222448546' (valid 15-digit TRN starting 100) must pass

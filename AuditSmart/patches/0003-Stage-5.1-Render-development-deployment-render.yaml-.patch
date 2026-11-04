@@ -1,0 +1,541 @@
+From ab591111d0ea33d77faac8794531d7bb7cf496b5 Mon Sep 17 00:00:00 2001
+From: "Grok Bot (AuditSmart build for Savio Jose)"
+ <auditsmart-build@localhost>
+Date: Mon, 2 Nov 2026 17:09:06 +0000
+Subject: [PATCH 3/3] Stage 5.1 Render development deployment: render.yaml,
+ start.sh, Dockerfile, DEPLOY_DEV guide, D46-D49, Stage 5 status
+
+---
+ .gitattributes          |   2 +
+ docs/DEPLOY_DEV.md      | 282 ++++++++++++++++++++++++++++++++++++++++
+ docs/STAGE5_STATUS.md   |  49 +++++++
+ engine/Dockerfile       |   8 +-
+ engine/scripts/start.sh |  13 ++
+ plans/DECISIONS.md      |   4 +
+ render.yaml             | 110 ++++++++++++++++
+ 7 files changed, 466 insertions(+), 2 deletions(-)
+ create mode 100644 .gitattributes
+ create mode 100644 docs/DEPLOY_DEV.md
+ create mode 100644 docs/STAGE5_STATUS.md
+ create mode 100644 engine/scripts/start.sh
+ create mode 100644 render.yaml
+
+diff --git a/.gitattributes b/.gitattributes
+new file mode 100644
+index 0000000..e03564e
+--- /dev/null
++++ b/.gitattributes
+@@ -0,0 +1,2 @@
++# Shell scripts run in Linux containers: keep LF even on Windows checkouts.
++*.sh text eol=lf
+diff --git a/docs/DEPLOY_DEV.md b/docs/DEPLOY_DEV.md
+new file mode 100644
+index 0000000..3a2981e
+--- /dev/null
++++ b/docs/DEPLOY_DEV.md
+@@ -0,0 +1,282 @@
++# Deploy the AuditSmart engine to Render (development, dummy data only)
++
++Stage 5, step 1. This guide puts the calculation engine on the internet so the Lovable app can
++call it. It is written for a non-developer: follow the steps in order and copy the commands
++exactly. Decisions: plans/DECISIONS.md D46-D49.
++
++> **DUMMY DATA ONLY.** This is a free development set-up. Files can disappear at any time, the
++> database is deleted after 30 days, and nothing here has been reviewed for real client data.
++> Never upload a real client's ledger, trial balance or TRN list.
++
++> **Keys and secrets never go into files, GitHub or chat.** You type them only into the Render
++> dashboard (step 4). If a key is ever pasted somewhere else, treat it as leaked and replace it.
++
++---
++
++## 1. What you will end up with
++
++| Thing | Name on Render | Cost | Notes |
++|---|---|---|---|
++| Web service (the engine, from `engine/Dockerfile`) | `auditsmart-engine` | Free | Frankfurt; sleeps after 15 min without visits; about 1 minute to wake |
++| PostgreSQL database | `auditsmart-db` | Free | Frankfurt; 1 GB; **expires 30 days after creation** |
++| Weekly FTA monitor (cron job) | *(not created)* | Paid only | Left switched off in `render.yaml` (section 9) |
++
++Everything is described in one file, `render.yaml`, at the top of the repository. Render calls
++this a **Blueprint**.
++
++When the engine starts it automatically (a) updates the database tables (`alembic upgrade
++head`) and (b) loads the shared default rules and the watched FTA sources. Starting again is
++safe: nothing is loaded twice.
++
++---
++
++## 2. Put the new files on GitHub (PowerShell, on your PC)
++
++You received `auditsmart_stage5_step1.zip`. It holds every file added or changed since commit
++`c062f7b` (the last one on GitHub), at the same folder positions as in the repository, plus a
++`patches` folder and `COPY_LIST.txt` (the list of files, each marked `added` or `modified`).
++You do not copy `patches` or `COPY_LIST.txt` into the project.
++
++1. Save the zip to your **Downloads** folder.
++2. Open **PowerShell** (Start menu, type `PowerShell`, press Enter).
++3. Paste these lines one at a time and press Enter after each:
++
++```powershell
++cd C:\Projects\auditsmart
++git status
++```
++
++   `git status` should say `nothing to commit, working tree clean` (or list only files you know
++   about). If it lists changes you did not make, stop and ask before continuing.
++
++```powershell
++Expand-Archive -Path "$env:USERPROFILE\Downloads\auditsmart_stage5_step1.zip" -DestinationPath "$env:USERPROFILE\Downloads\auditsmart_stage5_step1" -Force
++robocopy "$env:USERPROFILE\Downloads\auditsmart_stage5_step1" "C:\Projects\auditsmart" /E /XD patches /XF COPY_LIST.txt
++```
++
++   robocopy prints a summary table. That is normal (its "exit code" 1 means "files copied").
++
++```powershell
++git status
++```
++
++   You should see the files from `COPY_LIST.txt` (for example `render.yaml`,
++   `docs/DEPLOY_DEV.md`, `engine/scripts/start.sh`). Nothing else should appear - in particular
++   no `.env` file and no file with real client data.
++
++```powershell
++git add render.yaml .gitattributes docs plans engine
++git commit -m "Stage 4 prompt pack + Stage 5 step 1: Render dev deployment, approval and firm-claim fixes"
++git push
++```
++
++4. Open https://github.com/Savio2358/AuditSmart in your browser. `render.yaml` should now be
++   in the file list at the top level.
++
++---
++
++## 3. Create the Render account
++
++1. Go to https://dashboard.render.com and choose **Sign up** (or **Sign in**).
++2. Choose **GitHub** and approve the request. Render can now see your repositories.
++3. Render may ask for a workspace name: `AuditSmart` is fine. No card is needed for free plans.
++
++---
++
++## 4. Create the Blueprint
++
++1. In the Render dashboard click **New** (top right) and choose **Blueprint**.
++2. Under *Connect a repository*, pick **Savio2358/AuditSmart**.
++   - Not in the list? Click **Configure GitHub** (or *Configure account*), allow Render access to
++     the `AuditSmart` repository, then come back.
++3. **Blueprint Name**: `auditsmart-dev`. **Branch**: the branch you pushed to (normally `main`).
++4. Render reads `render.yaml` and shows two items: `auditsmart-engine` (web service) and
++   `auditsmart-db` (database). Both should say **Free**.
++5. Render now asks for the values marked *sync: false*. Fill them from the table in section 5.
++   Leave a box empty where the table says "leave empty".
++6. Click **Deploy Blueprint** (the button may say **Apply**).
++7. The first build takes about 5-10 minutes. Click `auditsmart-engine` and open **Logs** to
++   watch. Success looks like:
++   ```
++   start.sh: alembic upgrade head
++   ... Application startup complete.
++   ... Uvicorn running on http://0.0.0.0:10000
++   ```
++
++---
++
++## 5. The settings (environment variables)
++
++You type only the rows marked **you type it**. The others are already in `render.yaml`.
++
++| Setting | Value | Where it comes from |
++|---|---|---|
++| `ENVIRONMENT` | `development` | Already set. Makes the engine load the default rules at start-up |
++| `DATABASE_URL` | *(automatic)* | Already set. Render links it to `auditsmart-db` |
++| `AUTH_PROVIDER` | `supabase` | Already set. Lovable Cloud sign-in is Supabase Auth |
++| `AUTH_ISSUER` | **you type it**: `https://<project-ref>.supabase.co/auth/v1` | Your Lovable Cloud project URL **plus `/auth/v1`**, no slash at the end. See 5.1 |
++| `AUTH_AUDIENCE` | `authenticated` | Already set. Supabase puts this in every signed-in user's token |
++| `AUTH_JWKS_URL` | **leave empty** | Optional. Empty means `<AUTH_ISSUER>/.well-known/jwks.json`. See 5.2 |
++| `AUTH_HS256_SECRET` | **leave empty** unless 5.2 says otherwise | Optional. Only for projects still on the *legacy* JWT secret. See 5.2 |
++| `ALLOWED_ORIGINS` | **you type it**: the Lovable preview URL and published URL, comma-separated, no spaces | See 5.3 |
++| `AI_PROVIDER` | **leave empty** (or `stub`) | Empty or `stub` = no outside AI service is called. `gemini` only after you decide to use Gemini |
++| `AI_MODEL` | **leave empty** | Only used with `gemini` (default `gemini-1.5-pro`) |
++| `GEMINI_API_KEY` | **leave empty** | Only with `AI_PROVIDER=gemini`. Typed only here, never in chat or files |
++| `RULES_ALLOW_PENDING` | `true` | Already set. Development: unverified seed rules may be used and are flagged |
++| `AUTH_FIRM_CLAIM` | `firm_id` | Already set. The firm is read from `app_metadata.firm_id` in the sign-in token |
++
++The AI only writes wording. It never calculates. Every number comes from the engine.
++
++You can change any value later: **auditsmart-engine > Environment > Edit**, then **Save,
++rebuild, and deploy**.
++
++### 5.1 Finding the Lovable Cloud project URL (for `AUTH_ISSUER`)
++
++Lovable Cloud runs on Supabase. The project URL looks like `https://abcdefghijklmnop.supabase.co`.
++Ways to find it (no credits needed):
++
++- In GitHub, open the Lovable app's repository and the `.env` file at the top. The line
++  `VITE_SUPABASE_URL="https://....supabase.co"` is the project URL. (The
++  `VITE_SUPABASE_PUBLISHABLE_KEY` next to it is a public key. You do not need it here.)
++- Or open the Lovable preview in Chrome, press **F12**, open **Network**, sign in, and look for
++  a request to `....supabase.co/auth/v1/token`. The part up to `.supabase.co` is the URL.
++
++Then add `/auth/v1`. Example: `https://abcdefghijklmnop.supabase.co/auth/v1`.
++
++### 5.2 JWKS (signing keys) or the legacy HS256 secret?
++
++Supabase signs each sign-in token in one of two ways:
++
++- **Signing keys (JWKS)** - newer projects. Tokens say `"alg": "ES256"` (or `RS256`). The
++  engine downloads the public keys itself from
++  `https://<project-ref>.supabase.co/auth/v1/.well-known/jwks.json`. **No secret is needed.**
++  Leave `AUTH_JWKS_URL` and `AUTH_HS256_SECRET` empty.
++- **Legacy JWT secret** - older projects. Tokens say `"alg": "HS256"`. The engine then needs
++  the project's *legacy JWT secret* in `AUTH_HS256_SECRET` (at least 32 characters).
++
++How to tell which one your project uses:
++
++1. Open `https://<project-ref>.supabase.co/auth/v1/.well-known/jwks.json` in your browser.
++   - It shows a key with `"alg":"ES256"` or `"alg":"RS256"` -> the project has signing keys.
++   - It shows `{"keys":[]}` -> the project uses only the legacy secret.
++2. To be certain which one signs your tokens today: open the Lovable preview, sign in, press
++   **F12**, open **Console**, paste this line and press Enter. It shows only the token's header
++   (which algorithm signed it). Nothing is sent anywhere:
++   ```js
++   JSON.parse(atob(JSON.parse(localStorage.getItem(Object.keys(localStorage).find(k => k.endsWith('-auth-token')))).access_token.split('.')[0]))
++   ```
++   `alg: "ES256"` or `"RS256"` = JWKS (leave the secret empty). `alg: "HS256"` = legacy secret.
++
++If it is HS256: Lovable Cloud may not show you the legacy secret. Do not guess and do not paste
++it into chat. Stop and decide with your adviser (section 10, decision 3).
++
++### 5.3 `ALLOWED_ORIGINS` (which websites may call the engine)
++
++Only these browser addresses can call the engine. Use the address bar, **without** any path and
++**without** a trailing `/`:
++
++- the Lovable **preview** URL, e.g. `https://id-preview--1234abcd.lovable.app`
++- the **published** URL, e.g. `https://auditsmart.lovable.app` (and any custom domain)
++
++Type them comma-separated with no spaces:
++`https://id-preview--1234abcd.lovable.app,https://auditsmart.lovable.app`
++(A trailing `/` is removed automatically, but other paths are not.)
++
++---
++
++## 6. Check that it works
++
++1. In Render, open `auditsmart-engine`. Copy its address at the top, e.g.
++   `https://auditsmart-engine.onrender.com` (Render may add a few letters to the name).
++2. Open `<that address>/v1/health` in your browser. You should see:
++   ```json
++   {"status":"ok","service":"auditsmart-engine","version":"0.2.0","environment":"development","db":"ok","queue":"in-process"}
++   ```
++   - The first visit after a quiet period takes about a minute (the free service is waking).
++   - `"db":"ok"` means the database is connected.
++3. `<that address>/docs` shows the list of engine endpoints.
++4. `<that address>/v1/rules` should answer `401` ("Sign in required"). That is correct: the
++   engine needs a signed-in Lovable user. Connecting Lovable is the next step (Stage 5 step 2).
++
++---
++
++## 7. Free-plan cautions
++
++- **It sleeps.** After 15 minutes with no visits the engine stops. The next visit wakes it in
++  about a minute. Render shows a loading page meanwhile.
++- **Uploaded files are temporary.** Uploads, parsed datasets and generated workpapers are
++  stored on the service's own disk, which is wiped on every restart, redeploy or sleep. The
++  database rows stay, but their files may be gone: upload the dummy file again if needed.
++- **The free database expires 30 days after it was created.** Render emails you before. After
++  that you have 14 days to upgrade it to a paid plan, then it is deleted with all its data. It
++  holds at most 1 GB and has no backups. Only one free database is allowed per workspace.
++- **512 MB memory.** The engine uses about 160 MB when idle. Very large dummy files may make it
++  restart. Keep test files small (a few thousand rows).
++- **750 free hours a month** for all free services together (enough for one service).
++- **Dummy data only.** See the top of this page.
++
++---
++
++## 8. Troubleshooting
++
++| What you see | What it means | What to do |
++|---|---|---|
++| Build fails in **Logs** | The Docker image could not be built | Open the first red line in Logs. Check that `render.yaml` and `engine/scripts/start.sh` reached GitHub (step 2) |
++| Log shows `alembic` error, service restarts | The database could not be updated | Check `auditsmart-db` is *Available*. Use **Manual Deploy > Deploy latest commit** to retry |
++| `/v1/health` shows `"db":"error..."` | Engine cannot reach the database | `DATABASE_URL` must come from `auditsmart-db` (it does in `render.yaml`). Both must be in Frankfurt |
++| **401** "Your sign-in token is not valid or has expired" | Token was checked and rejected: wrong issuer, wrong audience, or a key mismatch | `AUTH_ISSUER` must be exactly `https://<project-ref>.supabase.co/auth/v1` (no trailing `/`). `AUTH_AUDIENCE` = `authenticated`. Re-check section 5.2: an HS256 token needs `AUTH_HS256_SECRET`; an ES256/RS256 token needs the JWKS address to work. Sign out and in again (tokens expire after about an hour) |
++| **401** "Sign in required" | No token was sent | The Lovable app is not sending `Authorization: Bearer <token>` yet (step 2 work) |
++| **403** "Only a TaxPartner / Partner ..." or another role message | Signed in, but the token carries no suitable role, or no firm | The engine reads roles **only** from `app_metadata.roles` and the firm **only** from `app_metadata.firm_id`. Values the user typed into their own profile (`user_metadata`) are ignored on purpose. See section 10 |
++| Browser console says **CORS** / "blocked by CORS policy" | The page's address is not in `ALLOWED_ORIGINS` | Add the exact address from the browser bar (no path, no `/` at the end) and redeploy. Note the preview and published addresses are different |
++| Health page slow, then fine | The free service was asleep | Normal (section 7) |
++| Everything stopped after ~30 days | The free database expired | Upgrade it, or delete it and recreate the Blueprint for a new 30 days (all data is lost) |
++
++---
++
++## 9. Later: paid plans and the weekly FTA monitor (not now)
++
++- To stop the sleeping: change `plan: free` to a paid plan (for example `0.5c-512mb`) in
++  `render.yaml` for the web service, or in **Settings > Instance Type**.
++- The weekly FTA monitor is written in `render.yaml` but commented out (lines starting with
++  `#`). Render cron jobs have no free plan (smallest is `0.5c-512mb`). A cron job also runs in
++  its own container, so it would not see files kept by the free web service. Until then,
++  a TaxPartner or Admin runs the check by hand: `POST /v1/rules-monitor/check` (the Rules
++  monitor screen in the Lovable app, once it is connected). Running the check proposes rule
++  changes only; approving them stays with the TaxPartner / Partner.
++- A paid database (with backups) is needed before any non-dummy use.
++
++---
++
++## 10. Role and firm claims - the risk to settle in step 2
++
++The engine trusts only what is in the **signed** token, in `app_metadata`:
++
++```json
++{ "sub": "...", "aud": "authenticated", "role": "authenticated",
++  "app_metadata": { "roles": ["Partner"], "firm_id": "firm-cla-emirates" } }
++```
++
++- `app_metadata` can only be written by the server (Supabase admin side). A user cannot change
++  it, so it is safe to base approvals on.
++- `user_metadata` **can** be changed by the user from the browser, so the engine never reads it
++  (D48). The top-level `role` claim is always `authenticated` in Supabase and is not an
++  AuditSmart role.
++- **Risk:** Lovable apps usually keep roles in a database table (e.g. `user_roles`), not in
++  `app_metadata`. If so, every user reaches the engine with no role and gets **403** on
++  role-gated actions such as approvals. Never "fix" this by having the browser send a role, or
++  by reading `user_metadata` - that would let any user make themselves a TaxPartner.
++
++Safe ways to put roles and the firm into `app_metadata` (decide before step 2):
++
++1. **Custom Access Token Hook** (Supabase Auth hook): a small database function copies the
++   user's roles and firm from the `user_roles` table into `app_metadata` each time a token is
++   issued. Recommended - one source of truth.
++2. **Set `app_metadata` from a server-side function** (Supabase admin API, service-role key kept
++   on the server) whenever an admin changes a user's role.
++
++Both need changes in the Lovable Cloud project. Ask before using Lovable credits.
++
++Approval rules the engine enforces (D43, D47): **TaxPartner** approves tax rules (VAT, Input
++VAT, CT, TRN, legal references); **Partner** approves methodology rules (sampling, JE tests,
++Benford, data validation). **Admin never approves rules** - neither a firm Admin nor the
++platform Admin. A user who should approve both kinds needs both roles.
+diff --git a/docs/STAGE5_STATUS.md b/docs/STAGE5_STATUS.md
+new file mode 100644
+index 0000000..4a9aabb
+--- /dev/null
++++ b/docs/STAGE5_STATUS.md
+@@ -0,0 +1,49 @@
++# Stage 5 status – Step 1: development deployment files + two engine fixes
++
++Date: 2 Nov 2026. Builds on Stage 4 (GitHub `Savio2358/AuditSmart` at `c062f7b`, plus the
++Stage 4 status / Lovable docs). Nothing was pushed by the AI; no Lovable credits were used.
++**Dummy data only** on the development deployment.
++
++## What was added
++| Item | Purpose |
++|---|---|
++| `render.yaml` | Render Blueprint: free Docker web service `auditsmart-engine` + free PostgreSQL 16 `auditsmart-db`, Frankfurt. Secrets are `sync: false` (typed into the Render dashboard, never in git). Weekly FTA monitor cron is included **commented out** (no free cron plan) |
++| `engine/scripts/start.sh` | Container start: `alembic upgrade head` (when `DATABASE_URL` is set), then uvicorn on `$PORT` with proxy headers |
++| `engine/Dockerfile` | Copies `scripts/`, makes `/app/storage` writable by the non-root user, health check on `$PORT`, starts via `start.sh` |
++| `.gitattributes` | Keeps `*.sh` with LF line endings when committed from Windows |
++| `docs/DEPLOY_DEV.md` | Step-by-step for Savio: copy, push, Render Blueprint, environment variables, checks, troubleshooting, role/firm-claim notes |
++| Migration `0009_rule_unit_length` | Widens `rule_versions.unit` to 128 (found by a PostgreSQL rehearsal, D49) |
++
++## Fixes
++- **Fix A – Admin never approves (D47).** Shared defaults are approved / rejected by the
++  TaxPartner (VAT, INPUT_VAT, CT, TRN, LEGAL_REF) or the Partner (SAMPLING, JE, BENFORD,
++  VALIDATION). Admin, alone or with Manager, gets 403. Matches the firm-level rule (D43).
++- **Fix B – Supabase firm claim from `app_metadata` only (D48).** A top-level `firm_id`,
++  `user_metadata`, or a non-object `app_metadata` is ignored for `AUTH_PROVIDER=supabase`.
++  Entra keeps the top-level claim; `dev` keeps its fallback.
++- Also: `postgres://` URLs map to psycopg 3 (D46), `ALLOWED_ORIGINS` tolerates a trailing `/`,
++  `%` in a database password no longer breaks Alembic.
++
++## Verification (on the AI's box)
++- `pytest --cov`: 340 passed, total coverage 99.06% (gate 90%), SQLite.
++- Same 340 tests on a local PostgreSQL 16 (`AUDITSMART_TEST_PG_URL`): all passed.
++- `ruff check .`: clean. `mypy` (project config) and `mypy --strict app`: no issues.
++- Render rehearsal without Docker (Docker is not available on the box): same file layout as
++  the image, `PORT=10000`, Render-style `postgresql://` URL, Supabase HS256 dummy secret →
++  migrations to 0009, 53 rule versions + 9 watched sources seeded, `/v1/health` ok with db ok,
++  401 without a token / with a wrong issuer, Admin approval 403, CORS preflight ok for the
++  allowed origin and refused for others, restart idempotent, idle memory about 160 MB.
++- `render.yaml` validated against Render's published JSON schema: 0 errors.
++- Lovable contract export re-run: unchanged (no API shape changes).
++
++## Not done / waiting for Savio
++1. Copy the files into `C:\Projects\auditsmart`, commit and push (see `docs/DEPLOY_DEV.md` §2).
++2. Create the Render Blueprint and enter the secret values (§3–5).
++3. Decide how roles and `firm_id` reach `app_metadata` in the Supabase token (§10) –
++   Custom Access Token Hook (recommended) or server-side `app_metadata`. This touches the
++   Lovable project: ask before spending Lovable credits.
++4. Confirm whether Lovable Cloud exposes JWKS (asymmetric keys) or only the legacy HS256
++   secret (§5.2).
++5. AI provider / Gemini key for the rules monitor (optional; leave blank to keep AI off).
++6. The free database expires 30 days after creation; decide on a paid plan before then
++   if the data must be kept. Enabling the weekly monitor cron needs a paid cron plan.
+diff --git a/engine/Dockerfile b/engine/Dockerfile
+index 16e56bd..d130320 100644
+--- a/engine/Dockerfile
++++ b/engine/Dockerfile
+@@ -9,7 +9,11 @@ COPY app ./app
+ COPY alembic ./alembic
+ COPY alembic.ini ./
+ COPY seed_data ./seed_data
++COPY scripts/start.sh ./scripts/start.sh
++# File storage (STORAGE_URL empty -> /app/storage). Ephemeral on Render (D46): dummy data only.
++RUN mkdir -p /app/storage && chown engine:engine /app/storage
+ USER engine
+ EXPOSE 8000
+-HEALTHCHECK --interval=30s --timeout=5s CMD python -c "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/v1/health').status==200 else 1)"
+-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers"]
++HEALTHCHECK --interval=30s --timeout=5s CMD python -c "import os,urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:%s/v1/health' % os.environ.get('PORT','8000')).status==200 else 1)"
++# Runs `alembic upgrade head` when DATABASE_URL is set, then uvicorn on $PORT (scripts/start.sh).
++CMD ["sh", "scripts/start.sh"]
+diff --git a/engine/scripts/start.sh b/engine/scripts/start.sh
+new file mode 100644
+index 0000000..ce01e48
+--- /dev/null
++++ b/engine/scripts/start.sh
+@@ -0,0 +1,13 @@
++#!/bin/sh
++# Container start (Render free plan has no pre-deploy command, so migrations run here).
++# 1. With DATABASE_URL set (Render Postgres): bring the schema to the latest Alembic revision.
++#    Re-running is harmless: Alembic skips revisions already applied.
++# 2. Start the API on $PORT (Render sets it; 8000 locally). Outside ENVIRONMENT=production the
++#    app seeds the shared default rules and watched sources at start-up (idempotent).
++set -eu
++if [ -n "${DATABASE_URL:-}" ]; then
++  echo "start.sh: alembic upgrade head"
++  alembic upgrade head
++fi
++exec uvicorn app.main:app --host 0.0.0.0 --port "${PORT:-8000}" --proxy-headers \
++  --forwarded-allow-ips "${FORWARDED_ALLOW_IPS:-127.0.0.1}"
+diff --git a/plans/DECISIONS.md b/plans/DECISIONS.md
+index 8b94f4e..4c732b6 100644
+--- a/plans/DECISIONS.md
++++ b/plans/DECISIONS.md
+@@ -50,3 +50,7 @@ Savio was offline from 27 Oct 2026, 18:24. Each open decision below defaults to
+ | D43 | Who approves for a firm | Any Partner; or by domain | **TaxPartner for tax domains (VAT, INPUT_VAT, CT, TRN, LEGAL_REF), Partner for methodology**; Manager/Partner/TaxPartner may propose; Admin never approves; engagement overrides need engagement membership; every decision needs a comment and is audit-logged. Same person may propose and approve (no four-eyes yet) | Firm access policy |
+ | D44 | Pending defaults for new firms | Block until approved; or allow pending | **`RULES_ALLOW_PENDING=true` stays the default**; each firm can only tighten it (`require_approved_rules`); pending allowed = platform flag AND NOT firm flag | Each firm's partner |
+ | D45 | Isolation between firms | Filter in the UI; or enforce in the engine | **Enforced in the engine**: rule scope (ContextVar) set per job and per sync endpoint from the engagement's client firm; other firms' rows are never candidates, return 404 and are never listed; other firms' engagements → 403; closing / superseding / STALE limited to the owning firm or engagement; the rules monitor sees shared defaults only; firm claim read from the token (`AUTH_FIRM_CLAIM`, Supabase `app_metadata` only) | Savio: token claim set-up per firm |
++| D46 | Where the development engine runs (Stage 5 step 1) | Render free; Render paid; Azure | **Render Blueprint (`render.yaml`), free web service + free Postgres 16, Frankfurt, no Redis (jobs in-process).** Free has no pre-deploy command, so `engine/scripts/start.sh` runs `alembic upgrade head` then uvicorn on `$PORT`; `ENVIRONMENT=development` (the only mode that seeds default rules and watched sources at start-up). `postgres://` / `postgresql://` URLs are normalised to `postgresql+psycopg://` (psycopg 3; psycopg2 is not installed). ALLOWED_ORIGINS drops a trailing `/`. Storage is the container disk (ephemeral: lost on restart, redeploy or sleep); database expires after 30 days. Weekly FTA monitor cron left commented out (cron has no free plan; it would not share the web service's files). **Dummy data only** | Change `plan:` in render.yaml (e.g. `0.5c-512mb`); uncomment the cron block; add a disk or object storage before real data |
++| D47 | Who approves a **shared default** (platform user, no firm claim) | TaxPartner or Admin (Stage 3); or the D43 domain split | **D43 split, Admin never**: TaxPartner for tax domains (VAT, INPUT_VAT, CT, TRN, LEGAL_REF), Partner for methodology (SAMPLING, JE, BENFORD, VALIDATION, ...). Same for reject. Supersedes the "Tax Partner or Admin" wording in SPEC 3.8; `APPROVER_ROLES` is now `("TaxPartner", "Partner")` | `FIRM_TAX_APPROVERS` / `FIRM_METHOD_APPROVERS` / `TAX_DOMAINS` in app/services/rules.py |
++| D48 | Where the Supabase firm claim is read | `app_metadata` then top-level (Stage 3 fallback); or `app_metadata` only | **`app_metadata.<AUTH_FIRM_CLAIM>` only** for `AUTH_PROVIDER=supabase` (server-set; a top-level claim could come from a custom hook or a third-party token and is ignored, like `user_metadata`). Entra: top-level claim. `dev` (development only) keeps the fallback, like its roles | app/core/security.py `_principal` |
++| D49 | VARCHAR lengths only failing on PostgreSQL | Shorten seed units; or widen the column | **Migration 0009 widens `rule_versions.unit` to 128** (three JE seed units are 41-64 characters; SQLite never enforced 32). Found by a local PostgreSQL 16 rehearsal of the Render start. The suite can now run on PostgreSQL: set `AUDITSMART_TEST_PG_URL` to a scratch database (its schema is dropped per test) | `alembic downgrade 0008` reverses it (fails if a longer unit is stored) |
+diff --git a/render.yaml b/render.yaml
+new file mode 100644
+index 0000000..3eb7bef
+--- /dev/null
++++ b/render.yaml
+@@ -0,0 +1,110 @@
++# AuditSmart - Render Blueprint for the DEVELOPMENT engine (Stage 5, step 1; D46).
++# Render reads this file when you choose New > Blueprint and pick this repository.
++# Guide for non-developers: docs/DEPLOY_DEV.md
++#
++# DUMMY DATA ONLY. The free plan sleeps after 15 minutes idle, keeps uploaded files only until
++# the next restart/redeploy (no disks on free), and the free database is deleted 30 days after
++# it is created (14-day grace to upgrade). Nothing here is fit for real client data.
++#
++# Secrets are never written in this file: every "sync: false" value is typed into the Render
++# dashboard when the Blueprint is first created (Render asks for each one).
++
++services:
++  - type: web
++    name: auditsmart-engine
++    runtime: docker
++    # Free plan: 512 MB RAM / 0.1 CPU, sleeps when idle, no pre-deploy command, no disk.
++    # Upgrade later by changing to a paid plan such as "0.5c-512mb" - docs/DEPLOY_DEV.md section 9.
++    plan: free
++    # Frankfurt is the Render region closest to the UAE.
++    region: frankfurt
++    dockerfilePath: ./engine/Dockerfile
++    dockerContext: ./engine
++    # Free plan has no preDeployCommand, so migrations run in the start script:
++    # `alembic upgrade head` (when DATABASE_URL is set), then uvicorn on Render's $PORT.
++    dockerCommand: sh scripts/start.sh
++    healthCheckPath: /v1/health
++    # Only rebuild when the engine (or this file) changes, not for docs-only commits.
++    buildFilter:
++      paths:
++        - engine/**
++        - render.yaml
++      ignoredPaths:
++        - engine/tests/**
++        - engine/**/*.md
++    envVars:
++      # "development" makes the engine seed the shared default rules and the watched FTA
++      # sources at start-up (idempotent). It is the only mode that seeds; see D46.
++      - key: ENVIRONMENT
++        value: development
++      - key: DATABASE_URL
++        fromDatabase:
++          name: auditsmart-db
++          property: connectionString
++      # Sign-in comes from Lovable Cloud (Supabase Auth).
++      - key: AUTH_PROVIDER
++        value: supabase
++      # https://<project-ref>.supabase.co/auth/v1  (no trailing slash)
++      - key: AUTH_ISSUER
++        sync: false
++      - key: AUTH_AUDIENCE
++        value: authenticated
++      # Optional. Empty = <AUTH_ISSUER>/.well-known/jwks.json (Supabase signing keys).
++      - key: AUTH_JWKS_URL
++        sync: false
++      # Optional. Only if the Supabase project still signs with the legacy HS256 JWT secret.
++      - key: AUTH_HS256_SECRET
++        sync: false
++      # Lovable preview + published URLs, comma-separated, e.g.
++      # https://id-preview--xxxx.lovable.app,https://auditsmart.lovable.app
++      - key: ALLOWED_ORIGINS
++        sync: false
++      # AI wording only (the AI never calculates). Empty or "stub" = no external AI call.
++      - key: AI_PROVIDER
++        sync: false
++      - key: AI_MODEL
++        sync: false
++      - key: GEMINI_API_KEY
++        sync: false
++      # Development: unverified (pending_verification) seed rules may be used, flagged.
++      - key: RULES_ALLOW_PENDING
++        value: "true"
++      # The firm is read from app_metadata.firm_id in the Supabase token (D48).
++      - key: AUTH_FIRM_CLAIM
++        value: firm_id
++      # No REDIS_URL: jobs run in-process on the free plan (no Render Key Value needed).
++
++  # Weekly FTA source monitor - DISABLED. Render cron jobs have no free plan (smallest is
++  # "0.5c-512mb", billed for its run time), and a cron job runs in its own container,
++  # so it cannot see the web service's ephemeral files. Until it is enabled, run the check by hand from the app
++  # (POST /v1/rules-monitor/check) or locally with `python -m app.cli monitor-check`.
++  # To enable later, uncomment (and copy the auth/AI envVars above if it needs them):
++  #
++  # - type: cron
++  #   name: auditsmart-fta-monitor
++  #   runtime: docker
++  #   plan: 0.5c-512mb
++  #   region: frankfurt
++  #   schedule: "0 4 * * 1"   # Mondays 04:00 UTC = 08:00 UAE
++  #   dockerfilePath: ./engine/Dockerfile
++  #   dockerContext: ./engine
++  #   dockerCommand: python -m app.cli monitor-check
++  #   envVars:
++  #     - key: ENVIRONMENT
++  #       value: development
++  #     - key: DATABASE_URL
++  #       fromDatabase:
++  #         name: auditsmart-db
++  #         property: connectionString
++
++databases:
++  - name: auditsmart-db
++    # Free: 1 GB, no backups, one per workspace, EXPIRES 30 days after creation.
++    plan: free
++    region: frankfurt
++    databaseName: auditsmart
++    user: auditsmart
++    postgresMajorVersion: "16"
++    # Empty list = no connections from the internet; only Render services in this
++    # workspace (the engine) can connect.
++    ipAllowList: []
+-- 
+2.47.3
+

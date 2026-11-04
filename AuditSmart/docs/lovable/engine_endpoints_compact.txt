@@ -1,0 +1,69 @@
+GET /v1/health ->status,service,version,environment,db,queue
+POST /v1/uploads {engagement_id,file_name,size_bytes,kind?} ->201 dataset_id,chunk_size_bytes,max_upload_bytes,status
+PUT /v1/uploads/{dataset_id}/chunks/{index} ->dataset_id,index,chunks_received
+POST /v1/uploads/{dataset_id}/complete {mapping_override?,sha256?} ->202 dataset_id,job_id,sha256,mapping_suggestion,profile,status
+POST /v1/datasets {engagement_id,file,kind?,mapping_override?} multipart ->202 dataset_id,job_id,sha256,mapping_suggestion,profile,status
+GET /v1/datasets/{dataset_id} ->id,engagement_id,file_name,kind,status,sha256,size_bytes,rows,total_dr,total_cr,mapping,profile,created_at
+PUT /v1/datasets/{dataset_id}/mapping {mapping_override} ->202 job_id,dataset_id,status
+POST /v1/datasets/{dataset_id}/validate q:wait? {tb_dataset_id?} ->202 job_id,dataset_id,status
+GET /v1/datasets/{dataset_id}/errors ->dataset_id,status,critical,warnings,blocked,row_note,errors
+GET /v1/datasets/{dataset_id}/rows q:offset?,limit?,voucher_no?,account_code?,user_id?,date_from?,date_to?,min_amount? ->dataset_id,total,offset,limit,rows
+PUT /v1/engagements/{engagement_id} {client,fye,framework?,materiality?,perf_materiality?,trivial?,status?,members} ->created?,engagement,client,members,stale?
+GET /v1/engagements/{engagement_id} ->created?,engagement,client,members,stale?
+GET /v1/jobs q:engagement_id?,status?,type?,offset?,limit? ->total,offset,limit,items
+GET /v1/jobs/{job_id} ->id,type,engagement_id?,status,progress,error,result_ref,created_at,started_at,finished_at
+POST /v1/jobs/{job_id}/cancel ->id,type,engagement_id?,status,progress,error,result_ref,created_at,started_at,finished_at
+POST /v1/sample {dataset_id,method?,basis?,account_types?,account_codes?,confidence?,tolerable_misstatement?,expected_misstatement_pct?,size_formula?,sample_size?,key_item_threshold?,strata_boundaries?,num_strata?,seed?} ->201 sample_id,dataset_id,engagement_id,method,status,parameters,cf_value,cf_rule_version,formula_text,n_required,sample_size,seed,random_start,interval,basic_precision,population,top_stratum,key_items,credit_lines_excluded,strata,items,warnings,rationale,engine_version,dataset_hash,rule_versions_used,rules_pending_verification
+GET /v1/samples/{sample_id} ->sample_id,dataset_id,engagement_id,method,status,parameters,cf_value,cf_rule_version,formula_text,n_required,sample_size,seed,random_start,interval,basic_precision,population,top_stratum,key_items,credit_lines_excluded,strata,items,warnings,rationale,engine_version,dataset_hash,rule_versions_used,rules_pending_verification
+POST /v1/je-tests {dataset_id,parameters?} ->202 je_run_id,job_id,status_url,result_url
+GET /v1/je-tests/{run_id} ->je_run_id,status,job_id?,dataset_id,engagement_id
+GET /v1/je-tests/{run_id}/flags q:flag?,min_score?,offset?,limit?
+POST /v1/benford {dataset_id,account_types?,min_amount?} ->dataset_id,n,mad,conclusion,chart
+POST /v1/vat-check {dataset_id,sides?} ->dataset_id,exceptions_count
+POST /v1/evaluate {sample_id,method?,tolerable_misstatement?,items?} ->sample_id,method,conclusion
+POST /v1/workpaper {engagement_id,wp_ref,sample_id?,je_run_id?,input_vat_run_id?,reviewer?,stale_overrides?} ->201 workpaper_id,wp_ref,status,sha256,file_url
+POST /v1/workpaper/jobs {engagement_id,wp_ref,sample_id?,je_run_id?,input_vat_run_id?,reviewer?,stale_overrides?}
+GET /v1/workpapers/{workpaper_id} ->workpaper_id,wp_ref,status,sha256,file_url
+GET /v1/workpapers/{workpaper_id}/file
+POST /v1/ai/observation {sample_item_id,failed_attribute,test?,remark?,rule_keys?} ->201 observation_id,ai_generated
+GET /v1/observations/{observation_id} ->observation_id,ai_generated
+POST /v1/observations/{observation_id}/review {text?} ->observation_id,ai_generated
+GET /v1/rules q:rule_key?,domain?,status?
+GET /v1/rules/resolve/{rule_key} q:on?,engagement_id? ->ref,rule_key,version,status
+POST /v1/rules/proposals {rule_key,value,effective_from,effective_to?,source_url?,source_ref?,unit?,comment?} ->201 ref,rule_key,version,status
+POST /v1/rules/{version_id}/approve {comment}
+POST /v1/rules/{version_id}/reject {comment} ->ref,rule_key,version,status
+GET /v1/firm
+PATCH /v1/firm/settings {require_approved_rules,comment}
+GET /v1/firm/rules/review q:on?,domain?,status?,engagement_id?
+POST /v1/firm/rules/{rule_key}/approve {comment,version_id?,on?}
+POST /v1/firm/rules/{rule_key}/override {value,effective_from,effective_to?,engagement_id?,source_url?,source_ref?,unit?,comment} ->201 ref,rule_key,version,status
+POST /v1/firm/rules/{rule_key}/reject {version_id,comment} ->ref,rule_key,version,status
+POST /v1/firms {id,name,require_approved_rules?}
+PUT /v1/firms/{firm_id}/clients/{client_id}
+GET /v1/rules-monitor/sources
+POST /v1/rules-monitor/sources {url,name,type,active?}
+PATCH /v1/rules-monitor/sources/{source_id} {url?,name?,type?,active?}
+POST /v1/rules-monitor/check q:force?
+POST /v1/rules-monitor/upload {file,source_url?} multipart
+GET /v1/rules-monitor/alerts q:status?,kind?
+POST /v1/rules-monitor/alerts/{alert_id}/close
+GET /v1/calendar/resolve q:start,end,engagement_id?,client_id?,emirate?,include_days?
+GET /v1/calendar/clients/{client_id}
+POST /v1/calendar/clients/{client_id}/workweeks {off_days,half_days?,effective_from,effective_to?}
+POST /v1/calendar/clients/{client_id}/exceptions {date,type,note?}
+DELETE /v1/calendar/clients/{client_id}/{kind}/{item_id}
+POST /v1/calendar/emirate-profiles {off_days,half_days?,effective_from,effective_to?,emirate}
+POST /v1/calendar/holidays {date,name,scope?,emirate?,status?}
+PATCH /v1/calendar/holidays/{holiday_id} {status}
+DELETE /v1/calendar/{kind}/{item_id}
+GET /v1/calendar/template
+GET /v1/calendar/clients/{client_id}/export
+POST /v1/calendar/clients/{client_id}/import q:apply? {file} multipart
+PUT /v1/engagements/{engagement_id}/supplier-register {file} multipart
+GET /v1/engagements/{engagement_id}/supplier-register
+PUT /v1/engagements/{engagement_id}/expense-mapping {items}
+GET /v1/engagements/{engagement_id}/expense-mapping
+POST /v1/input-vat-check {dataset_id,effective_date_override?} ->202 input_vat_run_id,job_id,status_url,result_url
+GET /v1/input-vat-check/{run_id}
+GET /v1/input-vat-check/{run_id}/exceptions q:check?,offset?,limit?

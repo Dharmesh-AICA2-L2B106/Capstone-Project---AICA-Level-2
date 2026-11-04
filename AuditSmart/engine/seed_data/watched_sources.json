@@ -1,0 +1,59 @@
+{
+  "_note": "Watched sources for the FTA monitor (prompt 3.9). URLs are only those recorded in the repo (Stage 2 fetches of tax.gov.ae); documents without a recorded URL are inactive urn: placeholders until the Tax Partner/Admin records the URL (admin editable via /v1/rules-monitor/sources).",
+  "sources": [
+    {
+      "name": "FTA legislation page",
+      "url": "https://tax.gov.ae/en/legislation.aspx",
+      "type": "html",
+      "active": true
+    },
+    {
+      "name": "FTA legislation archive",
+      "url": "https://tax.gov.ae/en/Legislation.archive.aspx",
+      "type": "html",
+      "active": true
+    },
+    {
+      "name": "FTA VAT guides and references (public clarifications, guides)",
+      "url": "https://tax.gov.ae/en/taxes/Vat/guides.references.aspx",
+      "type": "html",
+      "active": true
+    },
+    {
+      "name": "FTA Corporate Tax guides and references",
+      "url": "https://tax.gov.ae/en/taxes/corporate.tax/corporate.tax.guides.references.aspx",
+      "type": "html",
+      "active": true
+    },
+    {
+      "name": "FTA news (press releases)",
+      "url": "https://tax.gov.ae/en/media.centre/news.aspx",
+      "type": "html",
+      "active": true
+    },
+    {
+      "name": "FTA Decision No. 17 of 2026 (employee expenses)",
+      "url": "https://tax.gov.ae/datafolder/Files/Pdf/2026/legislation/FTA%20Decision%20No.%2017%20of%202026%20on%20the%20Cases%20and%20Conditions%20for%20the%20Recovery%20of%20Input%20Tax%20Incurred%20on%20Employee%20Expenses%20-%20Publishing.pdf",
+      "type": "pdf",
+      "active": true
+    },
+    {
+      "name": "FTA Decision No. 13 of 2026 (supplier verification) - URL to be recorded by the Tax Partner",
+      "url": "urn:auditsmart:pending:fta-decision-13-2026",
+      "type": "pdf",
+      "active": false
+    },
+    {
+      "name": "VAT Public Clarification VATP046 - URL to be recorded by the Tax Partner",
+      "url": "urn:auditsmart:pending:vatp046",
+      "type": "pdf",
+      "active": false
+    },
+    {
+      "name": "Amended VAT Executive Regulation - URL to be recorded by the Tax Partner",
+      "url": "urn:auditsmart:pending:vat-executive-regulation",
+      "type": "pdf",
+      "active": false
+    }
+  ]
+}
