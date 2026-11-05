@@ -1,0 +1,502 @@
+give me the python code for the same.# Project: Assignment Tracker & EOD Portal
+
+## 1. Project Objective
+
+Build a modern, professional, colorful, and fully functional web-based application named **"Assignment Tracker & EOD Portal"** for a mid-sized Chartered Accountancy (CA) firm based in Mumbai, Maharashtra, India.
+
+Use the attached screenshot of the existing MyEOD Portal as the primary visual and functional reference. Recreate the important features shown in the screenshot while improving the user experience, navigation, reporting, visual design, and workflow.
+
+This must be a working business application, not just a static dashboard or UI prototype. All forms, buttons, filters, charts, assignments, employee accounts, and reports must function correctly and use a persistent database.
+
+## 2. Organization Structure and User Roles
+
+Implement secure, separate login accounts for every member of the organization.
+
+Support the following roles:
+
+### A. Super Admin / Firm Administrator
+- Create, edit, deactivate, and manage employee accounts.
+- Assign roles and permissions.
+- Add, edit, and archive clients.
+- Create assignments and allocate them to individual employees or teams.
+- Set deadlines, priorities, budgets, expected hours, and review requirements.
+- View all employee EODs, assignments, hours, utilization, and compliance.
+- Approve, reject, or request corrections to submitted EODs.
+- Manage holidays, leave calendars, departments, designations, and reporting structures.
+- Access firm-wide dashboards, reports, and audit logs.
+- Configure financial year settings and notification preferences.
+
+### B. Manager / Team Leader
+- View assignments allocated to their team.
+- Assign work to team members where permission is granted.
+- Track assignment progress and deadlines.
+- Review, approve, reject, or return EOD submissions.
+- Monitor team hours, pending EODs, utilization, and overdue work.
+- View reports for their permitted teams and clients.
+- Add review comments and request corrections.
+
+### C. Employee / Article Assistant / Audit Assistant
+- Log in using their own credentials.
+- View their assigned clients, assignments, tasks, and deadlines.
+- Submit daily End-of-Day (EOD) reports.
+- Record time spent against specific assignments and clients.
+- Save EODs as drafts and edit them before submission.
+- View their EOD history, manager feedback, and approval status.
+- Receive notifications for new assignments, upcoming deadlines, and returned EODs.
+- View their personal work summary, attendance-related work logs, and leave/holiday calendar.
+
+### D. Optional Reviewer / Partner Role
+- Review work assigned to them.
+- Approve EODs and assignment milestones within their authority.
+- Access partner-level summaries and client engagement reports.
+- View escalations and overdue assignments.
+
+Enforce role-based access control on the backend, not merely by hiding interface elements.
+
+## 3. Authentication and Employee Management
+
+Create a secure authentication system with:
+- Individual employee usernames or email addresses and passwords.
+- Secure password hashing and password reset functionality.
+- Role-based authorization.
+- Session management and logout.
+- Employee profiles containing employee ID, full name, official email, department, designation, reporting manager, joining date, and active status.
+- Account activation and deactivation.
+- Login and important administrative activity logs.
+
+Only authorized administrators can create employee accounts or invite new members. Do not use a shared organization-wide login.
+
+## 4. Main Navigation and Modules
+
+Build a responsive sidebar inspired by the attached screenshot, with these sections:
+
+**Dashboard**
+- Role-specific dashboard with live data and actionable summaries.
+
+**New EOD Entry**
+- Create and submit daily work reports.
+
+**My EOD History**
+- Search and filter previous submissions by date, client, assignment, status, and hours.
+
+**Inbox / Notifications**
+- Assignment notifications, review comments, approval updates, deadline reminders, and pending EOD alerts.
+
+**Team EOD**
+- Manager's team-wise EOD submissions, approval queue, and compliance status.
+
+**Holidays & Leave**
+- Financial-year holiday calendar, leave entries, and holiday management.
+
+**Clients**
+- Client master with searchable client profiles.
+
+**Assignments**
+- Assignment creation, allocation, progress tracking, and deadline monitoring.
+
+**Team / Employees**
+- Employee directory, role management, reporting structure, and team allocation.
+
+**Reports & Analytics**
+- Hours, utilization, EOD compliance, client-wise effort, assignment status, and employee productivity reports.
+
+**Settings & Audit Logs**
+- Organization settings, financial year, permissions, and administrative activity.
+
+Do not include a Help & Tutorials tab.
+
+## 5. Dashboard Design
+
+Design a visually attractive dashboard inspired by the screenshot, with a more refined, polished, and professional appearance.
+
+### Visual style
+- Primary colors: deep royal blue, indigo, and electric blue.
+- Supporting colors: teal, emerald green, amber, violet, and coral.
+- Use colorful gradient banners, subtle shadows, rounded cards, clean spacing, and modern charts.
+- Use an attractive, readable font such as Inter, Manrope, or Plus Jakarta Sans.
+- Use consistent typography, accessible color contrast, intuitive icons, and clear visual hierarchy.
+- Avoid an overcrowded layout or excessive animations.
+- Include responsive layouts for desktop, tablet, and mobile.
+- Add a welcome banner displaying the logged-in user's name and current date.
+- Display the firm's name and logo, configurable through settings.
+
+### Dashboard KPI cards
+
+Display relevant metrics such as:
+1. Total Team Hours.
+2. Utilization Percentage.
+3. EOD Compliance Percentage.
+4. Open Assignments.
+5. Pending EODs Today.
+6. Overdue Assignments.
+7. Assignments Due Soon.
+8. Pending EOD Approvals.
+
+Use meaningful colors and small trend indicators where reliable historical data is available.
+
+### Dashboard charts
+
+Include:
+- Hours by Team Member.
+- Daily and Weekly Hours Trend.
+- Client-wise Hours Distribution.
+- Assignment Status Breakdown.
+- EOD Submission and Approval Trend.
+- Team Utilization Comparison.
+- Overdue Assignments by Team or Manager.
+
+Provide date-range filters, including Today, This Week, This Month, Custom Range, and Financial Year.
+
+All KPIs and charts must use actual database data and respect user permissions. Display appropriate empty states when no data exists.
+
+## 6. Client Management
+
+Create a complete client master module.
+
+Each client profile should support:
+- Unique client code.
+- Client name and legal entity name.
+- Client type: Individual, Proprietorship, Partnership, LLP, Private Limited, Public Limited, Trust, or Other.
+- Industry and business category.
+- Primary contact person.
+- Contact email and phone.
+- Registered office address and city.
+- PAN, GSTIN, and other relevant identifiers where required.
+- Assigned partner, manager, and team.
+- Engagement start date and status.
+- Services provided.
+- Client-specific notes.
+- Related assignments and EOD history.
+
+Provide create, view, edit, search, filter, archive, and export capabilities.
+
+Prevent accidental duplicate client creation through duplicate checks on client code and relevant identifiers.
+
+Restrict access to sensitive client information based on role. Never expose confidential client data unnecessarily.
+
+## 7. Assignment Management
+
+Create a robust assignment management module suitable for a CA practice.
+
+### Assignment creation fields
+- Assignment ID, generated automatically.
+- Assignment title.
+- Client.
+- Service category.
+- Detailed scope and description.
+- Assigned partner.
+- Responsible manager.
+- Assigned employees and team.
+- Assignment start date.
+- Due date and optional internal review deadline.
+- Priority: Low, Medium, High, Critical.
+- Estimated hours.
+- Actual hours, calculated from approved or recorded work logs according to configured rules.
+- Status: Not Started, In Progress, Under Review, On Hold, Completed, Cancelled.
+- Recurrence, where applicable.
+- Internal notes and review instructions.
+
+### CA-specific service categories
+Include configurable categories such as:
+- Statutory Audit.
+- Internal Audit.
+- Tax Audit.
+- Income Tax Return and Taxation.
+- GST Returns and GST Compliance.
+- GST Audit / Departmental Matters.
+- TDS/TCS Compliance.
+- ROC and MCA Compliance.
+- Accounting and Bookkeeping.
+- Payroll and Statutory Compliance.
+- Financial Statements.
+- Due Diligence.
+- Company Incorporation.
+- Certifications and Attestations.
+- Notices, Appeals, and Assessments.
+- Other Professional Services.
+
+### Assignment functionality
+- Assign work to one or multiple employees.
+- Support task-level ownership and subtasks.
+- Set deadlines and reminders.
+- Track progress and status changes.
+- Display upcoming deadlines and overdue tasks.
+- Add comments, attachments, and internal review notes.
+- Maintain assignment history and activity logs.
+- Allow managers to reassign work with an audit trail.
+- Display estimated versus actual hours.
+- Filter by client, employee, manager, priority, service category, and status.
+
+Add list, table, and Kanban views.
+
+## 8. Daily EOD Submission Workflow
+
+Create a structured EOD form for daily work reporting.
+
+### EOD form fields
+- Employee name, automatically populated.
+- Work date, defaulting to the current date.
+- Client.
+- Assignment.
+- Task or work description.
+- Work performed and deliverables.
+- Start time and end time, optionally.
+- Time spent in hours and minutes.
+- Work status: In Progress, Completed, Blocked, or Awaiting Review.
+- Progress percentage, where relevant.
+- Blockers or issues.
+- Next steps and planned follow-up.
+- Optional attachments.
+- Remarks for the reporting manager.
+
+Allow multiple work-log entries in one daily EOD submission.
+
+### EOD actions
+- Save as Draft.
+- Add Another Work Entry.
+- Calculate Total Hours automatically.
+- Preview.
+- Submit EOD.
+- View Submission History.
+
+### EOD review workflow
+
+Use these statuses:
+- Draft.
+- Submitted.
+- Under Review.
+- Approved.
+- Rejected / Changes Requested.
+
+After submission, employees should not silently alter approved records. Corrections must follow a controlled resubmission workflow and retain the previous version in the audit history.
+
+Managers should be able to approve or return submissions with comments.
+
+Prevent duplicate submissions for the same employee and work date unless the system explicitly supports amendments or multiple submission batches.
+
+Allow configurable reminders for employees who have not submitted their EOD by the firm's configured cut-off time.
+
+Calculate daily total hours accurately and flag unusual or potentially duplicate time entries.
+
+## 9. Team EOD and Compliance Monitoring
+
+Provide a manager-facing team EOD screen showing:
+- Employee name.
+- Reporting date.
+- Submission status.
+- Total hours.
+- Assigned work.
+- Pending review status.
+- Manager comments.
+- Approval date and reviewer.
+
+Add filters for team, employee, manager, client, date, and status.
+
+Highlight:
+- Missing EODs.
+- Incomplete submissions.
+- Low reported hours, using configurable thresholds.
+- Excessive hours requiring verification.
+- Pending approvals.
+- Employees with repeated late submissions.
+
+Compliance percentages must be calculated from eligible working days, excluding configured weekly offs, firm holidays, and approved leave where applicable.
+
+Do not automatically equate long working hours with high productivity.
+
+## 10. Holidays & Leave — FY 2026–27
+
+Configure the financial year from **1 April 2026 to 31 March 2027**.
+
+Create a holiday calendar suitable for a CA firm based in Mumbai, Maharashtra.
+
+Include a preloaded holiday list for FY 2026–27, covering applicable Maharashtra public holidays, Maharashtra government-notified holidays, and relevant Mumbai office holidays.
+
+The initial list must be verified against official Maharashtra Government holiday notifications applicable to 2026 and 2027. Do not rely on an unverified generic Indian holiday calendar or assume every central government holiday is applicable to the firm.
+
+Each holiday record should contain:
+- Holiday name.
+- Date.
+- Day of week.
+- Holiday category.
+- Applicability.
+- Description.
+- Active/inactive status.
+
+Include support for:
+- Maharashtra public holidays.
+- Applicable national holidays.
+- Optional firm-specific holidays.
+- Optional restricted holidays.
+- Configurable weekly offs.
+- Admin-created holidays.
+- Holiday calendar import/export.
+- Employee leave requests and approval, if enabled.
+
+Preload only verified dates. If the official notification for a relevant period is not available, clearly flag the date for administrative verification instead of presenting it as confirmed.
+
+Ensure the calendar correctly handles the Indian financial year and does not confuse calendar-year holidays with financial-year dates.
+
+## 11. Reports & Analytics
+
+Create downloadable reports for:
+- Employee-wise daily and monthly hours.
+- Client-wise hours and effort.
+- Assignment progress and completion.
+- Estimated versus actual assignment hours.
+- EOD submission compliance.
+- Pending and rejected EODs.
+- Manager approval turnaround time.
+- Overdue assignments.
+- Employee utilization.
+- Team workload distribution.
+- Holiday and leave summaries.
+
+Allow date-range filtering and CSV/Excel export where supported.
+
+Provide print-friendly report layouts and ensure reports respect role-based access permissions.
+
+Define utilization transparently. For example:
+
+Utilization % = Recorded billable hours / Available working hours × 100.
+
+Allow administrators to configure working hours, billable categories, weekly offs, holidays, and leave treatment. Do not invent historical metrics or display misleading percentages when source data is unavailable.
+
+## 12. Notifications and Reminders
+
+Implement in-app notifications for:
+- New assignment allocation.
+- Assignment reassignment.
+- Upcoming deadlines.
+- Overdue assignments.
+- EOD submission reminders.
+- EOD approval or rejection.
+- Review comments.
+- Changes to assignment details.
+
+Provide configurable reminder timing and read/unread status.
+
+Email or other external notifications can be added through configurable integrations. Do not claim emails or messages have been sent unless the relevant integration is implemented and successfully completes the action.
+
+## 13. Database and Technical Architecture
+
+Use a maintainable, production-oriented architecture.
+
+Preferred stack:
+- Frontend: React with TypeScript.
+- Styling: Tailwind CSS.
+- UI components: shadcn/ui or an equivalent accessible component system.
+- Charts: Recharts or a comparable charting library.
+- Backend: Node.js with a well-structured API.
+- Database: PostgreSQL.
+- ORM: Prisma or an equivalent type-safe ORM.
+- Authentication: A secure session-based or established authentication solution.
+- Validation: Zod or equivalent schema validation.
+
+If working within an environment that provides a managed backend such as Supabase, use its authentication, PostgreSQL database, and row-level security capabilities appropriately.
+
+Design the database with normalized entities for:
+- Organizations.
+- Users.
+- Roles and permissions.
+- Teams and departments.
+- Clients.
+- Assignments.
+- Assignment members.
+- Tasks and subtasks.
+- EOD submissions.
+- EOD work-log entries.
+- EOD review history.
+- Holidays.
+- Leave requests.
+- Notifications.
+- Attachments.
+- Audit logs.
+- Organization settings.
+
+Use foreign keys, indexes, timestamps, data validation, and appropriate deletion or archival policies.
+
+All create, read, update, and delete operations must be backed by persistent storage. A page refresh must not erase records.
+
+Implement secure authorization, server-side validation, protection against unauthorized data access, and safe handling of client documents and attachments.
+
+Never expose database service credentials or privileged API keys in frontend code.
+
+## 14. User Experience Requirements
+
+- Create a polished login page with the portal name and professional branding.
+- Provide role-specific landing dashboards.
+- Use searchable tables, sorting, pagination, and practical filters.
+- Include clear success, error, loading, and empty states.
+- Use confirmation dialogs for destructive actions.
+- Provide form validation with helpful error messages.
+- Use consistent date formats, preferably DD-MM-YYYY, throughout the interface.
+- Use Asia/Kolkata as the default timezone.
+- Format numbers and time consistently.
+- Support keyboard navigation and accessible controls.
+- Make the dashboard responsive.
+- Use realistic demo data only in development or clearly labelled demo mode.
+- Never mix sample data with live business records without explicit labelling.
+
+## 15. Important Business Rules
+
+1. Employees can access only their own profile, permitted assignments, and authorized EOD information.
+2. Managers can access their assigned teams and permitted client engagements.
+3. Administrators can configure organization-wide records according to their privileges.
+4. EOD work entries must be associated with a valid client and assignment when required by firm policy.
+5. Actual hours must be derived from validated work-log entries rather than manually fabricated totals.
+6. Approved EOD records must retain an audit trail when amended.
+7. Assignment completion and EOD approval are separate processes.
+8. Holiday and leave calculations must affect working-day and compliance calculations appropriately.
+9. Prevent overlapping or duplicate time entries when applicable.
+10. All important changes must record who made the change and when.
+11. Dashboard figures must reconcile with the underlying records.
+12. Support multiple employees working on the same assignment without duplicating the assignment itself.
+13. Use configurable settings for daily working hours, EOD deadlines, weekly offs, and approval rules.
+14. Follow applicable Indian data protection and confidentiality requirements for employee and client information.
+
+## 16. Implementation and Acceptance Criteria
+
+Build the application in logical stages, but continue through implementation rather than stopping at a design proposal.
+
+### Stage 1 — Foundation
+- Project structure and reusable UI components.
+- Login, logout, employee accounts, and role permissions.
+- Database schema and migrations.
+- Organization settings and sample development data.
+
+### Stage 2 — Core Operations
+- Client management.
+- Assignment creation and allocation.
+- Employee dashboards.
+- EOD creation, drafts, submission, review, and approval.
+
+### Stage 3 — Management Dashboard
+- KPI cards.
+- Charts.
+- Team EOD monitoring.
+- Filters and date ranges.
+- Assignment and compliance reports.
+
+### Stage 4 — Calendar and Notifications
+- FY 2026–27 holiday calendar.
+- Leave management, if enabled.
+- Notifications and reminders.
+- Audit history.
+
+### Stage 5 — Testing and Deployment
+- Test all CRUD operations.
+- Test employee, manager, reviewer, and admin permissions.
+- Test EOD calculations and approval workflows.
+- Test date filters, financial-year boundaries, holidays, and timezone handling.
+- Test empty states and error handling.
+- Verify persistence after refreshing and signing out.
+- Provide setup instructions, environment variable documentation, database migrations, and deployment guidance.
+
+### Final Deliverable
+
+Deliver a working, attractive, production-oriented **Assignment Tracker & EOD Portal** with a complete responsive frontend, backend, database, authentication, role-based permissions, assignment workflow, EOD workflow, dashboard, reporting, and holiday calendar.
+
+Prioritize a reliable end-to-end workflow over decorative features.
+
+Start by establishing the project architecture and database schema, then build the application module by module. Do not stop after generating mock screens. Clearly identify any integrations, official holiday data, or deployment steps that still require configuration or verification. install whatever library you required & get me the py file.
