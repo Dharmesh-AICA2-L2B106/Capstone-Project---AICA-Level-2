@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AMRG Review Workbench</title>
+    <link rel="icon" type="image/png" href="/amrg-global-logo.png" />
+    <meta name="description" content="UAE client onboarding and historical compliance review workbench for AMRG Global, featuring multimodal document extraction, cross-document reconciliation, reviewer sign-off, and fixed-format Excel report generation." />
+    <meta property="og:title" content="AMRG Review Workbench" />
+    <meta property="og:description" content="UAE client onboarding and historical compliance review workbench for AMRG Global, featuring multimodal document extraction, cross-document reconciliation, reviewer sign-off, and fixed-format Excel report generation." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script>
+      // AI Studio Environment: HMR is disabled; ignore WebSocket and Vite HMR connection rejections
+      window.addEventListener('unhandledrejection', function(event) {
+        var reason = event.reason;
+        var msg = (reason && (reason.message || reason.stack || String(reason))) || '';
+        if (
+          msg.includes('WebSocket') ||
+          msg.includes('@vite/client') ||
+          msg.includes('vite:ws')
+        ) {
+          event.preventDefault();
+        }
+      });
+      window.addEventListener('error', function(event) {
+        var msg = (event.message || '') + ' ' + (event.filename || '');
+        if (
+          msg.includes('WebSocket') ||
+          msg.includes('@vite/client')
+        ) {
+          event.preventDefault();
+        }
+      });
+    </script>
+    <meta property="og:image" content="https://bolt.new/static/og_default.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://bolt.new/static/og_default.png">
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+

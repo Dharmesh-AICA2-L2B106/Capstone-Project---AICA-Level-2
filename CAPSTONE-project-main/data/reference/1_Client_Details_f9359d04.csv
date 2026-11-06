@@ -1,0 +1,41 @@
+Area,Permanent detail / review field,Client value,Source checklist IDs,Where to find / verify
+Client / scope,Legal name and former names,Quadria Healthcare GCC Consulting Ltd. Proposed names are not proven former legal names.,GOV001; GOV003,DOC-E2BA7D1B p1; DOC-505486F8 slide1
+Client / scope,Legal form and entity / registrar number,DIFC Private Company; registered number11992,GOV001; GOV004,DOC-E2BA7D1B p1
+Client / scope,Incorporation date and country,"26-Nov-2025; UAE, DIFC Dubai",GOV001,DOC-E2BA7D1B p1
+Client / scope,Business commencement / cessation date,Not established. Quote says no operational business; transaction evidence required.,GOV023; ACC008,DOC-51BD3C56 C8:C9; REQ16
+Client / scope,Registered and operating addresses,"IH-00-01-02-OF-01, Floor2, Innovation Hub, DIFC. Actual occupancy/term unverified.",GOV003; GOV018,DOC-A800B75E p1; REQ07
+Client / scope,Licensed activities and actual business,Marketing Research & Consultancies. Actual investment/advisory activity is an unverified adviser understanding.,GOV003; ACC008,DOC-A800B75E p1; DOC-51BD3C56 A31; ISSUE-0006
+Client / scope,"Shareholders, capital and ownership %",At26-Nov-2025: Amit Varma50 A shares; Abrar Mir50 A shares; each50%. Nominal capitalUSD100. Paid capital unverified.,GOV007; GOV008,DOC-9B358907 p1; DOC-F3619C0C p4
+Client / scope,UBOs and basis of control,"Two50% direct shareholders are UBO candidates. Current declarations, control and filings absent.",GOV009; GOV010,DOC-9B358907 p1; REQ09
+Client / scope,"Directors, managers and authorised signers","Directors: Abrar Mir, Amit Varma, Sunil Kumar Thakur. Secretary: Sunil Kumar Thakur. Licence permits any one named signatory. Current changes unverified.",GOV012; GOV013,DOC-9B358907 p1; DOC-A800B75E p1
+Client / scope,Accounting system and data location,Not evidenced in supplied collection; obtain applicable records before concluding.,ACC026; OTH021,ACC026; OTH021; see Documents Not Received
+Client / scope,Accounting framework and basis,Not evidenced in supplied collection; obtain applicable records before concluding.,ACC001; CT008,ACC001; CT008; see Documents Not Received
+Client / scope,Functional and presentation currency,Not evidenced in supplied collection; obtain applicable records before concluding.,ACC001; ACC023,ACC001; ACC023; see Documents Not Received
+Client / scope,Financial year start and end,Not evidenced in supplied collection; obtain applicable records before concluding.,GOV002; ACC001,GOV002; ACC001; see Documents Not Received
+Client / scope,Bank accounts and payment platforms,Not evidenced in supplied collection; obtain applicable records before concluding.,ACC016; ACC017; ACC022,ACC016; ACC017; ACC022; see Documents Not Received
+Client / scope,"Reviewer, preparation date and version",Unassigned reviewer; prepared28-Oct-2026; Quadria v1.0 draft. AMRG takeover date not established.,OTH023,REQ10; REQ19
+VAT permanent details,VAT registration status,Unresolved; no VAT certificate or threshold analysis supplied.,VAT002; VAT052,REQ04; ISSUE-0004
+VAT permanent details,VAT TRN and registered legal name,Not evidenced in supplied collection; obtain applicable records before concluding.,VAT002,VAT002; see Documents Not Received
+VAT permanent details,VAT registration basis,Not evidenced in supplied collection; obtain applicable records before concluding.,VAT001; VAT003,VAT001; VAT003; see Documents Not Received
+VAT permanent details,VAT filing frequency,Not evidenced in supplied collection; obtain applicable records before concluding.,VAT004; VAT005,VAT004; VAT005; see Documents Not Received
+VAT permanent details,VAT filing due date,Not evidenced in supplied collection; obtain applicable records before concluding.,VAT004; VAT005,VAT004; VAT005; see Documents Not Received
+VAT permanent details,E-invoicing phase and key dates,Scope/revenue unknown. Conditional >=AED50m ASP deadline30-Oct-2026; assess immediately.,VAT054; VAT055,R15; REQ05
+VAT permanent details,E-invoicing ASP and system identifiers,Not evidenced in supplied collection; obtain applicable records before concluding.,VAT055; VAT056,VAT055; VAT056; see Documents Not Received
+CT permanent details,CT taxable-person category / status,UAE resident juridical free-zone company; CT registration approved. QFZP/elections unverified.,CT001; CT002,DOC-1FD528F9 p1; REQ03
+CT permanent details,CT TRN and registered legal name,105324871000001; Quadria Healthcare GCC Consulting LTD,CT002,DOC-1FD528F9 p1
+CT permanent details,CT registration application / approval date,Submitted28-Jan-2026 13:13GST; approval email28-Jan-2026 15:29:53. Same reference101002179218.,CT001; CT002,DOC-96D034D9 p1; DOC-1FD528F9 p1
+CT permanent details,CT registration deadline and basis,26-Feb-2026; three calendar months from26-Nov-2025. Submission29 days early.,CT001; GOV001; GOV003,R01; DOC-E2BA7D1B; DOC-96D034D9
+CT permanent details,CT first tax period length,Unresolved. Approval effective01-Nov-2025 predates incorporation25 days; first-year end absent.,CT003,ISSUE-0001; ISSUE-0002
+CT permanent details,CT return due date,Cannot calculate until tax-period end confirmed. Ordinary rule: nine months after period end.,CT005; CT004,R02; REQ01; REQ02
+Free-zone permanent details,"Zone name, emirate and registrar",Dubai International Financial Centre; Dubai; DIFC Registrar of Companies,GOV001; FZ001,DOC-E2BA7D1B p1
+Free-zone permanent details,Zone legal form and entity number,Private Company;11992,GOV001; GOV004,DOC-E2BA7D1B p1
+Free-zone permanent details,"Licence number, issue and expiry dates",CL11992; issued26-Nov-2025; expires25-Nov-2026;28 days after cutoff,GOV003; FZ002,DOC-A800B75E p1
+Free-zone permanent details,Permitted activity codes and conditions,Marketing Research & Consultancies; no numeric code shown. Financial services require valid DFSA licence.,GOV003; GOV020,DOC-A800B75E p1
+Free-zone permanent details,Registered premises and lease expiry,Innovation Hub address evidenced; lease and expiry not supplied.,GOV018; FZ009,DOC-A800B75E p1; REQ07
+Free-zone permanent details,Immigration establishment card / expiry,Establishment card supplied; expires25-Nov-2026. Employee allocation not supplied.,FZ011,DOC-1F0E1421 p1; REQ12
+Free-zone permanent details,"Share capital authorised, issued and paid",Issued initial100 Class A shares x USD1 = USD100. Separate authorised amount/paid amount not evidenced.,GOV008; FZ008,DOC-F3619C0C p4; REQ08
+Free-zone permanent details,Zone normal financial year-end,Not evidenced in supplied collection; obtain applicable records before concluding.,GOV002; ACC001,GOV002; ACC001; see Documents Not Received
+Free-zone permanent details,Auditor name and approval status,Not evidenced in supplied collection; obtain applicable records before concluding.,ACC003; FZ006,ACC003; FZ006; see Documents Not Received
+Free-zone permanent details,Accounts / audit filing deadline,Where DIFC filing applies: seven months after financial-year end. Actual year-end and audit exemption unresolved.,FZ001; FZ004,R05; R06; R07; REQ17
+Review scope,Cutoff and coverage,26-Nov-2025 to 28-Oct-2026; Asia/Dubai. One UAE entity; foreign chart entities context only.,GOV001; OTH023,All15 source files
+Review scope,Financial and substantive limitations,No books/returns/bank/payroll population. Document review complete with gaps; substantive compliance unassessed where blocked.,OTH023,Coverage and Documents Not Received

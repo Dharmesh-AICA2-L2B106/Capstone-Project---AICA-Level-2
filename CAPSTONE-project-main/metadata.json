@@ -1,0 +1,6 @@
+{
+  "name": "AMRG Review Workbench",
+  "description": "UAE client onboarding and historical compliance review workbench for AMRG Global, featuring multimodal document extraction, cross-document reconciliation, reviewer sign-off, and fixed-format Excel report generation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

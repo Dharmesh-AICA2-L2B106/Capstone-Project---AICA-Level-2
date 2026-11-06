@@ -1,0 +1,144 @@
+,,,,
+AMRG Global UAE onboarding,,,,
+Design v2.0 | Example client only. Permanent details retain history; annual positions require reassessment.,,,,
+Source IDs link to Tab 2. Record actual file/page references when reviewing a client. No client folder reviewed.,,,,
+,,,,
+Area,Permanent detail / review field,Client value,Source checklist IDs,Where to find / verify
+Client / scope,Legal name and former names,Example Trading FZCO (fictional),GOV001; GOV003,Certificate and licence identity fields
+Client / scope,Legal form and entity / registrar number,To obtain,GOV001; GOV004,Registration and register extract
+Client / scope,Incorporation date and country,To obtain,GOV001,Incorporation certificate
+Client / scope,Business commencement / cessation date,To obtain,GOV023; ACC008,First transactions and cessation records
+,,,,
+Client / scope,Registered and operating addresses,To obtain,GOV003; GOV018,Licence / lease / actual premises
+Client / scope,Licensed activities and actual business,To obtain,GOV003; ACC008,Licence codes / contracts / invoices
+Client / scope,"Shareholders, capital and ownership %",To obtain,GOV007; GOV008,"Registers, certificates and resolutions"
+Client / scope,UBOs and basis of control,To obtain,GOV009; GOV010,Ownership chain and UBO register
+Client / scope,"Directors, managers and authorised signers",To obtain,GOV012; GOV013,Appointments and authority documents
+,,,,
+,,,,
+Client / scope,Accounting system and data location,To obtain,ACC026; OTH021,ERP profile / archive index
+Client / scope,Accounting framework and basis,To obtain,ACC001; CT008,Accounting policies / statements
+Client / scope,Functional and presentation currency,To obtain,ACC001; ACC023,Accounting policy and FX workings
+Client / scope,Financial year start and end,To obtain,GOV002; ACC001,Articles / board decision / accounts
+Client / scope,Bank accounts and payment platforms,To obtain,ACC016; ACC017; ACC022,Account register and statements
+Client / scope,"Reviewer, preparation date and version",Unassigned; 27 Oct 2026; v2.0,OTH023,AMRG engagement review record
+VAT permanent details,VAT registration status,To obtain,VAT002; VAT052,FTA decision and current portal profile
+VAT permanent details,VAT TRN and registered legal name,To obtain,VAT002,VAT certificate
+VAT permanent details,VAT registration basis,To obtain,VAT001; VAT003,Application and threshold computation
+,,,,
+,,,,
+,,,,
+,,,,
+VAT permanent details,VAT filing frequency,To obtain,VAT004; VAT005,EmaraTax obligation list and approval
+,,,,
+,,,,
+,,,,
+VAT permanent details,VAT filing due date,To obtain,VAT004; VAT005,Portal due date plus operative rule
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+VAT permanent details,E-invoicing phase and key dates,To obtain,VAT054; VAT055,Turnover assessment / operative decisions
+VAT permanent details,E-invoicing ASP and system identifiers,To obtain,VAT055; VAT056,Appointment / provider registration
+CT permanent details,CT taxable-person category / status,To obtain,CT001; CT002,Registration and legal analysis
+CT permanent details,CT TRN and registered legal name,To obtain,CT002,CT certificate / portal profile
+CT permanent details,CT registration application / approval date,To obtain,CT001; CT002,Acknowledgement and FTA decision
+CT permanent details,CT registration deadline and basis,To obtain,CT001; GOV001; GOV003,Applicable FTA decision and formation/licence dates
+,,,,
+,,,,
+CT permanent details,CT first tax period length,To obtain,CT003,Verified start and end dates
+,,,,
+,,,,
+,,,,
+CT permanent details,CT return due date,To obtain,CT005; CT004,Portal and period-specific filing rule
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+Free-zone permanent details,"Zone name, emirate and registrar","DMCC, Dubai (example only)",GOV001; FZ001,Incorporation and official zone rules
+Free-zone permanent details,Zone legal form and entity number,To obtain,GOV001; GOV004,Registration certificate
+Free-zone permanent details,"Licence number, issue and expiry dates",To obtain,GOV003; FZ002,Licence and renewal records
+Free-zone permanent details,Permitted activity codes and conditions,To obtain,GOV003; GOV020,Licence / regulatory NOCs
+Free-zone permanent details,Registered premises and lease expiry,To obtain,GOV018; FZ009,"Lease, Ejari or zone occupancy record"
+Free-zone permanent details,Immigration establishment card / expiry,To obtain,FZ011,Authority card and portal
+Free-zone permanent details,"Share capital authorised, issued and paid",To obtain,GOV008; FZ008,"Articles, register and payment proof"
+,,,,
+Free-zone permanent details,Zone normal financial year-end,To obtain,GOV002; ACC001,Articles and accounts
+,,,,
+,,,,
+,,,,
+Free-zone permanent details,Auditor name and approval status,To obtain,ACC003; FZ006,Appointment and zone approved list
+Free-zone permanent details,Accounts / audit filing deadline,To obtain,FZ001; FZ004,Current/historical rules and portal notice
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,

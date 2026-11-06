@@ -1,0 +1,13 @@
+,,,,,,,,,,,,
+AMRG Global issues and reconciliations,,,,,,,,,,,,
+ILLUSTRATIVE ONLY — fictional amounts and findings. Source register updated; legal conclusions remain unverified.,,,,,,,,,,,,
+"Filter by law, priority or status. Scroll right for evidence, rule mapping, action and reviewer fields.",,,,,,,,,,,,
+,,,,,,,,,,,,
+Issue ID,Entity ID,Law / domain tags,Period,Issue summary,Classification,Evidence A locator,Evidence B locator,Amount A (AED),Amount B (AED),A minus B (AED),Reconciliation / test,Unresolved explanation / limit
+I001,ENT-001,VAT / CT,FY2025,Sales differ between ledger and returns,Discrepancy,Sales!F2:F100,Annual aligned return totals,#REF!,#REF!,#REF!,"Compare same entity, period, currency and net-of-VAT basis.","Timing, credit notes and out-of-scope supplies not yet reconciled."
+I002,ENT-001,CT,FY2025,Accounting profit differs from CT starting point,Discrepancy,TB!G100,Accounting income field,#REF!,#REF!,#REF!,"Compare final trial balance profit with CT accounting income, before tax adjustments.",Final accounts adjustments and return version not yet reconciled.
+I003,ENT-001,Free Zone,FY2025,Audit filing evidence not located,Missing evidence,Signed audit report,Receipt absent,,,,Audited accounts do not establish submission to the authority.,Applicable deadline and filing obligation remain unverified.
+I004,ENT-001,CT / Free Zone,FY2025,Support for free-zone tax treatment incomplete,Potential issue,Tax treatment fields,Analysis absent,,,,"Map claimed treatment to activities, income streams and supporting records.",Example assumes treatment claimed; all conditions need testing.
+I005,ENT-001,Banking / CT / VAT,FY2025,December bank reconciliation cannot be completed,Missing evidence,Jan–Nov only,Sales / trial balance,,,,Match receipts and payments to books after completing bank coverage.,December bank transactions have not been tested.
+,,,,,,,,,,,,
+,,,,,,,,,,,,
