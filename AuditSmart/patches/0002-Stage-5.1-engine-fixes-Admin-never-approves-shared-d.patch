@@ -1,0 +1,472 @@
+From d36790b3d508dbe9654b4b16e8a65255bcb3266f Mon Sep 17 00:00:00 2001
+From: "Grok Bot (AuditSmart build for Savio Jose)"
+ <auditsmart-build@localhost>
+Date: Mon, 2 Nov 2026 17:09:06 +0000
+Subject: [PATCH 2/3] Stage 5.1 engine fixes: Admin never approves shared
+ defaults (D47); Supabase firm claim from app_metadata only (D48); psycopg3
+ URL normalisation, unit column 128 (0009, D49), opt-in PostgreSQL test run
+
+---
+ docs/MULTI_FIRM_APPROVAL.md                   |  6 ++--
+ engine/SPEC.md                                |  4 +--
+ engine/alembic/env.py                         |  4 ++-
+ .../alembic/versions/0009_rule_unit_length.py | 30 +++++++++++++++++
+ engine/app/api/v1/rules.py                    |  5 +--
+ engine/app/core/config.py                     | 19 +++++++++--
+ engine/app/core/security.py                   | 15 +++++++--
+ engine/app/models/__init__.py                 |  2 +-
+ engine/app/services/rules.py                  | 26 ++++++++-------
+ engine/tests/api/test_rules_api.py            | 10 ++++--
+ engine/tests/conftest.py                      | 12 ++++++-
+ engine/tests/unit/test_firm_scope.py          | 19 ++++++++++-
+ engine/tests/unit/test_health_config.py       | 16 +++++++++
+ engine/tests/unit/test_rules_library.py       | 33 ++++++++++++++++++-
+ 14 files changed, 172 insertions(+), 29 deletions(-)
+ create mode 100644 engine/alembic/versions/0009_rule_unit_length.py
+
+diff --git a/docs/MULTI_FIRM_APPROVAL.md b/docs/MULTI_FIRM_APPROVAL.md
+index 260fd53..7783de5 100644
+--- a/docs/MULTI_FIRM_APPROVAL.md
++++ b/docs/MULTI_FIRM_APPROVAL.md
+@@ -72,7 +72,7 @@ Firm users are identified by a **firm claim** in their token. The claim name is
+ `AUTH_FIRM_CLAIM` (default `firm_id`) and its value must equal `firms.id`.
+ - **Entra ID:** a top-level claim (add it as an optional claim or app role mapping).
+ - **Supabase:** `app_metadata.firm_id`, which only the server can set. `user_metadata` is
+-  never read.
++  never read, and neither is a top-level `firm_id` claim (D48).
+ 
+ Every decision needs a non-empty `comment` and is written to `audit_log`.
+ 
+@@ -88,7 +88,9 @@ Every decision needs a non-empty `comment` and is written to `audit_log`.
+ | `PUT /v1/firms/{firm_id}/clients/{client_id}` | Link an unassigned client to a firm. Repeating it is harmless; moving a client to another firm returns 409 | Platform Admin |
+ 
+ The **Admin role never approves rules**. This applies to firm Admins and to the platform
+-Admin.
++Admin. Platform users (no firm claim) approving or rejecting a **shared default** through
++`POST /v1/rules/{id}/approve|reject` follow the same domain split: TaxPartner for tax domains,
++Partner for methodology domains (D47).
+ 
+ ### What changes in the existing `/v1/rules` endpoints for firm users
+ - `GET /v1/rules` lists the shared defaults plus the caller's own firm's rows only.
+diff --git a/engine/SPEC.md b/engine/SPEC.md
+index 05d9e15..614cfcc 100644
+--- a/engine/SPEC.md
++++ b/engine/SPEC.md
+@@ -133,7 +133,7 @@ Versioning | effective_from / effective_to; no overlapping approved versions; ap
+ Watched sources | Seeded with FTA legislation page, public clarifications, guides, and specifically: FTA Decision No. 13 of 2026, FTA Decision No. 17 of 2026, VAT Public Clarification VATP046, amended VAT Executive Regulation
+ Monitor | Weekly + 'Check now'; respectful fetching; manual PDF upload mode
+ AI proposal | Few-shot extraction prompt (2.2) → JSON proposal with citation → status 'proposed'
+-Approval | Tax Partner or Admin; mandatory comment; side-by-side old vs new
++Approval | Tax Partner (tax domains) or Partner (methodology domains), never Admin (D43, D47); mandatory comment; side-by-side old vs new
+ Stale results | When a rule version used by a result is superseded for the same period, the result is marked STALE; WP sign-off and export are blocked until re-run or the reviewer records a justified override
+ [/TABLE]
+ ## 3.5 Working Calendar
+@@ -346,7 +346,7 @@ golden_results.xlsx – Population | Totals, counts, Dr/Cr check
+ ### 3.8 Rules Library
+ - `rule_versions` gains `version`, `domain`, `unit`, `source_ref`, `created_at` (migration 0005). The seed (`seed_data/rules_seed.json`, 53 rules) is loaded idempotently by `rules.seed_database()` at app start-up (non-production) and in tests; production runs it as a deployment step.
+ - `get_rule(key, on_date)` returns exactly one version: approved wins; `pending_verification` is used only while `RULES_ALLOW_PENDING=true` (D24); duplicates → `RuleConflict` (409 on the API); none → `RuleNotFound` with a clear message. In-process cache, cleared on every write, 30 s TTL.
+-- Workflow: `propose` (status proposed, version N+1) → `approve` / `reject` (TaxPartner or Admin, comment ≥ 10 characters). Approve closes the earlier open version, rejects other overlaps (D25), writes `audit_log` (rule_propose / rule_close / rule_approve / rule_reject), and marks STALE every current Sample / JeRun / InputVatRun whose stored refs lost coverage in an overlapping period (D26).
++- Workflow: `propose` (status proposed, version N+1) → `approve` / `reject` (TaxPartner for tax domains, Partner for methodology domains, never Admin - D47; comment ≥ 10 characters). Approve closes the earlier open version, rejects other overlaps (D25), writes `audit_log` (rule_propose / rule_close / rule_approve / rule_reject), and marks STALE every current Sample / JeRun / InputVatRun whose stored refs lost coverage in an overlapping period (D26).
+ - Immutability: a `before_flush` guard refuses edits or deletes of approved rows except closing `effective_to` earlier and status → superseded.
+ - API: `GET /v1/rules`, `GET /v1/rules/resolve/{key}?on=`, `POST /v1/rules/proposals` (Manager/Partner/TaxPartner/Admin), `POST /v1/rules/{id}/approve`, `POST /v1/rules/{id}/reject`.
+ - `rule_proposals.parse_extraction` validates the AI rule-extractor JSON (schema + allowed key families, D28); `create_proposals` turns dated changes into proposed versions. The WP Rules sheet now reads source_ref/source_url from the library.
+diff --git a/engine/alembic/env.py b/engine/alembic/env.py
+index 935b633..1293688 100644
+--- a/engine/alembic/env.py
++++ b/engine/alembic/env.py
+@@ -9,7 +9,9 @@ from app.core.db import Base
+ 
+ config = context.config
+ if not config.get_main_option("sqlalchemy.url"):
+-    config.set_main_option("sqlalchemy.url", get_settings().effective_database_url)
++    # '%' must be doubled for configparser (URL-encoded passwords contain it).
++    config.set_main_option("sqlalchemy.url",
++                           get_settings().effective_database_url.replace("%", "%%"))
+ target_metadata = Base.metadata
+ 
+ 
+diff --git a/engine/alembic/versions/0009_rule_unit_length.py b/engine/alembic/versions/0009_rule_unit_length.py
+new file mode 100644
+index 0000000..dbc98b8
+--- /dev/null
++++ b/engine/alembic/versions/0009_rule_unit_length.py
+@@ -0,0 +1,30 @@
++"""rule_versions.unit: VARCHAR(32) -> VARCHAR(128) (D49)
++
++Three seed rules (je.vague_narration.keywords, je.sensitive_account_types,
++je.sensitive_account_codes) carry a unit longer than 32 characters. SQLite does not enforce
++VARCHAR lengths, so this only showed on PostgreSQL (first Render deploy rehearsal).
++
++Revision ID: 0009
++Revises: 0008
++Create Date: 2026-11-02 17:10:00
++"""
++from alembic import op
++import sqlalchemy as sa
++
++
++revision = '0009'
++down_revision = '0008'
++branch_labels = None
++depends_on = None
++
++
++def upgrade() -> None:
++    with op.batch_alter_table('rule_versions', schema=None) as batch_op:
++        batch_op.alter_column('unit', existing_type=sa.String(length=32),
++                              type_=sa.String(length=128), existing_nullable=True)
++
++
++def downgrade() -> None:
++    with op.batch_alter_table('rule_versions', schema=None) as batch_op:
++        batch_op.alter_column('unit', existing_type=sa.String(length=128),
++                              type_=sa.String(length=32), existing_nullable=True)
+diff --git a/engine/app/api/v1/rules.py b/engine/app/api/v1/rules.py
+index 26b0ba5..ea9e0f3 100644
+--- a/engine/app/api/v1/rules.py
++++ b/engine/app/api/v1/rules.py
+@@ -3,9 +3,10 @@
+ GET  /v1/rules                         -> versions (filter: rule_key, domain, status)
+ GET  /v1/rules/resolve/{rule_key}?on=  -> the single version effective on a date
+ POST /v1/rules/proposals               -> new version, status proposed (Manager+ / Tax Partner)
+-POST /v1/rules/{id}/approve            -> Tax Partner / Admin, mandatory comment; closes prior,
++POST /v1/rules/{id}/approve            -> Tax Partner (tax domains) / Partner (methodology),
++                                          never Admin (D47); mandatory comment; closes prior,
+                                           audit_log, marks dependent results STALE
+-POST /v1/rules/{id}/reject             -> Tax Partner / Admin, mandatory comment
++POST /v1/rules/{id}/reject             -> same approvers as approve, mandatory comment
+ 
+ Multi-firm (D42): a user whose token carries a firm sees the shared defaults plus only its own
+ firm's versions, resolves in its firm's scope, and cannot change shared defaults here; firm
+diff --git a/engine/app/core/config.py b/engine/app/core/config.py
+index 328af7d..5bf6111 100644
+--- a/engine/app/core/config.py
++++ b/engine/app/core/config.py
+@@ -58,12 +58,14 @@ class Settings(BaseSettings):
+ 
+     @property
+     def origins(self) -> list[str]:
+-        return [o.strip() for o in self.allowed_origins.split(",") if o.strip()]
++        # A browser Origin never ends in "/": drop one pasted with the URL (D46).
++        return [o.strip().rstrip("/") for o in self.allowed_origins.split(",")
++                if o.strip().rstrip("/")]
+ 
+     @property
+     def effective_database_url(self) -> str:
+         if self.database_url:
+-            return self.database_url
++            return normalise_database_url(self.database_url)
+         return f"sqlite:///{ENGINE_ROOT / 'auditsmart_dev.db'}"
+ 
+     @property
+@@ -82,6 +84,19 @@ class Settings(BaseSettings):
+         return self.upload_chunk_mb * 1024 * 1024
+ 
+ 
++def normalise_database_url(url: str) -> str:
++    """Use the installed psycopg (v3) driver for plain PostgreSQL URLs (D46).
++
++    Render, Heroku-style hosts and Supabase hand out ``postgres://`` or ``postgresql://``;
++    SQLAlchemy would pick psycopg2 for those, which is not installed.
++    """
++    url = url.strip()
++    for prefix in ("postgres://", "postgresql://"):
++        if url.startswith(prefix):
++            return "postgresql+psycopg://" + url.removeprefix(prefix)
++    return url
++
++
+ @lru_cache
+ def get_settings() -> Settings:
+     return Settings()
+diff --git a/engine/app/core/security.py b/engine/app/core/security.py
+index ff80113..0fbf133 100644
+--- a/engine/app/core/security.py
++++ b/engine/app/core/security.py
+@@ -2,7 +2,8 @@
+ 
+ * entra    – RS256 tokens, keys from the tenant JWKS; roles from the ``roles`` claim (app roles).
+ * supabase – RS256/ES256 via the project JWKS, or HS256 with the legacy JWT secret;
+-             roles from ``app_metadata.roles`` (list) or ``app_metadata.role``.
++             roles from ``app_metadata.roles`` (list) or ``app_metadata.role``; firm from
++             ``app_metadata.<AUTH_FIRM_CLAIM>`` only (D48).
+ * dev      – HS256 with AUTH_HS256_SECRET; refused unless ENVIRONMENT=development.
+ 
+ Issuer, audience, exp and iat are always required. ``alg=none`` and algorithm confusion
+@@ -134,7 +135,17 @@ class TokenValidator:
+         provider = self.settings.auth_provider
+         claim = self.settings.auth_firm_claim
+         meta = claims.get("app_metadata") or {}
+-        raw_firm = claims.get(claim) if provider == "entra" else meta.get(claim, claims.get(claim))
++        if not isinstance(meta, dict):
++            meta = {}
++        # D48 (docs/MULTI_FIRM_APPROVAL.md section 4): Entra reads a top-level claim; Supabase
++        # reads app_metadata only (server-set; never user_metadata, never a top-level claim).
++        # dev (local only) mirrors Supabase but accepts a top-level claim, like its roles.
++        if provider == "entra":
++            raw_firm = claims.get(claim)
++        elif provider == "supabase":
++            raw_firm = meta.get(claim)
++        else:
++            raw_firm = meta.get(claim, claims.get(claim))
+         firm_id = str(raw_firm).strip()[:64] if raw_firm not in (None, "") else None
+         if provider == "entra":
+             user_id = str(claims.get("oid") or claims["sub"])
+diff --git a/engine/app/models/__init__.py b/engine/app/models/__init__.py
+index 5eaa017..92f262e 100644
+--- a/engine/app/models/__init__.py
++++ b/engine/app/models/__init__.py
+@@ -262,7 +262,7 @@ class RuleVersion(Base):
+     comment: Mapped[str | None] = mapped_column(Text)
+     version: Mapped[int] = mapped_column(Integer, default=1)  # + rule_key@vN (3.8)
+     domain: Mapped[str | None] = mapped_column(String(16))  # + VAT, INPUT_VAT, CT, ... (3.8)
+-    unit: Mapped[str | None] = mapped_column(String(32))  # + (3.8)
++    unit: Mapped[str | None] = mapped_column(String(128))  # + (3.8); widened 0009 (D49)
+     source_ref: Mapped[str | None] = mapped_column(Text)  # + citation text (3.8)
+     created_at: Mapped[datetime | None] = mapped_column(
+         DateTime(timezone=True),  # +
+diff --git a/engine/app/services/rules.py b/engine/app/services/rules.py
+index 9633561..4c24390 100644
+--- a/engine/app/services/rules.py
++++ b/engine/app/services/rules.py
+@@ -17,8 +17,8 @@ Resolution - exactly one version (prompt 3.8)
+ * an approved version always wins over a pending one; two versions of the same status
+   -> RuleConflict; none -> RuleNotFound with a clear message.
+ 
+-Workflow: :func:`propose` -> :func:`approve` / :func:`reject` (Tax Partner or Admin, mandatory
+-comment).
++Workflow: :func:`propose` -> :func:`approve` / :func:`reject` (mandatory comment; Tax Partner for
++tax domains, Partner for methodology domains, Admin never - D43, D47).
+ Approval closes the prior version, never edits an approved row (immutability guard), writes
+ ``audit_log`` and marks dependent results STALE.
+ 
+@@ -67,7 +67,8 @@ SEED_PATH = Path(__file__).resolve().parents[2] / "seed_data" / "rules_seed.json
+ 
+ IMPLEMENTED_BY_PROMPT = "3.8"
+ 
+-APPROVER_ROLES = ("TaxPartner", "Admin")
++# D47: shared defaults follow the same domain split as firm decisions (D43); Admin never approves.
++APPROVER_ROLES = ("TaxPartner", "Partner")
+ PROPOSER_ROLES = ("TaxPartner", "Admin", "Partner", "Manager")
+ MIN_COMMENT = 10
+ RESOLVABLE = ("approved", "pending_verification")
+@@ -532,13 +533,14 @@ def check_firm_approver(rule_key: str, roles: Iterable[str], comment: str | None
+     return check_comment(comment)
+ 
+ 
+-def _check_approver(roles: Iterable[str], comment: str | None) -> str:
+-    if not set(roles).intersection(APPROVER_ROLES):
+-        raise RuleError("Only a Tax Partner or Admin can approve or reject rule versions", 403)
+-    text = (comment or "").strip()
+-    if len(text) < MIN_COMMENT:
+-        raise RuleError(f"A comment of at least {MIN_COMMENT} characters is mandatory")
+-    return text
++def _check_approver(rule_key: str, roles: Iterable[str], comment: str | None) -> str:
++    """Approver of a shared default (platform user): same domain split as a firm (D47)."""
++    need = firm_approver_roles(rule_key)
++    if not set(roles).intersection(need):
++        kind = "tax" if need == FIRM_TAX_APPROVERS else "methodology"
++        raise RuleError(f"Only a {' or '.join(need)} can approve or reject {kind} rule "
++                        f"'{rule_key}' (Admin never approves rules)", 403)
++    return check_comment(comment)
+ 
+ 
+ @dataclass
+@@ -588,7 +590,7 @@ def approve(s: Session, version_id: str, *, user_id: str, roles: Iterable[str],
+     """Approve a version. ``firm_id`` is the acting user's firm (None = platform user)."""
+     row = _row_for(s, version_id, firm_id)
+     text = (check_firm_approver(row.rule_key, roles, comment) if row.firm_id is not None
+-            else _check_approver(roles, comment))
++            else _check_approver(row.rule_key, roles, comment))
+     if row.status not in OPEN_STATUSES:
+         raise RuleError(f"{row.rule_key}@v{row.version} is {row.status}; only proposed or "
+                         "pending_verification versions can be approved", 409)
+@@ -658,7 +660,7 @@ def reject(s: Session, version_id: str, *, user_id: str, roles: Iterable[str],
+            comment: str | None, firm_id: str | None = None) -> RuleVersion:
+     row = _row_for(s, version_id, firm_id)
+     text = (check_firm_approver(row.rule_key, roles, comment) if row.firm_id is not None
+-            else _check_approver(roles, comment))
++            else _check_approver(row.rule_key, roles, comment))
+     if row.status != "proposed":
+         raise RuleError(f"{row.rule_key}@v{row.version} is {row.status}; only proposed "
+                         "versions can be rejected", 409)
+diff --git a/engine/tests/api/test_rules_api.py b/engine/tests/api/test_rules_api.py
+index db51e76..dbdebf7 100644
+--- a/engine/tests/api/test_rules_api.py
++++ b/engine/tests/api/test_rules_api.py
+@@ -68,13 +68,19 @@ def test_approval_marks_overlapping_results_stale(client: TestClient,
+                                                  token: Callable[..., str],
+                                                  results: dict[str, Any]) -> None:  # noqa: F811
+     tok, body = results["tok"], results["body"]
+-    tp = token(sub="tp-1", roles=["TaxPartner"])
++    # D47: methodology keys (je.*, sampling.*) are approved by a Partner, never an Admin
++    partner = token(sub="p-1", roles=["Partner"])
++    admin = token(sub="adm-1", roles=["Admin"])
+     sid, jid = body["sample_id"], body["je_run_id"]
+ 
+     def approve(key: str, value: Any, frm: str) -> dict[str, Any]:
+         p = client.post("/v1/rules/proposals", headers=auth(tok),
+                         json={"rule_key": key, "value": value, "effective_from": frm})
+-        r = client.post(f"/v1/rules/{p.json()['id']}/approve", headers=auth(tp), json=OK)
++        r = client.post(f"/v1/rules/{p.json()['id']}/approve", headers=auth(admin), json=OK)
++        assert r.status_code == 403 and "Admin never approves" in r.text
++        r = client.post(f"/v1/rules/{p.json()['id']}/reject", headers=auth(admin), json=OK)
++        assert r.status_code == 403
++        r = client.post(f"/v1/rules/{p.json()['id']}/approve", headers=auth(partner), json=OK)
+         assert r.status_code == 200, r.text
+         return dict(r.json())
+ 
+diff --git a/engine/tests/conftest.py b/engine/tests/conftest.py
+index ecf7f91..5aead2b 100644
+--- a/engine/tests/conftest.py
++++ b/engine/tests/conftest.py
+@@ -3,6 +3,7 @@
+ from __future__ import annotations
+ 
+ import json
++import os
+ import time
+ from collections.abc import Iterator
+ from pathlib import Path
+@@ -20,6 +21,9 @@ ISSUER = "https://login.microsoftonline.com/00000000-test-tenant/v2.0"
+ AUDIENCE = "api://auditsmart-engine-test"
+ KID = "test-key-1"
+ HS_SECRET = "s" * 40
++# Opt-in: run the suite on PostgreSQL (e.g. postgresql://u:p@127.0.0.1:5432/scratch_db).
++# The schema of that database is DROPPED for every test - never point it at real data.
++PG_TEST_URL = os.environ.get("AUDITSMART_TEST_PG_URL", "")
+ 
+ 
+ @pytest.fixture(scope="session")
+@@ -41,7 +45,7 @@ def env(monkeypatch: pytest.MonkeyPatch, tmp_path: Path, jwks_json: str) -> Iter
+     monkeypatch.chdir(tmp_path)  # no stray .env picked up
+     values = {
+         "ENVIRONMENT": "test",
+-        "DATABASE_URL": f"sqlite:///{tmp_path / 'test.db'}",
++        "DATABASE_URL": PG_TEST_URL or f"sqlite:///{tmp_path / 'test.db'}",
+         "REDIS_URL": "",
+         "AUTH_PROVIDER": "entra",
+         "AUTH_ISSUER": ISSUER,
+@@ -58,6 +62,12 @@ def env(monkeypatch: pytest.MonkeyPatch, tmp_path: Path, jwks_json: str) -> Iter
+         monkeypatch.setenv(k, v)
+     config.reset_settings()
+     db.reset_engine()
++    if PG_TEST_URL:  # opt-in PostgreSQL run (D49): a clean schema for every test
++        from sqlalchemy import text
++
++        with db.get_engine().begin() as conn:
++            conn.execute(text("DROP SCHEMA public CASCADE"))
++            conn.execute(text("CREATE SCHEMA public"))
+     db.create_all()
+     from app.services import rules
+ 
+diff --git a/engine/tests/unit/test_firm_scope.py b/engine/tests/unit/test_firm_scope.py
+index ba641f5..38526ba 100644
+--- a/engine/tests/unit/test_firm_scope.py
++++ b/engine/tests/unit/test_firm_scope.py
+@@ -95,6 +95,23 @@ def test_firm_claim_extraction(env: Path, rsa_key: Any) -> None:
+     tok = make_token(HS_SECRET, alg="HS256", extra={"firm_id": "  "})
+     assert sb.validate(tok).firm_id is None
+     custom = TokenValidator(_settings(auth_provider="supabase", auth_firm_claim="tenant"))
+-    tok = make_token(HS_SECRET, alg="HS256", extra={"tenant": "t-1"})
++    tok = make_token(HS_SECRET, alg="HS256", extra={"app_metadata": {"tenant": "t-1"}})
+     assert custom.validate(tok).firm_id == "t-1"
++    # D48: Supabase reads app_metadata only - a top-level or user_metadata firm is ignored
++    for extra in ({"firm_id": "firm-top"}, {"user_metadata": {"firm_id": "firm-um"}},
++                  {"app_metadata": "not-a-dict", "firm_id": "firm-top"}):
++        assert sb.validate(make_token(HS_SECRET, alg="HS256", extra=extra)).firm_id is None
++    tok = make_token(HS_SECRET, alg="HS256",
++                     extra={"firm_id": "firm-top", "app_metadata": {"firm_id": "firm-am"}})
++    assert sb.validate(tok).firm_id == "firm-am"
++    # dev (local only) mirrors Supabase but still accepts a top-level claim
++    dev = TokenValidator(_settings(auth_provider="dev", environment="development"))
++    assert dev.validate(make_token(HS_SECRET, alg="HS256",
++                                   extra={"firm_id": "firm-top"})).firm_id == "firm-top"
++    assert dev.validate(make_token(HS_SECRET, alg="HS256", extra={
++        "firm_id": "firm-top", "app_metadata": {"firm_id": "firm-am"}})).firm_id == "firm-am"
+     assert sb.validate(make_token(HS_SECRET, alg="HS256")).firm_id is None
++    # Entra: top-level claim only (app_metadata is not an Entra concept)
++    entra = TokenValidator(_settings(auth_provider="entra"))
++    assert entra._principal({"sub": "u", "firm_id": "firm-e"}).firm_id == "firm-e"
++    assert entra._principal({"sub": "u", "app_metadata": {"firm_id": "x"}}).firm_id is None
+diff --git a/engine/tests/unit/test_health_config.py b/engine/tests/unit/test_health_config.py
+index d193ba2..5d35f18 100644
+--- a/engine/tests/unit/test_health_config.py
++++ b/engine/tests/unit/test_health_config.py
+@@ -59,6 +59,22 @@ def test_settings_validation(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) ->
+         _ = config.Settings(storage_url="s3://bucket").storage_path
+ 
+ 
++def test_render_style_database_urls_use_psycopg3(monkeypatch: pytest.MonkeyPatch) -> None:
++    """D46: Render/Supabase give postgres:// or postgresql://; psycopg2 is not installed."""
++    n = config.normalise_database_url
++    assert n("postgres://u:p@h:5432/db") == "postgresql+psycopg://u:p@h:5432/db"
++    assert n(" postgresql://u:p@h/db ") == "postgresql+psycopg://u:p@h/db"
++    for kept in ("postgresql+psycopg://u:p@h/db", "sqlite:///x.db", "sqlite://"):
++        assert n(kept) == kept
++    monkeypatch.setenv("DATABASE_URL", "postgres://u:p@h/db")
++    assert config.Settings().effective_database_url == "postgresql+psycopg://u:p@h/db"
++    monkeypatch.setenv("ALLOWED_ORIGINS", "https://a.lovable.app/,https://b.example//, /")
++    assert config.Settings().origins == ["https://a.lovable.app", "https://b.example"]
++    from sqlalchemy import create_engine
++    eng = create_engine(config.Settings().effective_database_url)
++    assert eng.dialect.driver == "psycopg"
++
++
+ def test_cors_whitelist(client: TestClient) -> None:
+     ok = client.get("/v1/health", headers={"Origin": "https://auditsmart.example.com"})
+     assert ok.headers.get("access-control-allow-origin") == "https://auditsmart.example.com"
+diff --git a/engine/tests/unit/test_rules_library.py b/engine/tests/unit/test_rules_library.py
+index b3126bb..ac39365 100644
+--- a/engine/tests/unit/test_rules_library.py
++++ b/engine/tests/unit/test_rules_library.py
+@@ -129,6 +129,37 @@ def test_approve_roles_comment_and_reject(env: Path) -> None:
+         assert e.value.status_code == 409
+ 
+ 
++def test_shared_default_approvers_follow_domain_split_no_admin(env: Path) -> None:
++    """D47: platform Admin never approves; tax -> TaxPartner, methodology -> Partner."""
++    with session_factory()() as s:
++        tax = rules.propose(s, rule_key="vat.rate.SR", value="0.06",
++                            effective_from=date(2028, 1, 1))
++        meth = rules.propose(s, rule_key="sampling.mus.cf.95", value="3.10",
++                             effective_from=date(2028, 1, 1))
++        for row in (tax, meth):
++            for fn in (rules.approve, rules.reject):
++                for roles in (["Admin"], ["Admin", "Manager"]):
++                    with pytest.raises(RuleError, match="Admin never approves") as e:
++                        fn(s, row.id, user_id="adm", roles=roles, comment=OK)
++                    assert e.value.status_code == 403
++        with pytest.raises(RuleError, match="TaxPartner can approve or reject tax") as e:
++            rules.approve(s, tax.id, user_id="p", roles=["Partner"], comment=OK)
++        assert e.value.status_code == 403
++        with pytest.raises(RuleError, match="Partner can approve or reject methodology") as e:
++            rules.approve(s, meth.id, user_id="tp", roles=TP, comment=OK)
++        assert e.value.status_code == 403
++        with pytest.raises(RuleError, match="mandatory"):
++            rules.approve(s, meth.id, user_id="p", roles=["Partner"], comment="ok")
++        assert rules.approve(s, meth.id, user_id="p", roles=["Partner"],
++                             comment=OK).rule.status == "approved"
++        assert rules.approve(s, tax.id, user_id="tp", roles=["TaxPartner", "Admin"],
++                             comment=OK).rule.status == "approved"
++        rej = rules.propose(s, rule_key="je.round_sum.min", value="20000",
++                            effective_from=date(2028, 1, 1))
++        assert rules.reject(s, rej.id, user_id="p", roles=["Partner"],
++                            comment="Not agreed by the firm").status == "rejected"
++
++
+ def test_approve_seed_then_new_version_closes_prior(env: Path) -> None:
+     sid = _id("vat.rate.SR")
+     with session_factory()() as s:
+@@ -136,7 +167,7 @@ def test_approve_seed_then_new_version_closes_prior(env: Path) -> None:
+         assert a.rule.status == "approved" and not a.closed and not a.stale
+         new = rules.propose(s, rule_key="vat.rate.SR", value="0.06",
+                             effective_from=date(2027, 1, 1), source_ref="hypothetical test")
+-        a2 = rules.approve(s, new.id, user_id="tp", roles=["Admin"], comment=OK)
++        a2 = rules.approve(s, new.id, user_id="tp", roles=TP, comment=OK)
+         assert a2.closed == [{"ref": "vat.rate.SR@v1", "effective_to": date(2026, 12, 31)}]
+         assert a2.as_dict()["closed"][0]["effective_to"] == "2026-12-31"
+         actions = s.scalars(select(AuditLog.action).where(AuditLog.entity == "rule_version"))
+-- 
+2.47.3
+

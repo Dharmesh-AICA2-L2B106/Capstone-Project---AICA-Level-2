@@ -1,0 +1,69 @@
+- GET /v1/health: Engine version, database and queue status. Returns Health: status, service, version, environment, db, queue
+- POST /v1/uploads: Start a chunked upload (returns the dataset id and chunk size). Body (application/json) UploadStart: engagement_id, file_name, size_bytes, kind?. Returns 201 UploadSession: dataset_id, chunk_size_bytes, max_upload_bytes, status
+- PUT /v1/uploads/{dataset_id}/chunks/{index}: Send one chunk (raw bytes, index from 0). Returns ChunkAck: dataset_id, index, chunks_received
+- POST /v1/uploads/{dataset_id}/complete: Assemble chunks, compute SHA-256 and start the parse job. Body (application/json) UploadComplete: mapping_override?, sha256?. Returns 202 DatasetAccepted: dataset_id, job_id, sha256, mapping_suggestion, profile, status
+- POST /v1/datasets: Upload a GL or TB file (async: returns job id, mapping, SHA-256). Body (multipart/form-data) Body_upload_dataset_v1_datasets_post: engagement_id, file, kind?, mapping_override?. Returns 202 DatasetAccepted: dataset_id, job_id, sha256, mapping_suggestion, profile, status
+- GET /v1/datasets/{dataset_id}: Get Dataset. Returns DatasetOut: id, engagement_id, file_name, kind, status, sha256, size_bytes, rows, total_dr, total_cr, mapping, profile, created_at
+- PUT /v1/datasets/{dataset_id}/mapping: Override the header mapping and re-parse. Body (application/json) MappingUpdate: mapping_override. Returns 202 JobAccepted: job_id, dataset_id, status
+- POST /v1/datasets/{dataset_id}/validate: Run validation (async job; wait=true returns the results). Query: wait?. Body (application/json) ValidateRequest: tb_dataset_id?. Returns 202 JobAccepted: job_id, dataset_id, status
+- GET /v1/datasets/{dataset_id}/errors: Errors. Returns ValidationResult: dataset_id, status, critical, warnings, blocked, row_note, errors
+- GET /v1/datasets/{dataset_id}/rows: Filters are pushed down to the Parquet reader, so a 1M-line file is not loaded whole. Query: offset?, limit?, voucher_no?, account_code?, user_id?, date_from?, date_to?, min_amount?. Returns RowsPage: dataset_id, total, offset, limit, rows
+- PUT /v1/engagements/{engagement_id}: Create or update an engagement, its client and its whole team (sync). Body (application/json) EngagementSync: client, fye, framework?, materiality?, perf_materiality?, trivial?, status?, members. Returns EngagementOut: created?, engagement, client, members, stale?
+- GET /v1/engagements/{engagement_id}: The engine's copy of an engagement, its client and team. Returns EngagementOut: created?, engagement, client, members, stale?
+- GET /v1/jobs: List jobs you can see. Query: engagement_id?, status?, type?, offset?, limit?. Returns JobsPage: total, offset, limit, items
+- GET /v1/jobs/{job_id}: Status and progress of a job. Returns JobOut: id, type, engagement_id?, status, progress, error, result_ref, created_at, started_at, finished_at
+- POST /v1/jobs/{job_id}/cancel: Cancel a job. Returns JobOut: id, type, engagement_id?, status, progress, error, result_ref, created_at, started_at, finished_at
+- POST /v1/sample: Create Sample. Body (application/json) SampleCreate: dataset_id, method?, basis?, account_types?, account_codes?, confidence?, tolerable_misstatement?, expected_misstatement_pct?, size_formula?, sample_size?, key_item_threshold?, strata_boundaries?, num_strata?, seed?. Returns 201 SampleOut: sample_id, dataset_id, engagement_id, method, status, parameters, cf_value, cf_rule_version, formula_text, n_required, sample_size, seed, random_start, interval, basic_precision, population, top_stratum, key_items, credit_lines_excluded, strata, items, warnings, rationale, engine_version, dataset_hash, rule_versions_used, rules_pending_verification
+- GET /v1/samples/{sample_id}: Read Sample. Returns SampleOut: sample_id, dataset_id, engagement_id, method, status, parameters, cf_value, cf_rule_version, formula_text, n_required, sample_size, seed, random_start, interval, basic_precision, population, top_stratum, key_items, credit_lines_excluded, strata, items, warnings, rationale, engine_version, dataset_hash, rule_versions_used, rules_pending_verification
+- POST /v1/je-tests: Run journal-entry tests (ISA 240) as a background job. Body (application/json) JeRunCreate: dataset_id, parameters?. Returns 202 JeRunAccepted: je_run_id, job_id, status_url, result_url
+- GET /v1/je-tests/{run_id}: JE test run result. Returns JeRunOut: je_run_id, status, job_id?, dataset_id, engagement_id
+- GET /v1/je-tests/{run_id}/flags: Flagged lines of a run, paginated. Query: flag?, min_score?, offset?, limit?
+- POST /v1/benford: Benford first-digit test. Body (application/json) BenfordCreate: dataset_id, account_types?, min_amount?. Returns BenfordOut: dataset_id, n, mad, conclusion, chart
+- POST /v1/vat-check: Output VAT and TRN checks. Body (application/json) VatCheckCreate: dataset_id, sides?. Returns VatCheckOut: dataset_id, exceptions_count
+- POST /v1/evaluate: Evaluate a sample (ISA 450). Body (application/json) EvaluateCreate: sample_id, method?, tolerable_misstatement?, items?. Returns EvaluationOut: sample_id, method, conclusion
+- POST /v1/workpaper: Generate the Excel working paper (ISA 230). Body (application/json) WorkpaperCreate: engagement_id, wp_ref, sample_id?, je_run_id?, input_vat_run_id?, reviewer?, stale_overrides?. Returns 201 WorkpaperOut: workpaper_id, wp_ref, status, sha256, file_url
+- POST /v1/workpaper/jobs: Generate the working paper as a background job (large exports). Body (application/json) WorkpaperCreate: engagement_id, wp_ref, sample_id?, je_run_id?, input_vat_run_id?, reviewer?, stale_overrides?
+- GET /v1/workpapers/{workpaper_id}: Get Workpaper. Returns WorkpaperOut: workpaper_id, wp_ref, status, sha256, file_url
+- GET /v1/workpapers/{workpaper_id}/file: Download Workpaper
+- POST /v1/ai/observation: Draft an observation with AI from an anonymised payload. Body (application/json) ObservationCreate: sample_item_id, failed_attribute, test?, remark?, rule_keys?. Returns 201 ObservationOut: observation_id, ai_generated
+- GET /v1/observations/{observation_id}: Get Observation. Returns ObservationOut: observation_id, ai_generated
+- POST /v1/observations/{observation_id}/review: Review Observation. Body (application/json) ObservationReview: text?. Returns ObservationOut: observation_id, ai_generated
+- GET /v1/rules: List rule versions. Query: rule_key?, domain?, status?
+- GET /v1/rules/resolve/{rule_key}: The single version of a rule effective on a date. Query: on?, engagement_id?. Returns RuleOut: ref, rule_key, version, status
+- POST /v1/rules/proposals: Propose Rule. Body (application/json) RuleProposal: rule_key, value, effective_from, effective_to?, source_url?, source_ref?, unit?, comment?. Returns 201 RuleOut: ref, rule_key, version, status
+- POST /v1/rules/{version_id}/approve: Approve Rule. Body (application/json) RuleDecision: comment
+- POST /v1/rules/{version_id}/reject: Reject Rule. Body (application/json) RuleDecision: comment. Returns RuleOut: ref, rule_key, version, status
+- GET /v1/firm: Your firm and its rule settings
+- PATCH /v1/firm/settings: Tighten or relax the firm's pending-rule setting. Body (application/json) FirmSettings: require_approved_rules, comment
+- GET /v1/firm/rules/review: Review every default rule for your firm. Query: on?, domain?, status?, engagement_id?
+- POST /v1/firm/rules/{rule_key}/approve: Approve a default (or your firm's proposal) for your firm. Body (application/json) FirmRuleApprove: comment, version_id?, on?
+- POST /v1/firm/rules/{rule_key}/override: Propose your firm's (or one engagement's) value for a rule. Body (application/json) FirmRuleOverride: value, effective_from, effective_to?, engagement_id?, source_url?, source_ref?, unit?, comment. Returns 201 RuleOut: ref, rule_key, version, status
+- POST /v1/firm/rules/{rule_key}/reject: Reject one of your firm's rule proposals. Body (application/json) FirmRuleReject: version_id, comment. Returns RuleOut: ref, rule_key, version, status
+- POST /v1/firms: Register a firm (platform Admin). Body (application/json) FirmCreate: id, name, require_approved_rules?
+- PUT /v1/firms/{firm_id}/clients/{client_id}: Link an unassigned client to a firm (platform Admin)
+- GET /v1/rules-monitor/sources: List Sources
+- POST /v1/rules-monitor/sources: Add Source. Body (application/json) SourceIn: url, name, type, active?
+- PATCH /v1/rules-monitor/sources/{source_id}: Edit Source. Body (application/json) SourcePatch: url?, name?, type?, active?
+- POST /v1/rules-monitor/check: Check Now. Query: force?
+- POST /v1/rules-monitor/upload: Upload. Body (multipart/form-data) Body_upload_v1_rules_monitor_upload_post: file, source_url?
+- GET /v1/rules-monitor/alerts: List Alerts. Query: status?, kind?
+- POST /v1/rules-monitor/alerts/{alert_id}/close: Close Alert
+- GET /v1/calendar/resolve: Resolve. Query: start, end, engagement_id?, client_id?, emirate?, include_days?
+- GET /v1/calendar/clients/{client_id}: Client Layers
+- POST /v1/calendar/clients/{client_id}/workweeks: Add Workweek. Body (application/json) WorkWeekIn: off_days, half_days?, effective_from, effective_to?
+- POST /v1/calendar/clients/{client_id}/exceptions: Add Exception. Body (application/json) ExceptionIn: date, type, note?
+- DELETE /v1/calendar/clients/{client_id}/{kind}/{item_id}: Delete Company
+- POST /v1/calendar/emirate-profiles: Add Emirate Profile. Body (application/json) EmirateWeekIn: off_days, half_days?, effective_from, effective_to?, emirate
+- POST /v1/calendar/holidays: Add Holiday. Body (application/json) HolidayIn: date, name, scope?, emirate?, status?
+- PATCH /v1/calendar/holidays/{holiday_id}: Patch Holiday. Body (application/json) HolidayPatch: status
+- DELETE /v1/calendar/{kind}/{item_id}: Delete Global
+- GET /v1/calendar/template: Template
+- GET /v1/calendar/clients/{client_id}/export: Export
+- POST /v1/calendar/clients/{client_id}/import: Import Calendar. Query: apply?. Body (multipart/form-data) Body_import_calendar_v1_calendar_clients__client_id__import_post: file
+- PUT /v1/engagements/{engagement_id}/supplier-register: Upload the supplier verification register (CSV, replaces). Body (multipart/form-data) Body_put_register_v1_engagements__engagement_id__supplier_register_put: file
+- GET /v1/engagements/{engagement_id}/supplier-register: Get Register
+- PUT /v1/engagements/{engagement_id}/expense-mapping: Map expense accounts to the Decision 17 categories (replaces). Body (application/json) MappingIn: items
+- GET /v1/engagements/{engagement_id}/expense-mapping: Get Mapping
+- POST /v1/input-vat-check: Run the Decision 13 / 17 input-VAT checks as a background job. Body (application/json) InputVatCreate: dataset_id, effective_date_override?. Returns 202 InputVatAccepted: input_vat_run_id, job_id, status_url, result_url
+- GET /v1/input-vat-check/{run_id}: Input-VAT run result
+- GET /v1/input-vat-check/{run_id}/exceptions: Exceptions, paginated. Query: check?, offset?, limit?

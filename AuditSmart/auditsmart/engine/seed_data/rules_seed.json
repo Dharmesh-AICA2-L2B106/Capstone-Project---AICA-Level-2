@@ -1,0 +1,526 @@
+{
+  "_note": "Rules Library seed (prompts 3.2-3.8). Loaded into rule_versions by rules.seed_database(). Every rule is pending_verification until the Tax Partner approves it (Appendix D). Values come only from repo documents; source_url only where recorded in the repo.",
+  "rules": [
+    {
+      "rule_key": "validation.balance_tolerance",
+      "version": 1,
+      "effective_from": "2018-01-01",
+      "value": "0.00",
+      "unit": "AED",
+      "status": "pending_verification",
+      "source_ref": "Build Guide v2.0 prompt 3.2 (tolerance from rules); firm default nil"
+    },
+    {
+      "rule_key": "validation.trn_pattern",
+      "version": 1,
+      "effective_from": "2018-01-01",
+      "value": "^100\\d{12}$",
+      "unit": "regex",
+      "status": "pending_verification",
+      "source_ref": "UAE TRN: 15 digits starting 100 (Build Guide SPEC; Stage 1 answer key)"
+    },
+    {
+      "rule_key": "validation.amount_decimal_places",
+      "version": 1,
+      "effective_from": "2018-01-01",
+      "value": 2,
+      "unit": "dp",
+      "status": "pending_verification",
+      "source_ref": "AED fils precision"
+    },
+    {
+      "rule_key": "sampling.mus.cf.80",
+      "version": 1,
+      "effective_from": "2018-01-01",
+      "value": "1.61",
+      "unit": "factor",
+      "status": "pending_verification",
+      "source_ref": "firm_methodology_v0.2 Section 5 (DRAFT pending Assurance Partner approval)"
+    },
+    {
+      "rule_key": "sampling.mus.cf.90",
+      "version": 1,
+      "effective_from": "2018-01-01",
+      "value": "2.31",
+      "unit": "factor",
+      "status": "pending_verification",
+      "source_ref": "firm_methodology_v0.2 Section 5 (DRAFT pending Assurance Partner approval)"
+    },
+    {
+      "rule_key": "sampling.mus.cf.95",
+      "version": 1,
+      "effective_from": "2018-01-01",
+      "value": "3.00",
+      "unit": "factor",
+      "status": "pending_verification",
+      "source_ref": "firm_methodology_v0.2 Section 5 (DRAFT pending Assurance Partner approval)"
+    },
+    {
+      "rule_key": "sampling.mus.cf.99",
+      "version": 1,
+      "effective_from": "2018-01-01",
+      "value": "4.61",
+      "unit": "factor",
+      "status": "pending_verification",
+      "source_ref": "firm_methodology_v0.2 Section 5 (DRAFT pending Assurance Partner approval)"
+    },
+    {
+      "rule_key": "sampling.mus.ef.80",
+      "version": 1,
+      "effective_from": "2018-01-01",
+      "value": "1.3",
+      "unit": "factor",
+      "status": "pending_verification",
+      "source_ref": "firm_methodology_v0.2 Section 5 (DRAFT pending Assurance Partner approval)"
+    },
+    {
+      "rule_key": "sampling.mus.ef.90",
+      "version": 1,
+      "effective_from": "2018-01-01",
+      "value": "1.5",
+      "unit": "factor",
+      "status": "pending_verification",
+      "source_ref": "firm_methodology_v0.2 Section 5 (DRAFT pending Assurance Partner approval)"
+    },
+    {
+      "rule_key": "sampling.mus.ef.95",
+      "version": 1,
+      "effective_from": "2018-01-01",
+      "value": "1.6",
+      "unit": "factor",
+      "status": "pending_verification",
+      "source_ref": "firm_methodology_v0.2 Section 5 (DRAFT pending Assurance Partner approval)"
+    },
+    {
+      "rule_key": "sampling.mus.if.95",
+      "version": 1,
+      "effective_from": "2018-01-01",
+      "value": [
+        "1.75",
+        "1.55",
+        "1.46",
+        "1.40",
+        "1.36"
+      ],
+      "unit": "factors by rank",
+      "status": "pending_verification",
+      "source_ref": "firm_methodology_v0.2 Section 5 (DRAFT pending Assurance Partner approval)"
+    },
+    {
+      "rule_key": "sampling.mus.if.90",
+      "version": 1,
+      "effective_from": "2018-01-01",
+      "value": [
+        "1.58",
+        "1.44",
+        "1.36",
+        "1.31",
+        "1.28"
+      ],
+      "unit": "factors by rank",
+      "status": "pending_verification",
+      "source_ref": "firm_methodology_v0.2 Section 5 (DRAFT pending Assurance Partner approval)"
+    },
+    {
+      "rule_key": "sampling.mus.expected_pct",
+      "version": 1,
+      "effective_from": "2018-01-01",
+      "value": "0.10",
+      "unit": "fraction of TM",
+      "status": "pending_verification",
+      "source_ref": "firm_methodology_v0.2 Section 5 (DRAFT pending Assurance Partner approval)"
+    },
+    {
+      "rule_key": "sampling.mus.max_expected_pct",
+      "version": 1,
+      "effective_from": "2018-01-01",
+      "value": "0.50",
+      "unit": "fraction of TM",
+      "status": "pending_verification",
+      "source_ref": "firm_methodology_v0.2 Section 5 (DRAFT pending Assurance Partner approval)"
+    },
+    {
+      "rule_key": "sampling.min_n",
+      "version": 1,
+      "effective_from": "2018-01-01",
+      "value": 5,
+      "unit": "items",
+      "status": "pending_verification",
+      "source_ref": "firm_methodology_v0.2 Section 5 (DRAFT pending Assurance Partner approval)"
+    },
+    {
+      "rule_key": "sampling.size_difference_warn_pct",
+      "version": 1,
+      "effective_from": "2018-01-01",
+      "value": "0.10",
+      "unit": "fraction of n",
+      "status": "pending_verification",
+      "source_ref": "firm_methodology_v0.2 Section 5 (DRAFT pending Assurance Partner approval)"
+    },
+    {
+      "rule_key": "je.round_sum.multiple",
+      "version": 1,
+      "effective_from": "2018-01-01",
+      "value": "1000",
+      "unit": "AED",
+      "status": "pending_verification",
+      "source_ref": "firm_methodology_v0.2 Section 5 - JE criteria (DRAFT pending Assurance Partner approval)"
+    },
+    {
+      "rule_key": "je.round_sum.min",
+      "version": 1,
+      "effective_from": "2018-01-01",
+      "value": "10000",
+      "unit": "AED",
+      "status": "pending_verification",
+      "source_ref": "firm_methodology_v0.2 Section 5 - JE criteria (DRAFT pending Assurance Partner approval)"
+    },
+    {
+      "rule_key": "je.period_end.days",
+      "version": 1,
+      "effective_from": "2018-01-01",
+      "value": 5,
+      "unit": "days either side of period end",
+      "status": "pending_verification",
+      "source_ref": "firm_methodology_v0.2 Section 5 - JE criteria (DRAFT pending Assurance Partner approval)"
+    },
+    {
+      "rule_key": "je.rare_user.max_pct",
+      "version": 1,
+      "effective_from": "2018-01-01",
+      "value": "0.01",
+      "unit": "fraction of entries",
+      "status": "pending_verification",
+      "source_ref": "firm_methodology_v0.2 Section 5 - JE criteria (DRAFT pending Assurance Partner approval)"
+    },
+    {
+      "rule_key": "je.vague_narration.keywords",
+      "version": 1,
+      "effective_from": "2018-01-01",
+      "value": [
+        "adj",
+        "misc",
+        "correction",
+        "reversal",
+        "error",
+        "as per md"
+      ],
+      "unit": "keywords (blank narration always flagged)",
+      "status": "pending_verification",
+      "source_ref": "firm_methodology_v0.2 Section 5 - JE criteria (DRAFT pending Assurance Partner approval)"
+    },
+    {
+      "rule_key": "je.account_pair.min_count",
+      "version": 1,
+      "effective_from": "2018-01-01",
+      "value": 3,
+      "unit": "vouchers",
+      "status": "pending_verification",
+      "source_ref": "firm_methodology_v0.2 Section 5 - JE criteria (DRAFT pending Assurance Partner approval)"
+    },
+    {
+      "rule_key": "je.score.test",
+      "version": 1,
+      "effective_from": "2018-01-01",
+      "value": 3,
+      "unit": "criteria met",
+      "status": "pending_verification",
+      "source_ref": "firm_methodology_v0.2 Section 5 - JE criteria (DRAFT pending Assurance Partner approval)"
+    },
+    {
+      "rule_key": "je.score.judgement",
+      "version": 1,
+      "effective_from": "2018-01-01",
+      "value": 2,
+      "unit": "criteria met",
+      "status": "pending_verification",
+      "source_ref": "firm_methodology_v0.2 Section 5 - JE criteria (DRAFT pending Assurance Partner approval)"
+    },
+    {
+      "rule_key": "je.judgement.min_items",
+      "version": 1,
+      "effective_from": "2018-01-01",
+      "value": 10,
+      "unit": "entries",
+      "status": "pending_verification",
+      "source_ref": "firm_methodology_v0.2 Section 5 - JE criteria (DRAFT pending Assurance Partner approval)"
+    },
+    {
+      "rule_key": "je.manual_voucher_prefixes",
+      "version": 1,
+      "effective_from": "2018-01-01",
+      "value": [
+        "JV"
+      ],
+      "unit": "voucher prefix",
+      "status": "pending_verification",
+      "source_ref": "Engine default (plans/DECISIONS.md D11) - pending methodology owner approval"
+    },
+    {
+      "rule_key": "je.sensitive_account_types",
+      "version": 1,
+      "effective_from": "2018-01-01",
+      "value": [
+        "Revenue"
+      ],
+      "unit": "account types (manual entries to revenue/cash)",
+      "status": "pending_verification",
+      "source_ref": "firm_methodology_v0.2 Section 5 - JE criteria (DRAFT pending Assurance Partner approval)"
+    },
+    {
+      "rule_key": "je.sensitive_account_codes",
+      "version": 1,
+      "effective_from": "2018-01-01",
+      "value": [],
+      "unit": "account codes (cash/bank) - set per engagement chart of accounts",
+      "status": "pending_verification",
+      "source_ref": "Engine default (plans/DECISIONS.md D11) - pending methodology owner approval"
+    },
+    {
+      "rule_key": "benford.min_amount",
+      "version": 1,
+      "effective_from": "2018-01-01",
+      "value": "10",
+      "unit": "AED",
+      "status": "pending_verification",
+      "source_ref": "firm_methodology_v0.2 Section 5 - JE criteria (DRAFT pending Assurance Partner approval)"
+    },
+    {
+      "rule_key": "benford.mad.first_digit",
+      "version": 1,
+      "effective_from": "2018-01-01",
+      "value": [
+        "0.006",
+        "0.012",
+        "0.015"
+      ],
+      "unit": "MAD close/acceptable/marginal",
+      "status": "pending_verification",
+      "source_ref": "firm_methodology_v0.2 Section 5 - JE criteria (DRAFT pending Assurance Partner approval)"
+    },
+    {
+      "rule_key": "benford.chi2.alpha",
+      "version": 1,
+      "effective_from": "2018-01-01",
+      "value": "0.05",
+      "unit": "significance level",
+      "status": "pending_verification",
+      "source_ref": "Engine default (plans/DECISIONS.md D11) - pending methodology owner approval"
+    },
+    {
+      "rule_key": "vat.rate.SR",
+      "version": 1,
+      "effective_from": "2018-01-01",
+      "value": "0.05",
+      "unit": "rate",
+      "status": "pending_verification",
+      "source_ref": "UAE Federal Decree-Law No. 8 of 2017 (VAT) – standard rate 5%, zero rate, exempt; reverse charge at the standard rate"
+    },
+    {
+      "rule_key": "vat.rate.ZR",
+      "version": 1,
+      "effective_from": "2018-01-01",
+      "value": "0",
+      "unit": "rate",
+      "status": "pending_verification",
+      "source_ref": "UAE Federal Decree-Law No. 8 of 2017 (VAT) – standard rate 5%, zero rate, exempt; reverse charge at the standard rate"
+    },
+    {
+      "rule_key": "vat.rate.EX",
+      "version": 1,
+      "effective_from": "2018-01-01",
+      "value": "0",
+      "unit": "rate",
+      "status": "pending_verification",
+      "source_ref": "UAE Federal Decree-Law No. 8 of 2017 (VAT) – standard rate 5%, zero rate, exempt; reverse charge at the standard rate"
+    },
+    {
+      "rule_key": "vat.rate.RC",
+      "version": 1,
+      "effective_from": "2018-01-01",
+      "value": "0.05",
+      "unit": "rate",
+      "status": "pending_verification",
+      "source_ref": "UAE Federal Decree-Law No. 8 of 2017 (VAT) – standard rate 5%, zero rate, exempt; reverse charge at the standard rate"
+    },
+    {
+      "rule_key": "vat.tolerance",
+      "version": 1,
+      "effective_from": "2018-01-01",
+      "value": "0.01",
+      "unit": "AED",
+      "status": "pending_verification",
+      "source_ref": "golden_results.xlsx VAT!B3 placeholder; Tax Partner to confirm"
+    },
+    {
+      "rule_key": "vat.codes",
+      "version": 1,
+      "effective_from": "2018-01-01",
+      "value": [
+        "SR",
+        "ZR",
+        "EX",
+        "RC"
+      ],
+      "unit": "list",
+      "status": "pending_verification",
+      "source_ref": "Engine VAT codes (standard, zero, exempt, reverse charge); Build Guide SPEC 3.2"
+    },
+    {
+      "rule_key": "trn.pattern",
+      "version": 1,
+      "effective_from": "2018-01-01",
+      "value": "^100\\d{12}$",
+      "unit": "regex",
+      "status": "pending_verification",
+      "source_ref": "UAE TRN: 15 digits starting 100 (same value as validation.trn_pattern; key family used by the FTA monitor)"
+    },
+    {
+      "rule_key": "input_vat.verification.spend_threshold",
+      "version": 1,
+      "effective_from": "2026-10-01",
+      "value": "375000.00",
+      "unit": "AED",
+      "status": "pending_verification",
+      "source_ref": "FTA Decision No. 13 of 2026 (provided text prompts/stage2_tests/FTA_Decision_13_of_2026.txt), Art 3(4): bank-account verification where supplies exceed AED 375,000 in the previous 12 months"
+    },
+    {
+      "rule_key": "input_vat.verification.revalidate_months",
+      "version": 1,
+      "effective_from": "2026-10-01",
+      "value": 12,
+      "unit": "months",
+      "status": "pending_verification",
+      "source_ref": "FTA Decision No. 13 of 2026 (provided text prompts/stage2_tests/FTA_Decision_13_of_2026.txt), Art 5(1): re-verify if not verified in the previous 12 months"
+    },
+    {
+      "rule_key": "input_vat.verification.exception_below",
+      "version": 1,
+      "effective_from": "2026-10-01",
+      "value": "10000.00",
+      "unit": "AED",
+      "status": "pending_verification",
+      "source_ref": "FTA Decision No. 13 of 2026 (provided text prompts/stage2_tests/FTA_Decision_13_of_2026.txt), Art 6(1): exception where consideration excl. VAT is below AED 10,000"
+    },
+    {
+      "rule_key": "input_vat.verification.exception_cap",
+      "version": 1,
+      "effective_from": "2026-10-01",
+      "value": "100000.00",
+      "unit": "AED",
+      "status": "pending_verification",
+      "source_ref": "FTA Decision No. 13 of 2026 (provided text prompts/stage2_tests/FTA_Decision_13_of_2026.txt), Art 6(2): exception does not apply where supplies exceed AED 100,000 in 12 months"
+    },
+    {
+      "rule_key": "input_vat.verification.effective_date",
+      "version": 1,
+      "effective_from": "2026-10-01",
+      "value": "2026-10-01",
+      "unit": "date",
+      "status": "pending_verification",
+      "source_ref": "FTA Decision No. 13 of 2026 (provided text prompts/stage2_tests/FTA_Decision_13_of_2026.txt), Art 7: effective 1 October 2026"
+    },
+    {
+      "rule_key": "input_vat.employee_expense.categories",
+      "version": 1,
+      "effective_from": "2026-10-01",
+      "value": [
+        "transport",
+        "food_beverages_remote",
+        "accommodation_operational",
+        "accommodation_new_employee",
+        "mobile_phone_internet",
+        "parking"
+      ],
+      "unit": "list",
+      "status": "pending_verification",
+      "source_ref": "FTA Decision No. 17 of 2026 (provided text prompts/stage2_tests/FTA_Decision_17_of_2026.txt), Art 2(1)-(6): the six recoverable cases",
+      "source_url": "https://tax.gov.ae/datafolder/Files/Pdf/2026/legislation/FTA%20Decision%20No.%2017%20of%202026%20on%20the%20Cases%20and%20Conditions%20for%20the%20Recovery%20of%20Input%20Tax%20Incurred%20on%20Employee%20Expenses%20-%20Publishing.pdf"
+    },
+    {
+      "rule_key": "input_vat.employee_expense.new_employee_accommodation_max_days",
+      "version": 1,
+      "effective_from": "2026-10-01",
+      "value": 30,
+      "unit": "days",
+      "status": "pending_verification",
+      "source_ref": "FTA Decision No. 17 of 2026 (provided text prompts/stage2_tests/FTA_Decision_17_of_2026.txt), Art 2(4)(a)",
+      "source_url": "https://tax.gov.ae/datafolder/Files/Pdf/2026/legislation/FTA%20Decision%20No.%2017%20of%202026%20on%20the%20Cases%20and%20Conditions%20for%20the%20Recovery%20of%20Input%20Tax%20Incurred%20on%20Employee%20Expenses%20-%20Publishing.pdf"
+    },
+    {
+      "rule_key": "input_vat.employee_expense.contract_or_policy_required",
+      "version": 1,
+      "effective_from": "2026-10-01",
+      "value": true,
+      "unit": "bool",
+      "status": "pending_verification",
+      "source_ref": "FTA Decision No. 17 of 2026 (provided text prompts/stage2_tests/FTA_Decision_17_of_2026.txt), Art 1",
+      "source_url": "https://tax.gov.ae/datafolder/Files/Pdf/2026/legislation/FTA%20Decision%20No.%2017%20of%202026%20on%20the%20Cases%20and%20Conditions%20for%20the%20Recovery%20of%20Input%20Tax%20Incurred%20on%20Employee%20Expenses%20-%20Publishing.pdf"
+    },
+    {
+      "rule_key": "input_vat.employee_expense.cash_alternative_prohibits_recovery",
+      "version": 1,
+      "effective_from": "2026-10-01",
+      "value": true,
+      "unit": "bool",
+      "status": "pending_verification",
+      "source_ref": "FTA Decision No. 17 of 2026 (provided text prompts/stage2_tests/FTA_Decision_17_of_2026.txt), Art 2(1)(c), 2(2)(d), 2(3)(a)",
+      "source_url": "https://tax.gov.ae/datafolder/Files/Pdf/2026/legislation/FTA%20Decision%20No.%2017%20of%202026%20on%20the%20Cases%20and%20Conditions%20for%20the%20Recovery%20of%20Input%20Tax%20Incurred%20on%20Employee%20Expenses%20-%20Publishing.pdf"
+    },
+    {
+      "rule_key": "ct.rate.standard",
+      "version": 1,
+      "effective_from": "2023-06-01",
+      "value": "0.09",
+      "unit": "ratio",
+      "status": "pending_verification",
+      "source_ref": "UAE Corporate Tax standard rate 9% (Federal Decree-Law No. 47 of 2022) - to be verified and source URL recorded by the Tax Partner"
+    },
+    {
+      "rule_key": "ct.threshold.taxable_income",
+      "version": 1,
+      "effective_from": "2023-06-01",
+      "value": "375000.00",
+      "unit": "AED",
+      "status": "pending_verification",
+      "source_ref": "UAE Corporate Tax 0% band up to AED 375,000 taxable income (Cabinet Decision No. 116 of 2023) - to be verified and source URL recorded by the Tax Partner"
+    },
+    {
+      "rule_key": "legal_ref.vat.law",
+      "version": 1,
+      "effective_from": "2018-01-01",
+      "value": "Federal Decree-Law No. 8 of 2017 on Value Added Tax",
+      "unit": "text",
+      "status": "pending_verification",
+      "source_ref": "Cited in the recitals of FTA Decisions 13 and 17 of 2026; source URL to be recorded by the Tax Partner"
+    },
+    {
+      "rule_key": "legal_ref.vat.executive_regulation",
+      "version": 1,
+      "effective_from": "2018-01-01",
+      "value": "Cabinet Decision No. 52 of 2017 on the Executive Regulation of the VAT Law",
+      "unit": "text",
+      "status": "pending_verification",
+      "source_ref": "Cited in the recitals of FTA Decision 17 of 2026; source URL to be recorded by the Tax Partner"
+    },
+    {
+      "rule_key": "legal_ref.input_vat.supplier_verification",
+      "version": 1,
+      "effective_from": "2026-10-01",
+      "value": "FTA Decision No. 13 of 2026",
+      "unit": "text",
+      "status": "pending_verification",
+      "source_ref": "FTA Decision No. 13 of 2026 (provided text prompts/stage2_tests/FTA_Decision_13_of_2026.txt); source URL to be recorded by the Tax Partner"
+    },
+    {
+      "rule_key": "legal_ref.input_vat.employee_expenses",
+      "version": 1,
+      "effective_from": "2026-10-01",
+      "value": "FTA Decision No. 17 of 2026",
+      "unit": "text",
+      "status": "pending_verification",
+      "source_ref": "FTA Decision No. 17 of 2026 (provided text prompts/stage2_tests/FTA_Decision_17_of_2026.txt), Art 3 (effective 1 October 2026)",
+      "source_url": "https://tax.gov.ae/datafolder/Files/Pdf/2026/legislation/FTA%20Decision%20No.%2017%20of%202026%20on%20the%20Cases%20and%20Conditions%20for%20the%20Recovery%20of%20Input%20Tax%20Incurred%20on%20Employee%20Expenses%20-%20Publishing.pdf"
+    }
+  ]
+}

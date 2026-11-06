@@ -1,0 +1,48 @@
+[project]
+name = "auditsmart-engine"
+version = "0.2.2"
+description = "AuditSmart calculation engine (CLA Emirates) – FastAPI + Decimal"
+requires-python = ">=3.11,<3.12"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = ["alembic/versions"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "C4", "SIM", "RUF"]
+ignore = ["S101", "RUF001", "RUF002", "RUF003", "B008"]
+
+[tool.ruff.lint.isort]
+known-third-party = ["alembic"]
+known-first-party = ["app", "tests"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S105", "S106", "S311"]
+"generate_stage1.py" = ["S603"]
+
+[tool.mypy]
+python_version = "3.11"
+packages = ["app"]
+plugins = ["pydantic.mypy"]
+ignore_missing_imports = true
+warn_unused_configs = true
+
+[[tool.mypy.overrides]]
+module = ["app.services.*"]
+strict = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --strict-markers"
+markers = ["golden: compares against data/golden_results.xlsx", "edge: edge-case suite", "security: security suite"]
+filterwarnings = ["ignore::DeprecationWarning:jwt.*", "ignore:Using `httpx` with `starlette.testclient`"]
+
+[tool.coverage.run]
+source = ["app"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+fail_under = 90

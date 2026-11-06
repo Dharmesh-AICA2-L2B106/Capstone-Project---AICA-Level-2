@@ -1,0 +1,9 @@
+-c requirements.txt
+pytest
+pytest-cov
+pytest-asyncio
+hypothesis
+ruff
+mypy
+pandas-stubs
+pre-commit

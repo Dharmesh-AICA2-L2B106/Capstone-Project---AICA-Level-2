@@ -1,0 +1,59 @@
+party_id,party_name,trn,verified_on,verification_ref,bank_evidence_ref,notes
+S001,Jebel Ali Packaging LLC,100815746004203,2025-08-06,VER-72154,BANK-49819,TRN checked on FTA portal; bank letter on file
+S002,Al Ghurair Foods Supply LLC,100524402120232,2025-08-20,VER-45658,BANK-36096,TRN checked on FTA portal; bank letter on file
+S003,Emirates Wholesale Imports LLC,100799218038211,2025-08-09,VER-71728,BANK-96972,TRN checked on FTA portal; bank letter on file
+S004,Gulf Pack Industries LLC,100535259673258,2025-09-10,VER-18313,BANK-30011,TRN checked on FTA portal; bank letter on file
+S005,Al Quoz Industrial Supplies,100393483452975,2025-08-28,VER-93720,BANK-68090,TRN checked on FTA portal; bank letter on file
+S006,Union Paper Products LLC,100602213054298,2025-09-21,VER-93808,BANK-89427,TRN checked on FTA portal; bank letter on file
+S007,Ras Al Khor Traders,100378679165721,2025-08-17,VER-32376,BANK-89650,TRN checked on FTA portal; bank letter on file
+S008,Dubai Global Commodities LLC,100521951900414,2025-08-23,VER-78448,BANK-75322,TRN checked on FTA portal; bank letter on file
+S009,Sahara Food Ingredients LLC,100452078193905,2025-09-20,VER-64995,BANK-66893,TRN checked on FTA portal; bank letter on file
+S010,Arabian Plastics Co LLC,100288558439117,2025-08-16,VER-36284,BANK-13784,TRN checked on FTA portal; bank letter on file
+S011,Hatta Mountain Water LLC,100290841235286,2025-09-11,VER-97403,BANK-16363,TRN checked on FTA portal; bank letter on file
+S012,Al Jaddaf Electronics Trading,100267143239060,2025-09-18,VER-42765,BANK-74317,TRN checked on FTA portal; bank letter on file
+S013,Oud Metha Garments LLC,100242116796782,2025-09-01,VER-10959,BANK-53294,TRN checked on FTA portal; bank letter on file
+S014,Sharjah Can Makers LLC,100442540989154,2025-08-05,VER-27464,BANK-97643,TRN checked on FTA portal; bank letter on file
+S015,Hamriyah Free Zone Supplies,100377483273324,2025-09-16,VER-26794,BANK-83794,TRN checked on FTA portal; bank letter on file
+S016,Khalifa Port Logistics Trading,100044034620414,2025-08-20,VER-25791,BANK-15122,TRN checked on FTA portal; bank letter on file
+S017,Al Rigga Beverages LLC,100455717882756,2025-09-17,VER-71302,BANK-71820,TRN checked on FTA portal; bank letter on file
+S018,Al Fahidi Spices Trading,100126589914689,2025-08-07,VER-91600,BANK-49635,TRN checked on FTA portal; bank letter on file
+S019,Bur Dubai Textiles LLC,100525735086169,2025-09-10,VER-83696,BANK-55436,TRN checked on FTA portal; bank letter on file
+S020,Nad Al Sheba Agro LLC,100206596697783,2025-08-17,VER-87148,BANK-84670,TRN checked on FTA portal; bank letter on file
+S021,Al Twar Household Goods LLC,100084380079013,2025-08-04,VER-20422,BANK-82570,TRN checked on FTA portal; bank letter on file
+S022,Umm Suqeim Cosmetics Trading,100184577057263,2025-09-04,VER-51648,BANK-88844,TRN checked on FTA portal; bank letter on file
+S023,Al Garhoud Auto Parts LLC,100264368716835,2025-09-07,VER-22622,BANK-61233,TRN checked on FTA portal; bank letter on file
+S024,Satwa Kitchenware Trading,100976498388364,2025-09-10,VER-13719,BANK-32227,TRN checked on FTA portal; bank letter on file
+S025,International City Wholesale LLC,100636780620729,2025-09-01,VER-35351,BANK-20463,TRN checked on FTA portal; bank letter on file
+S026,Al Khawaneej Dairy LLC,100660208810550,2025-09-09,VER-25689,BANK-87404,TRN checked on FTA portal; bank letter on file
+S027,Al Rashidiya Toys LLC,100294838457494,2025-09-01,VER-16300,BANK-78883,TRN checked on FTA portal; bank letter on file
+S028,Muhaisnah Building Materials,100818469594262,2025-09-06,VER-17888,BANK-66570,TRN checked on FTA portal; bank letter on file
+S029,Al Warqa Stationery Trading,100643757915175,2025-09-19,VER-92778,BANK-29313,TRN checked on FTA portal; bank letter on file
+S030,Jafza Chemicals Trading FZE,100225913693812,2025-08-20,VER-83545,BANK-36927,TRN checked on FTA portal; bank letter on file
+S100,Brandwave Media FZ-LLC,100810195010821,2025-09-06,VER-24653,BANK-46897,TRN checked on FTA portal; bank letter on file
+S101,FixPro Technical Services LLC,100936726307387,2025-09-25,VER-24069,BANK-26326,TRN checked on FTA portal; bank letter on file
+S102,OfficeHub Stationery LLC,100550355030615,2025-09-13,VER-95697,BANK-53850,TRN checked on FTA portal; bank letter on file
+S103,Seagate Customs Clearing LLC,100295587945142,2025-08-25,VER-85922,BANK-11239,TRN checked on FTA portal; bank letter on file
+S120,MetroLink Staff Transport LLC,100964638012876,2025-09-02,VER-56011,BANK-86521,TRN checked on FTA portal; bank letter on file
+S121,Al Kareem Catering LLC,100529962860790,2025-09-26,VER-48892,BANK-83767,TRN checked on FTA portal; bank letter on file
+S122,Sunrise Labour Accommodation LLC,100788912142446,2025-08-25,VER-49719,BANK-74835,TRN checked on FTA portal; bank letter on file
+S123,SkyNet Telecom Services LLC,100412832571767,2025-09-04,VER-18127,BANK-78508,TRN checked on FTA portal; bank letter on file
+S124,ParkEasy Dubai LLC,100103179130564,2025-09-26,VER-62526,BANK-80589,TRN checked on FTA portal; bank letter on file
+S200,Al Mansoori Bulk Foods Trading LLC,100007807071920,2025-08-26,VER-67469,,TRN checked on FTA portal; bank-account confirmation not obtained
+S201,Golden Dunes Import Export LLC,100376789271130,2025-08-08,VER-53535,,TRN checked on FTA portal; bank-account confirmation not obtained
+S202,Crescent Wholesale Distribution LLC,100436260616049,2025-08-18,VER-90781,,TRN checked on FTA portal; bank-account confirmation not obtained
+S300,Quickstock General Trading LLC,100889221614891,,,,first-time supplier - verification not yet performed
+S301,Blue Lagoon Trading FZE,100339636952849,,,,first-time supplier - verification not yet performed
+S302,Nova Supply Hub LLC,100940034227775,,,,first-time supplier - verification not yet performed
+S400,Al Fajr Bulk Commodities LLC,100242747141412,2025-08-18,VER-14532,BANK-50271,TRN checked on FTA portal; bank letter on file
+S401,Arabian Gulf Rice Mills LLC,100831385092866,2025-09-24,VER-83670,BANK-70235,TRN checked on FTA portal; bank letter on file
+S402,Emirates Sugar Traders LLC,100275293743120,2025-08-22,VER-91950,BANK-71720,TRN checked on FTA portal; bank letter on file
+S403,Delta Edible Oils Trading LLC,100039526200197,2025-09-10,VER-55086,BANK-79279,TRN checked on FTA portal; bank letter on file
+S404,Najma Frozen Foods Import LLC,100034813093277,2025-09-19,VER-61095,BANK-51965,TRN checked on FTA portal; bank letter on file
+S405,Atlas Grain Trading LLC,100282836237523,2025-08-02,VER-26907,BANK-38919,TRN checked on FTA portal; bank letter on file
+S406,Oasis Coffee Importers LLC,100147304415860,2025-09-07,VER-89447,BANK-75339,TRN checked on FTA portal; bank letter on file
+S407,Coral Bay Seafood Trading LLC,100495136885227,2025-09-12,VER-76427,BANK-28944,TRN checked on FTA portal; bank letter on file
+S500,Dubai Electricity and Water Authority (DEWA),100152725540342,2025-08-19,VER-49994,BANK-31744,TRN checked on FTA portal; bank letter on file
+S501,Emirates NBD Bank PJSC,100213694150629,2025-08-16,VER-45785,BANK-82682,TRN checked on FTA portal; bank letter on file
+S502,Al Quoz Warehousing Properties LLC,100379425205110,2025-08-03,VER-95447,BANK-83262,TRN checked on FTA portal; bank letter on file
+S503,Bay Square Office Leasing LLC,100334169207023,2025-09-22,VER-84288,BANK-46999,TRN checked on FTA portal; bank letter on file
+S600,Northbridge Advisory Ltd (UK) - overseas,,2025-08-14,VER-75756,BANK-83762,TRN checked on FTA portal; bank letter on file

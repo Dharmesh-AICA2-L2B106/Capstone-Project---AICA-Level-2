@@ -1,0 +1,28 @@
+File: edge_cases.csv
+60 rows checked. Total debits AED 61,095.04, total credits AED 61,084.99. 8 critical error(s), 3 warning(s).
+Row numbers count data rows: row 1 is the first row under the header.
+
+1. [CRITICAL] Voucher EV-001 is out of balance by AED 0.05 (debits AED 1,000.00, credits AED 999.95; rows 1, 2).
+   How to fix: Correct the source file or exclude the voucher with a reason.
+2. [CRITICAL] Voucher EV-002 is out of balance by AED 10.00 (debits AED 12,962.88, credits AED 12,952.88; rows 3, 4, 5).
+   How to fix: Correct the source file or exclude the voucher with a reason.
+3. [CRITICAL] The file does not balance: total debits AED 61,095.04 and total credits AED 61,084.99 differ by AED 10.05.
+   How to fix: Fix the unbalanced vouchers listed above, or re-export the complete ledger for the period (a partial export will not balance).
+4. [CRITICAL] 5 rows have an entry date that cannot be read (rows 6, 8, 10, 12, 14; e.g. '2025-02-30', '31/13/2025', 'TBD', '2025-13-05', '00/00/0000').
+   How to fix: Use a real calendar date in dd/mm/yyyy or yyyy-mm-dd format (an Excel date cell is also fine). Correct the rows and upload again.
+5. [CRITICAL] 5 rows have a posting date that cannot be read (rows 6, 8, 10, 12, 14; e.g. '2025-02-30', '31/13/2025', 'TBD', '2025-13-05', '00/00/0000').
+   How to fix: Use a real calendar date in dd/mm/yyyy or yyyy-mm-dd format (an Excel date cell is also fine). Correct the rows and upload again.
+6. [CRITICAL] 3 rows have no account code (rows 30, 33, 35).
+   How to fix: Every line must be posted to an account. Fill in the account code from the accounting system and upload again.
+7. [CRITICAL] Line ID E0037 appears more than once (first at row 37, again at row 38).
+   How to fix: Each line needs a unique ID. Remove the duplicated line if it was exported twice, or give it a new ID, then upload again.
+8. [CRITICAL] Line ID E0039 appears more than once (first at row 39, again at row 40).
+   How to fix: Each line needs a unique ID. Remove the duplicated line if it was exported twice, or give it a new ID, then upload again.
+9. [WARNING] 1 credit value includes the currency text (row 29; e.g. 'AED 500.00'). It was read as AED amounts.
+   How to fix: No action needed if the amounts are in AED. Otherwise export amounts without currency text.
+10. [WARNING] 1 debit value includes the currency text (row 28; e.g. 'AED 500'). It was read as AED amounts.
+   How to fix: No action needed if the amounts are in AED. Otherwise export amounts without currency text.
+11. [WARNING] 4 TRNs are not in the UAE format of 15 digits starting with 100 (rows 44, 47, 50, 53; e.g. '10045678901234', '1004567890123456', 'TRN100456789012', '1.00456E+14').
+   How to fix: Check the supplier's TRN on its tax invoice or on the FTA TRN verification service. Format the TRN column as text in Excel so long numbers are not turned into 1.00456E+14.
+
+Sampling, journal-entry tests and VAT checks stay blocked until the critical errors are fixed.

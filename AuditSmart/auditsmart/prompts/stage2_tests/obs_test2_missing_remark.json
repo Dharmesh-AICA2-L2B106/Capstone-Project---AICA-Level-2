@@ -1,0 +1,1 @@
+{"area":"Purchases","test":"VAT recomputation","item_ref":"S-014","book_amount":"10,500.00","vat_recorded":"600.00","vat_expected":"500.00","difference":"100.00","applicable_references":["UAE VAT law - tax invoice requirements"],"framework":"IFRS","currency":"AED"}

@@ -1,0 +1,9 @@
+{
+  "summary": "Updates input VAT recovery rules and legal references for employee expenses pursuant to FTA Decision No. 17 of 2026, setting conditions for recovery including maximum temporary accommodation duration, policy documentation, and restriction on cash-in-lieu options.",
+  "changes": [
+    {"rule_key": "input_vat.employee_expense.new_employee_accommodation_max_days", "current_value": null, "proposed_value": 30, "effective_date": "2026-10-01", "citation": "FTA Decision No. 17 of 2026, Article 2(4)(a)", "confidence": "high"},
+    {"rule_key": "input_vat.employee_expense.contract_or_policy_required", "current_value": null, "proposed_value": true, "effective_date": "2026-10-01", "citation": "FTA Decision No. 17 of 2026, Article 1", "confidence": "high"},
+    {"rule_key": "input_vat.employee_expense.cash_alternative_prohibits_recovery", "current_value": null, "proposed_value": true, "effective_date": "2026-10-01", "citation": "FTA Decision No. 17 of 2026, Article 2, Clauses 1(c), 2(d), and 3(a)", "confidence": "high"},
+    {"rule_key": "legal_ref.input_vat.employee_expenses", "current_value": null, "proposed_value": "FTA Decision No. 17 of 2026", "effective_date": "2026-10-01", "citation": "FTA Decision No. 17 of 2026, Article 3", "confidence": "high"}
+  ]
+}

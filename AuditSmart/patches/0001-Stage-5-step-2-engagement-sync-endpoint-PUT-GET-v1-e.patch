@@ -1,0 +1,1472 @@
+From 1c9578579396aafc992734bae35f5ad281bc7ed9 Mon Sep 17 00:00:00 2001
+From: "Grok Bot (AuditSmart build for Savio Jose)"
+ <auditsmart-build@localhost>
+Date: Mon, 2 Nov 2026 18:26:14 +0000
+Subject: [PATCH 1/2] Stage 5 step 2: engagement sync endpoint (PUT/GET
+ /v1/engagements/{id}), client_code per firm (0010), engine 0.2.1, Lovable
+ prompt 5.2
+
+---
+ docs/DEPLOY_DEV.md                            |   2 +-
+ docs/MULTI_FIRM_APPROVAL.md                   |  35 ++
+ docs/STAGE5_STATUS.md                         |  27 ++
+ docs/lovable/5.2_engine_connect.md            |  94 +++++
+ docs/lovable/README.md                        |   5 +-
+ docs/lovable/engine_endpoints.txt             |   2 +
+ docs/lovable/engine_endpoints_compact.txt     |   2 +
+ docs/lovable/engine_openapi.json              | 343 +++++++++++++++++-
+ engine/SPEC.md                                |   8 +
+ .../versions/0010_code_unique_per_firm.py     |  45 +++
+ engine/app/api/v1/engagements.py              |  50 +++
+ engine/app/api/v1/router.py                   |   2 +
+ engine/app/models/__init__.py                 |   4 +-
+ engine/app/schemas/engagements.py             |  82 +++++
+ engine/app/services/engagements.py            | 234 ++++++++++++
+ engine/app/version.py                         |   2 +-
+ engine/pyproject.toml                         |   2 +-
+ engine/tests/api/test_engagements_api.py      | 275 ++++++++++++++
+ plans/DECISIONS.md                            |   6 +
+ 19 files changed, 1213 insertions(+), 7 deletions(-)
+ create mode 100644 docs/lovable/5.2_engine_connect.md
+ create mode 100644 engine/alembic/versions/0010_code_unique_per_firm.py
+ create mode 100644 engine/app/api/v1/engagements.py
+ create mode 100644 engine/app/schemas/engagements.py
+ create mode 100644 engine/app/services/engagements.py
+ create mode 100644 engine/tests/api/test_engagements_api.py
+
+diff --git a/docs/DEPLOY_DEV.md b/docs/DEPLOY_DEV.md
+index 3a2981e..bd367e0 100644
+--- a/docs/DEPLOY_DEV.md
++++ b/docs/DEPLOY_DEV.md
+@@ -190,7 +190,7 @@ Type them comma-separated with no spaces:
+    `https://auditsmart-engine.onrender.com` (Render may add a few letters to the name).
+ 2. Open `<that address>/v1/health` in your browser. You should see:
+    ```json
+-   {"status":"ok","service":"auditsmart-engine","version":"0.2.0","environment":"development","db":"ok","queue":"in-process"}
++   {"status":"ok","service":"auditsmart-engine","version":"0.2.1","environment":"development","db":"ok","queue":"in-process"}
+    ```
+    - The first visit after a quiet period takes about a minute (the free service is waking).
+    - `"db":"ok"` means the database is connected.
+diff --git a/docs/MULTI_FIRM_APPROVAL.md b/docs/MULTI_FIRM_APPROVAL.md
+index 7783de5..c27c930 100644
+--- a/docs/MULTI_FIRM_APPROVAL.md
++++ b/docs/MULTI_FIRM_APPROVAL.md
+@@ -147,6 +147,7 @@ Partner for methodology domains (D47).
+ | Approve an override | `rule_approve` (+ `rule_close` for each closed or superseded own row) |
+ | Reject a proposal | `rule_reject` |
+ | Results affected | `stale` (one row per result) |
++| Engagement sync (§10) | `client_sync_create` / `client_sync_update`, `engagement_sync_create` / `engagement_sync_update` (old and new values, members, firm_id) |
+ 
+ ## 8. Database
+ 
+@@ -165,3 +166,37 @@ behaves exactly as before until a firm is registered.
+ - The same partner may both propose and approve (no four-eyes rule is enforced).
+ - Clients cannot move between firms.
+ - A Lovable screen for the review list is Stage 4.
++
++## 10. Engagement sync from the front end (Stage 5.2, D50–D55)
++
++Lovable keeps clients, engagements and teams in Supabase. The engine needs the same rows,
++because every engagement call checks membership and the firm boundary. The front end
++therefore sends each engagement to the engine whenever it or its team is created or edited:
++
++```
++PUT /v1/engagements/{engagement uuid}
++{"client": {"id": "<client uuid>", "client_code": "C001", "name": "…", "emirate": "Dubai",
++            "entity_type": "LLC"},
++ "fye": "2025-12-31", "framework": "IFRS", "materiality": "1500000.00",
++ "perf_materiality": "1125000.00", "trivial": "75000.00", "status": "planning",
++ "members": [{"user_id": "<auth user uuid = token sub>", "role": "Manager"}, …]}
++→ 201 {created: true, engagement, client, members, stale: []}   (first time)
++→ 200 {created: false, …}                                         (every later call)
++```
++
++- **Firm:** always the caller's token firm (`app_metadata.firm_id`). It must already be
++  registered with `POST /v1/firms` by the platform Admin; otherwise 403. The body has no
++  firm field.
++- **Who:** create needs app role Manager, Partner, TaxPartner or the firm's Admin. Update
++  needs a team member whose engagement role is Manager, Partner or TaxPartner, or the
++  firm's Admin. Seniors and Staff can never change a team.
++- **Isolation:** another firm's engagement id → 403; another firm's client id → 404;
++  a legacy client or engagement with no firm → 409 (the platform Admin links it first,
++  §4); an engagement cannot move to another client (409). `client_code` is unique per
++  firm (migration 0010).
++- **Team:** `members` replaces the whole team. It needs at least one Manager or Partner;
++  `user_id` must be the Supabase auth user id (the token `sub`).
++- **STALE:** a new year end marks all current samples, JE runs and input-VAT runs of the
++  engagement STALE; a new emirate re-checks the client's JE runs against the calendar.
++  Other changes are audit-only.
++- **Read back:** `GET /v1/engagements/{id}` (team members, or the firm's Admin).
+diff --git a/docs/STAGE5_STATUS.md b/docs/STAGE5_STATUS.md
+index 4a9aabb..f7e2f17 100644
+--- a/docs/STAGE5_STATUS.md
++++ b/docs/STAGE5_STATUS.md
+@@ -47,3 +47,30 @@ Stage 4 status / Lovable docs). Nothing was pushed by the AI; no Lovable credits
+ 5. AI provider / Gemini key for the rules monitor (optional; leave blank to keep AI off).
+ 6. The free database expires 30 days after creation; decide on a paid plan before then
+    if the data must be kept. Enabling the weekly monitor cron needs a paid cron plan.
++
++---
++
++# Stage 5 – Step 2: engagement sync endpoint + Lovable prompt 5.2
++
++Date: 2 Nov 2026. Builds on step 1 (`ab59111`, pushed by Savio). Engine **0.2.1**. Nothing
++was pushed by the AI; no Lovable credits were used.
++
++## What was added
++| Item | Purpose |
++|---|---|
++| `PUT /v1/engagements/{id}` | Idempotent upsert of client + engagement + whole team from Lovable (201 create / 200 update, `created` flag), firm from the token, audited old/new, STALE on year-end / emirate change (D50–D54) |
++| `GET /v1/engagements/{id}` | The engine's copy (team members or the firm Admin) |
++| Migration `0010_code_unique_per_firm` (file name avoids the `*client*` .gitignore pattern) | `client_code` unique per firm instead of globally (D52); tested on SQLite and PostgreSQL 16 (upgrade, downgrade, upgrade) |
++| Version 0.2.1 | Visible in `/v1/health`, so the redeploy can be confirmed (D55) |
++| `docs/lovable/5.2_engine_connect.md` | One-message Lovable prompt: engine-proxy edge function, mocks removed, roles/firm into `app_metadata` by trigger, engagement sync, firm registration, Engine status card, audit of each call |
++| Docs | SPEC 5.2 section, DECISIONS D50–D55, MULTI_FIRM_APPROVAL §10, Lovable contract re-exported (69 operations) |
++
++## Verification (on the AI's box)
++- `pytest --cov`: 361 passed (21 new), total coverage 99.10% (gate 90%); new modules 100%. SQLite.
++- Same 361 tests on a local PostgreSQL 16 (`AUDITSMART_TEST_PG_URL`): all passed.
++- `ruff check .`: clean. `mypy` (project config) and `mypy --strict app`: no issues.
++
++## Waiting for Savio
++1. Copy the zip contents into `C:\Projects\auditsmart`, commit, push; check `/v1/health` shows 0.2.1.
++2. Paste `docs/lovable/5.2_engine_connect.md` (block only) into the Lovable project (~8–12 credits).
++3. Send back Lovable's report: roles table, firm_id storage, JWT `alg` (header only).
+diff --git a/docs/lovable/5.2_engine_connect.md b/docs/lovable/5.2_engine_connect.md
+new file mode 100644
+index 0000000..3e618e4
+--- /dev/null
++++ b/docs/lovable/5.2_engine_connect.md
+@@ -0,0 +1,94 @@
++# Stage 5.2 – Connect the Lovable app to the engine (one message)
++
++Prepared 2 Nov 2026 for engine **0.2.1** (commit "Stage 5 step 2"). Build Guide 5.2 text is kept
++verbatim in the first paragraph of the paste block; the rest tailors it to our engine.
++
++## Before you paste
++1. **Push the engine first.** Copy `auditsmart_stage5_sync.zip` into `C:\Projects\auditsmart`
++   (see `COPY_LIST.txt` in the zip), commit, push to `Savio2358/AuditSmart`. Render redeploys
++   by itself (migration 0010 runs on start). Open
++   https://auditsmart-engine.onrender.com/v1/health and check `"version":"0.2.1"`.
++2. **Engine environment on Render** must already have `AUTH_PROVIDER=supabase`, `AUTH_ISSUER`
++   and either JWKS (default) or `AUTH_HS256_SECRET` (docs/DEPLOY_DEV.md §5). After this
++   prompt the browser no longer calls the engine directly (the edge function does), so
++   `ALLOWED_ORIGINS` no longer matters for the app.
++3. **Register the firms in the engine** if the app does not do it yet: after this prompt the
++   platform Admin has a "Register all firms in engine" button. Do that before "Sync all".
++4. Paste **only** the text between the two dashed lines, as one message, in the existing
++   Lovable project (not a new one). Approve the SQL migration when Lovable asks.
++5. Credits: about **8–12** (one large message; budget 12 if Lovable asks follow-ups).
++   Character count of the block: 6036 (limit we use: 8,000).
++
++----------------------------------------------------------------
++Stage 5.2 - connect to the engine. Build Guide 5.2: Create a server-side function "engine-proxy" that forwards authenticated requests to ENGINE_URL with the user's token, so no keys reach the browser. Remove mock data, add loading and error states, and log each call to audit_log.
++
++Details (keep everything built so far; change only what is needed):
++
++A. Edge function engine-proxy (Supabase)
++- Secret ENGINE_URL = https://auditsmart-engine.onrender.com (add it as a secret, never in code).
++- The browser calls {SUPABASE_URL}/functions/v1/engine-proxy/v1/<path>?<query> with the user's access token. The function verifies the user is signed in (supabase.auth.getUser with that token; otherwise 401 JSON {"detail":"Please sign in again."}).
++- Allow only paths starting with /v1/ (otherwise 400). Forward method, path, query and body unchanged to ENGINE_URL, with Authorization: Bearer <the same user access token>. Send no other keys. Do not forward cookies or the apikey header.
++- Pass bodies through as raw bytes: JSON, multipart/form-data (keep the boundary in Content-Type), application/octet-stream chunks (PUT /v1/uploads/{id}/chunks/{n}), and binary responses (GET /v1/workpapers/{id}/file is an xlsx; keep Content-Type and Content-Disposition). Never parse or re-encode file bodies.
++- Return the engine's status code and body unchanged (including 4xx/5xx JSON {"detail": ...}). Handle CORS (OPTIONS; expose Content-Disposition).
++- Timeout about 90 s per attempt. On 502, 503 or 504 (Render free plan is asleep), wait 5 s and retry once; stay under the 150 s function limit. A timeout returns 504 {"detail":"Engine is waking up (about a minute). Please try again."}.
++- After each call, insert one audit_log row with the service role (server side only): action "engine_call", entity "engine", user_id, firm_id from the token, new = {method, path (no query string), status, duration_ms, engagement_id}. engagement_id comes from the path /v1/engagements/{id} or from the request header x-engagement-id (sent by engine.ts, not forwarded). Never log request or response bodies, file names, client names or tokens. A logging failure must not fail the call.
++
++B. src/lib/engine.ts
++- Every engine call goes only through engine-proxy (one helper: engineFetch(method, path, {query, json, form, bytes, engagementId})). No direct calls to the engine URL from the browser.
++- Remove all mock data and mock switches. Every screen that uses engine data gets a loading state, an error state and an empty state.
++- Show engine errors verbatim (the "detail" text; for 422 list each item's msg). If a call takes more than 5 s, show "Engine is waking up (about a minute)" with a spinner.
++- Downloads (workpaper xlsx): fetch through the proxy as a blob and save it; file_url from the engine is a /v1/ path for the proxy.
++- Footer and version come from GET /v1/health.
++
++C. Roles and firm into the token (SQL migration)
++- The engine reads roles only from app_metadata.roles and the firm only from app_metadata.firm_id. Role names must be exactly: Admin, Partner, Manager, Senior, Staff, TaxPartner.
++- Create a SECURITY DEFINER function (search_path = public) that, for one user, writes raw_app_meta_data = raw_app_meta_data || {"roles": [...], "firm_id": "..."} into auth.users from the table(s) where we keep user roles and firm assignment (e.g. user_roles / profiles). Map variants to the exact names (tax_partner, tax partner, taxpartner -> TaxPartner; admin -> Admin; etc.). A user with no firm (platform Admin) has firm_id removed.
++- Add triggers (after insert, update, delete) on the roles table and on the firm assignment that call it. Run a one-time backfill for all existing users. Keep the RLS helpers current_firm_id() and has_role() working.
++- Users must sign out and in again to get a new token; show that hint after a role change.
++
++D. Engagement sync (the engine needs the same engagement, client and team)
++- Whenever an engagement or its team is created or edited (and when a client is edited, for each of its engagements), call PUT /v1/engagements/{engagement.id} with exactly this body:
++  {"client":{"id":"<clients.id>","client_code":"<code>","name":"<name>","emirate":"<Dubai|Abu Dhabi|Sharjah|Ajman|Umm Al Quwain|Ras Al Khaimah|Fujairah>","entity_type":"<or null>"},
++   "fye":"YYYY-MM-DD","framework":"<or null>","materiality":"1500000.00","perf_materiality":"1125000.00","trivial":"75000.00","status":"<status>",
++   "members":[{"user_id":"<auth user id>","role":"Manager"}]}
++- Use the same Lovable uuids for the engagement id and the client id. Money as strings with 2 decimals (or null). user_id is the Supabase auth user id (the token sub). members is the whole team (the engine replaces it); it must contain at least one Manager or Partner, each user once, roles with the exact names above.
++- 201 = created, 200 = updated. On an error, keep the Lovable save, show the engine's message and a "Not synced - Retry" badge on the engagement; retry calls the same PUT.
++- When the platform Admin creates a firm, also call POST /v1/firms {"id":"<firms.id>","name":"<name>"} (409 = already registered, treat as success).
++- One-time admin actions on Admin: platform Admin "Register all firms in engine" (POST /v1/firms for each firm; 409 = OK). Firm Admin "Sync all engagements" (PUT for every engagement of the firm, one at a time, with a progress count and a list of failures with the engine's message). The engine refuses a firm that is not registered yet (403), so register firms first.
++
++E. Audit log: as in A, one row per engine call; no bodies or client names.
++
++F. Settings/Admin: an "Engine status" card that calls GET /v1/health and shows status, version, environment, db and queue, the time of the check, and a Refresh button (waking-up state as in B).
++
++G. At the end, report to me in the chat: (1) which table holds user roles and how firm_id is stored per user; (2) the JWT algorithm from the access token header only (alg and kid if present, e.g. HS256 or ES256); do not print the token or any secret; (3) the list of files changed.
++----------------------------------------------------------------
++
++## After Lovable finishes – checklist
++1. **Sign out and sign in again** with every test user (new token with roles and firm_id).
++2. Lovable's report (step G): note the roles table, how firm_id is stored and the JWT
++   `alg`. If `alg` is HS256 the engine needs `AUTH_HS256_SECRET`; ES256/RS256 uses JWKS
++   (docs/DEPLOY_DEV.md §5.2). Tell the AI what it says.
++3. **Admin → Engine status** shows status ok, version **0.2.1**, db ok. (First call after
++   sleep: "Engine is waking up (about a minute)", then the card fills.)
++4. As **platform.admin**: "Register all firms in engine" → firm-a and firm-b OK (409 = OK).
++5. As **admin@test.local** (Firm A): "Sync all engagements" → no failures.
++6. As **manager@test.local**: create a new engagement with a team (yourself as Manager) →
++   no "Not synced" badge. Edit materiality → still synced. (Audit Trail shows
++   `engine_call` rows with method, path, status, duration – no names or bodies.)
++7. Upload `data/dummy_gl.csv` to that engagement, validate, then **MUS, confidence 95%,
++   account type Expense, tolerable misstatement 280,000, seed 2025** → n = **161**, CF **3.00**.
++8. Download the workpaper xlsx → it opens in Excel.
++9. As **manager.b@test.local** (Firm B): no Firm A client, engagement or audit row is visible;
++   opening a Firm A engagement URL shows the engine's 403 "This engagement belongs to another firm."
++   (or Lovable's own not-found).
++10. Senior user: no team edit; any engine error text is shown as returned.
++
++## If something fails
++- **401 from the engine:** token not accepted – check AUTH_PROVIDER / issuer / JWT alg (step 2).
++- **403 "not linked to a firm":** the user has no `app_metadata.firm_id` → sign out/in; check the trigger.
++- **403 "not registered in AuditSmart yet":** run "Register all firms in engine" (platform Admin).
++- **409 "not linked to a firm" on sync:** an old engine-only client (e.g. DUMMY01) – ignore, or link it via `PUT /v1/firms/{firm}/clients/{id}`.
++- **422 on sync:** the message names the field (e.g. no Manager/Partner in the team, perf > materiality).
++- Note: Render's free disk is ephemeral – uploaded datasets and workpapers disappear after a
++  restart or sleep; the engagements stay (Postgres). Re-run "Sync all" is never needed for
++  that, but datasets must be uploaded again.
+diff --git a/docs/lovable/README.md b/docs/lovable/README.md
+index 1bc02c4..d9309e2 100644
+--- a/docs/lovable/README.md
++++ b/docs/lovable/README.md
+@@ -13,7 +13,8 @@ Prepared 1 Nov 2026. Sources: Build Guide v2.0 (prompts 4.1 to 4.5, Appendix A),
+ | 4.4_calendar.md | Working Calendar (lean) |
+ | 4.5_rules_library.md | Rules Library (lean, manual mode, corrected roles) |
+ | 4.3_ux_and_fixes.md | UX pass plus the B3 batch-fix list, one message |
+-| engine_openapi.json | Full OpenAPI contract, exported from the committed engine 0.2.0 |
++| 5.2_engine_connect.md | **Stage 5.2**: engine-proxy edge function, remove mocks, roles/firm into the token, engagement sync (`PUT /v1/engagements/{id}`), Engine status card. Paste after the engine 0.2.1 is deployed (~8–12 credits) |
++| engine_openapi.json | Full OpenAPI contract, exported from the committed engine 0.2.1 |
+ | engine_endpoints.txt / engine_endpoints_compact.txt | Endpoint lists (long and compact). The compact list is inside 4.1 |
+ | export_contract.py | Regenerates the three files above: `engine/.venv/bin/python docs/lovable/export_contract.py` |
+ 
+@@ -38,7 +39,7 @@ Prepared 1 Nov 2026. Sources: Build Guide v2.0 (prompts 4.1 to 4.5, Appendix A),
+ | 3 | 4.4 Calendar | 13 | ~10 | Work Week editor (Mon to Sun boxes, half-day times, dated periods that refuse overlaps) and month preview colours. Test data: Client A has Sat/Sun off with a Friday half day to 12:00; Client B has Friday only off; the 2025 holidays are typed in by hand |
+ | 4 | 4.5 Rules Library | 13 | ~10 | Current Rules, version history, Upload FTA PDF, verification checklist, and the "Review for my firm" link to Partner Review |
+ | 5 | 4.3 plus fixes | 12 + 19 | ~15 | AED 1,234,567.89, dates like 26-Oct-2026, a Help panel on every tab, empty states, and your list fixed |
+-| | **Total** | **105** | **~87** | Keep about 8 for Stage 5.2 (connect to the engine) and a small buffer |
++| | **Total** | **105** | **~87** | Keep about 8–12 for Stage 5.2 (`5.2_engine_connect.md`) and a small buffer |
+ 
+ ### Multi-firm checks (log in as each test user)
+ - **senior@test.local:** sees only own engagements; **no** Approve, Override or Reject buttons anywhere.
+diff --git a/docs/lovable/engine_endpoints.txt b/docs/lovable/engine_endpoints.txt
+index d24a6ee..b38cdf0 100644
+--- a/docs/lovable/engine_endpoints.txt
++++ b/docs/lovable/engine_endpoints.txt
+@@ -8,6 +8,8 @@
+ - POST /v1/datasets/{dataset_id}/validate: Run validation (async job; wait=true returns the results). Query: wait?. Body (application/json) ValidateRequest: tb_dataset_id?. Returns 202 JobAccepted: job_id, dataset_id, status
+ - GET /v1/datasets/{dataset_id}/errors: Errors. Returns ValidationResult: dataset_id, status, critical, warnings, blocked, row_note, errors
+ - GET /v1/datasets/{dataset_id}/rows: Filters are pushed down to the Parquet reader, so a 1M-line file is not loaded whole. Query: offset?, limit?, voucher_no?, account_code?, user_id?, date_from?, date_to?, min_amount?. Returns RowsPage: dataset_id, total, offset, limit, rows
++- PUT /v1/engagements/{engagement_id}: Create or update an engagement, its client and its whole team (sync). Body (application/json) EngagementSync: client, fye, framework?, materiality?, perf_materiality?, trivial?, status?, members. Returns EngagementOut: created?, engagement, client, members, stale?
++- GET /v1/engagements/{engagement_id}: The engine's copy of an engagement, its client and team. Returns EngagementOut: created?, engagement, client, members, stale?
+ - GET /v1/jobs: List jobs you can see. Query: engagement_id?, status?, type?, offset?, limit?. Returns JobsPage: total, offset, limit, items
+ - GET /v1/jobs/{job_id}: Status and progress of a job. Returns JobOut: id, type, engagement_id?, status, progress, error, result_ref, created_at, started_at, finished_at
+ - POST /v1/jobs/{job_id}/cancel: Cancel a job. Returns JobOut: id, type, engagement_id?, status, progress, error, result_ref, created_at, started_at, finished_at
+diff --git a/docs/lovable/engine_endpoints_compact.txt b/docs/lovable/engine_endpoints_compact.txt
+index 26613c8..b94b140 100644
+--- a/docs/lovable/engine_endpoints_compact.txt
++++ b/docs/lovable/engine_endpoints_compact.txt
+@@ -8,6 +8,8 @@ PUT /v1/datasets/{dataset_id}/mapping {mapping_override} ->202 job_id,dataset_id
+ POST /v1/datasets/{dataset_id}/validate q:wait? {tb_dataset_id?} ->202 job_id,dataset_id,status
+ GET /v1/datasets/{dataset_id}/errors ->dataset_id,status,critical,warnings,blocked,row_note,errors
+ GET /v1/datasets/{dataset_id}/rows q:offset?,limit?,voucher_no?,account_code?,user_id?,date_from?,date_to?,min_amount? ->dataset_id,total,offset,limit,rows
++PUT /v1/engagements/{engagement_id} {client,fye,framework?,materiality?,perf_materiality?,trivial?,status?,members} ->created?,engagement,client,members,stale?
++GET /v1/engagements/{engagement_id} ->created?,engagement,client,members,stale?
+ GET /v1/jobs q:engagement_id?,status?,type?,offset?,limit? ->total,offset,limit,items
+ GET /v1/jobs/{job_id} ->id,type,engagement_id?,status,progress,error,result_ref,created_at,started_at,finished_at
+ POST /v1/jobs/{job_id}/cancel ->id,type,engagement_id?,status,progress,error,result_ref,created_at,started_at,finished_at
+diff --git a/docs/lovable/engine_openapi.json b/docs/lovable/engine_openapi.json
+index 08fa83f..095a3d2 100644
+--- a/docs/lovable/engine_openapi.json
++++ b/docs/lovable/engine_openapi.json
+@@ -3,7 +3,7 @@
+   "info": {
+     "title": "AuditSmart Engine",
+     "description": "Calculation engine for AuditSmart (CLA Emirates). All numbers are computed deterministically in Python with Decimal; AI is never used for calculations.",
+-    "version": "0.2.0"
++    "version": "0.2.1"
+   },
+   "paths": {
+     "/v1/health": {
+@@ -638,6 +638,124 @@
+         }
+       }
+     },
++    "/v1/engagements/{engagement_id}": {
++      "put": {
++        "tags": [
++          "engagements"
++        ],
++        "summary": "Create or update an engagement, its client and its whole team (sync)",
++        "operationId": "sync_engagement_v1_engagements__engagement_id__put",
++        "security": [
++          {
++            "HTTPBearer": []
++          }
++        ],
++        "parameters": [
++          {
++            "name": "engagement_id",
++            "in": "path",
++            "required": true,
++            "schema": {
++              "type": "string",
++              "minLength": 1,
++              "maxLength": 36,
++              "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$",
++              "title": "Engagement Id"
++            }
++          }
++        ],
++        "requestBody": {
++          "required": true,
++          "content": {
++            "application/json": {
++              "schema": {
++                "$ref": "#/components/schemas/EngagementSync"
++              }
++            }
++          }
++        },
++        "responses": {
++          "200": {
++            "description": "Successful Response",
++            "content": {
++              "application/json": {
++                "schema": {
++                  "$ref": "#/components/schemas/EngagementOut"
++                }
++              }
++            }
++          },
++          "201": {
++            "description": "Engagement created",
++            "content": {
++              "application/json": {
++                "schema": {
++                  "$ref": "#/components/schemas/EngagementOut"
++                }
++              }
++            }
++          },
++          "422": {
++            "description": "Validation Error",
++            "content": {
++              "application/json": {
++                "schema": {
++                  "$ref": "#/components/schemas/HTTPValidationError"
++                }
++              }
++            }
++          }
++        }
++      },
++      "get": {
++        "tags": [
++          "engagements"
++        ],
++        "summary": "The engine's copy of an engagement, its client and team",
++        "operationId": "get_engagement_v1_engagements__engagement_id__get",
++        "security": [
++          {
++            "HTTPBearer": []
++          }
++        ],
++        "parameters": [
++          {
++            "name": "engagement_id",
++            "in": "path",
++            "required": true,
++            "schema": {
++              "type": "string",
++              "minLength": 1,
++              "maxLength": 36,
++              "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$",
++              "title": "Engagement Id"
++            }
++          }
++        ],
++        "responses": {
++          "200": {
++            "description": "Successful Response",
++            "content": {
++              "application/json": {
++                "schema": {
++                  "$ref": "#/components/schemas/EngagementOut"
++                }
++              }
++            }
++          },
++          "422": {
++            "description": "Validation Error",
++            "content": {
++              "application/json": {
++                "schema": {
++                  "$ref": "#/components/schemas/HTTPValidationError"
++                }
++              }
++            }
++          }
++        }
++      }
++    },
+     "/v1/jobs": {
+       "get": {
+         "tags": [
+@@ -4121,6 +4239,56 @@
+         ],
+         "title": "ChunkAck"
+       },
++      "ClientSync": {
++        "properties": {
++          "id": {
++            "type": "string",
++            "maxLength": 36,
++            "minLength": 1,
++            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$",
++            "title": "Id"
++          },
++          "client_code": {
++            "type": "string",
++            "maxLength": 32,
++            "minLength": 1,
++            "title": "Client Code"
++          },
++          "name": {
++            "type": "string",
++            "maxLength": 255,
++            "minLength": 1,
++            "title": "Name"
++          },
++          "emirate": {
++            "type": "string",
++            "maxLength": 32,
++            "minLength": 2,
++            "title": "Emirate"
++          },
++          "entity_type": {
++            "anyOf": [
++              {
++                "type": "string",
++                "maxLength": 64
++              },
++              {
++                "type": "null"
++              }
++            ],
++            "title": "Entity Type"
++          }
++        },
++        "additionalProperties": false,
++        "type": "object",
++        "required": [
++          "id",
++          "client_code",
++          "name",
++          "emirate"
++        ],
++        "title": "ClientSync"
++      },
+       "DatasetAccepted": {
+         "properties": {
+           "dataset_id": {
+@@ -4375,6 +4543,155 @@
+         ],
+         "title": "EmirateWeekIn"
+       },
++      "EngagementOut": {
++        "properties": {
++          "created": {
++            "anyOf": [
++              {
++                "type": "boolean"
++              },
++              {
++                "type": "null"
++              }
++            ],
++            "title": "Created"
++          },
++          "engagement": {
++            "additionalProperties": true,
++            "type": "object",
++            "title": "Engagement"
++          },
++          "client": {
++            "additionalProperties": true,
++            "type": "object",
++            "title": "Client"
++          },
++          "members": {
++            "items": {
++              "additionalProperties": {
++                "type": "string"
++              },
++              "type": "object"
++            },
++            "type": "array",
++            "title": "Members"
++          },
++          "stale": {
++            "items": {
++              "additionalProperties": true,
++              "type": "object"
++            },
++            "type": "array",
++            "title": "Stale"
++          }
++        },
++        "type": "object",
++        "required": [
++          "engagement",
++          "client",
++          "members"
++        ],
++        "title": "EngagementOut"
++      },
++      "EngagementSync": {
++        "properties": {
++          "client": {
++            "$ref": "#/components/schemas/ClientSync"
++          },
++          "fye": {
++            "type": "string",
++            "format": "date",
++            "title": "Fye"
++          },
++          "framework": {
++            "anyOf": [
++              {
++                "type": "string",
++                "maxLength": 64
++              },
++              {
++                "type": "null"
++              }
++            ],
++            "title": "Framework"
++          },
++          "materiality": {
++            "anyOf": [
++              {
++                "type": "number",
++                "minimum": 0.0
++              },
++              {
++                "type": "string"
++              },
++              {
++                "type": "null"
++              }
++            ],
++            "title": "Materiality"
++          },
++          "perf_materiality": {
++            "anyOf": [
++              {
++                "type": "number",
++                "minimum": 0.0
++              },
++              {
++                "type": "string"
++              },
++              {
++                "type": "null"
++              }
++            ],
++            "title": "Perf Materiality"
++          },
++          "trivial": {
++            "anyOf": [
++              {
++                "type": "number",
++                "minimum": 0.0
++              },
++              {
++                "type": "string"
++              },
++              {
++                "type": "null"
++              }
++            ],
++            "title": "Trivial"
++          },
++          "status": {
++            "anyOf": [
++              {
++                "type": "string",
++                "maxLength": 32,
++                "minLength": 1
++              },
++              {
++                "type": "null"
++              }
++            ],
++            "title": "Status"
++          },
++          "members": {
++            "items": {
++              "$ref": "#/components/schemas/MemberSync"
++            },
++            "type": "array",
++            "maxItems": 200,
++            "title": "Members"
++          }
++        },
++        "additionalProperties": false,
++        "type": "object",
++        "required": [
++          "client",
++          "fye",
++          "members"
++        ],
++        "title": "EngagementSync",
++        "description": "Full engagement as the front end holds it. ``members`` replaces the whole team.\n\nOn update, optional fields that are left out keep their current value; send ``null``\nto clear one."
++      },
+       "EvaluateCreate": {
+         "properties": {
+           "sample_id": {
+@@ -5363,6 +5680,30 @@
+         ],
+         "title": "MappingUpdate"
+       },
++      "MemberSync": {
++        "properties": {
++          "user_id": {
++            "type": "string",
++            "maxLength": 128,
++            "minLength": 1,
++            "pattern": "^[A-Za-z0-9._@:|-]+$",
++            "title": "User Id"
++          },
++          "role": {
++            "type": "string",
++            "maxLength": 32,
++            "minLength": 1,
++            "title": "Role"
++          }
++        },
++        "additionalProperties": false,
++        "type": "object",
++        "required": [
++          "user_id",
++          "role"
++        ],
++        "title": "MemberSync"
++      },
+       "ObservationCreate": {
+         "properties": {
+           "sample_item_id": {
+diff --git a/engine/SPEC.md b/engine/SPEC.md
+index 614cfcc..cca1b42 100644
+--- a/engine/SPEC.md
++++ b/engine/SPEC.md
+@@ -405,3 +405,11 @@ golden_results.xlsx – Population | Totals, counts, Dr/Cr check
+ - **Job + API:** `POST /v1/input-vat-check {dataset_id, effective_date_override?}` → 202 {input_vat_run_id, job_id, status_url, result_url}; task `input_vat_check` streams `COLUMNS` from Parquet; run status queued → current (earlier current runs for the dataset → superseded) or failed / cancelled. `GET /v1/input-vat-check/{id}`, `GET /v1/input-vat-check/{id}/exceptions?check&offset&limit≤1000`. `PUT/GET /v1/engagements/{id}/supplier-register`, `PUT/GET /v1/engagements/{id}/expense-mapping` (write: Partner/Manager/Senior/Staff members; read: any member). Migration 0007 adds `job_id`, `result`, `created_by`, `created_at` to `input_vat_runs`.
+ - **Result:** engine_version, effective_date, parameters, population, summary [{check, lines, value}], exceptions, employee_expense_by_category, conclusion, basis, warnings, rule_versions_used, rules_pending_verification. The WP "Input VAT" sheet (3.6) reads it via `input_vat_run_id`.
+ - **Answer key (dummy_gl.csv, override 2025-10-01, mapping 6050 transport / 6060 accommodation_operational / 6070 mobile_phone_internet / 6080 parking / 6090 food_beverages_remote):** 15 unverified-supplier, 3 spend-threshold and 20 employee-expense lines, exact line sets (tests/api/test_input_vat_api.py).
++
++### 5.2 Engagement sync (Stage 5, D50–D55)
++- **Why:** Lovable (Supabase) owns clients, engagements and teams; every engagement-scoped engine call checks membership and the firm boundary, so the engine needs a copy. Details: docs/MULTI_FIRM_APPROVAL.md §10.
++- **`PUT /v1/engagements/{id}`** (id = the Lovable uuid, ≤36 chars) body `{client:{id, client_code, name, emirate, entity_type?}, fye, framework?, materiality?, perf_materiality?, trivial?, status?, members:[{user_id, role}]}` → **201** (created) / **200** (updated) `{created, engagement, client, members, stale}`. Idempotent: the same body twice → 200 and no new audit row. `members` replaces the whole team (needs ≥1 Manager or Partner; user_ids unique; roles normalised, e.g. `tax_partner` → TaxPartner). Optional fields left out keep their value; `null` clears. Money is Decimal (≤2 dp, ≥0; perf_materiality and trivial ≤ materiality) and returned as strings. `status` lower-cased, default `planning`. Emirate codes (DXB, AUH, …) map to names.
++- **`GET /v1/engagements/{id}`** → the same shape (`created: null`) for team members or the firm's Admin.
++- **Authorisation (D51):** firm from the token only, must be registered (`POST /v1/firms`; otherwise 403). Create: app role Manager / Partner / TaxPartner / Admin. Update: team member with engagement role Manager / Partner / TaxPartner, or the firm Admin. Other firm's engagement → 403; other firm's client id → 404; client or engagement not linked to a firm → 409; an engagement never moves to another client → 409; client_code unique per firm (D52, migration 0010) → 409.
++- **Audit:** `client_sync_create/update`, `engagement_sync_create/update` with old/new values (members and firm_id included), only when something changed.
++- **STALE (D53):** a changed `fye` marks every current sample, JE run and input-VAT run of the engagement STALE (`stale` rows, reason "year end changed A -> B"); a changed client emirate re-checks the client's JE runs against the calendar (hash comparison, D33). Materiality, framework, status and team changes are audit-only (materiality feeds no engine calculation).
+diff --git a/engine/alembic/versions/0010_code_unique_per_firm.py b/engine/alembic/versions/0010_code_unique_per_firm.py
+new file mode 100644
+index 0000000..b980dd2
+--- /dev/null
++++ b/engine/alembic/versions/0010_code_unique_per_firm.py
+@@ -0,0 +1,45 @@
++"""clients.client_code: unique per firm instead of globally (D52)
++
++The front end of each firm chooses its own client codes, so two firms may both use "C001".
++Replaces the unnamed global UNIQUE(client_code) from 0001 with
++UNIQUE(firm_id, client_code) named uq_clients_firm_code.
++
++Revision ID: 0010
++Revises: 0009
++Create Date: 2026-11-02 18:30:00
++"""
++from alembic import op
++import sqlalchemy as sa
++
++
++revision = '0010'
++down_revision = '0009'
++branch_labels = None
++depends_on = None
++
++# SQLite reflects the 0001 constraint without a name; this convention names it for batch mode.
++NAMING = {"uq": "uq_%(table_name)s_%(column_0_name)s"}
++
++
++def _global_unique_name() -> str:
++    bind = op.get_bind()
++    if bind.dialect.name == 'sqlite':
++        return 'uq_clients_client_code'
++    for uc in sa.inspect(bind).get_unique_constraints('clients'):
++        if uc['column_names'] == ['client_code'] and uc.get('name'):
++            return str(uc['name'])
++    return 'clients_client_code_key'  # PostgreSQL default name
++
++
++def upgrade() -> None:
++    name = _global_unique_name()
++    with op.batch_alter_table('clients', schema=None, naming_convention=NAMING) as batch_op:
++        batch_op.drop_constraint(name, type_='unique')
++        batch_op.create_unique_constraint('uq_clients_firm_code', ['firm_id', 'client_code'])
++
++
++def downgrade() -> None:
++    # Fails if two firms already share a client code (resolve that before downgrading).
++    with op.batch_alter_table('clients', schema=None, naming_convention=NAMING) as batch_op:
++        batch_op.drop_constraint('uq_clients_firm_code', type_='unique')
++        batch_op.create_unique_constraint('uq_clients_client_code', ['client_code'])
+diff --git a/engine/app/api/v1/engagements.py b/engine/app/api/v1/engagements.py
+new file mode 100644
+index 0000000..be407a9
+--- /dev/null
++++ b/engine/app/api/v1/engagements.py
+@@ -0,0 +1,50 @@
++"""Engagement sync (Stage 5.2, D50-D55): the front end copies clients, engagements and teams.
++
++PUT /v1/engagements/{engagement_id} -> idempotent upsert of client + engagement + full team
++                                       (201 created, 200 updated)
++GET /v1/engagements/{engagement_id} -> the engine's copy (team members or a firm Admin)
++"""
++
++from __future__ import annotations
++
++from typing import Annotated
++
++from fastapi import APIRouter, HTTPException, Path, Response, status
++
++from app.api.v1.deps import CurrentUser, DbSession
++from app.schemas.engagements import ID_PATTERN, EngagementOut, EngagementSync
++from app.services import engagements as svc
++from app.services import firm_rules
++from app.services.rules import RuleError
++
++router = APIRouter(tags=["engagements"])
++EngagementId = Annotated[str, Path(min_length=1, max_length=36, pattern=ID_PATTERN)]
++
++
++@router.put("/engagements/{engagement_id}", response_model=EngagementOut,
++            responses={201: {"model": EngagementOut, "description": "Engagement created"}},
++            summary="Create or update an engagement, its client and its whole team (sync)")
++def sync_engagement(engagement_id: EngagementId, body: EngagementSync, user: CurrentUser,
++                    db: DbSession, response: Response) -> EngagementOut:
++    try:
++        firm = firm_rules.get_firm(db, user.firm_id)
++        out = svc.upsert(db, firm, engagement_id, body, user_id=user.user_id,
++                         roles=user.roles)
++    except (RuleError, svc.EngagementError) as exc:
++        db.rollback()
++        raise HTTPException(exc.status_code, exc.message) from None
++    response.status_code = status.HTTP_201_CREATED if out["created"] else status.HTTP_200_OK
++    return EngagementOut.model_validate(out)
++
++
++@router.get("/engagements/{engagement_id}", response_model=EngagementOut,
++            summary="The engine's copy of an engagement, its client and team")
++def get_engagement(engagement_id: EngagementId, user: CurrentUser,
++                   db: DbSession) -> EngagementOut:
++    try:
++        firm = firm_rules.get_firm(db, user.firm_id)
++        eng = svc.check_access(db, firm.id, engagement_id, user.user_id, user.roles,
++                               edit=False)
++    except (RuleError, svc.EngagementError) as exc:
++        raise HTTPException(exc.status_code, exc.message) from None
++    return EngagementOut.model_validate(svc.view(db, eng))
+diff --git a/engine/app/api/v1/router.py b/engine/app/api/v1/router.py
+index 9827c67..5e35138 100644
+--- a/engine/app/api/v1/router.py
++++ b/engine/app/api/v1/router.py
+@@ -5,6 +5,7 @@ from fastapi import APIRouter
+ from app.api.v1 import (
+     calendar,
+     datasets,
++    engagements,
+     evaluation,
+     firm_rules,
+     health,
+@@ -21,6 +22,7 @@ from app.api.v1 import (
+ api_router = APIRouter(prefix="/v1")
+ api_router.include_router(health.router)
+ api_router.include_router(datasets.router)
++api_router.include_router(engagements.router)
+ api_router.include_router(jobs.router)
+ api_router.include_router(sampling.router)
+ api_router.include_router(je.router)
+diff --git a/engine/app/models/__init__.py b/engine/app/models/__init__.py
+index 92f262e..d34d054 100644
+--- a/engine/app/models/__init__.py
++++ b/engine/app/models/__init__.py
+@@ -51,8 +51,10 @@ class Firm(Base):  # + multi-firm (D42): the audit firm (tenant) that owns clien
+ 
+ class Client(Base):
+     __tablename__ = "clients"
++    # D52: client codes are unique per firm (two firms may both use "C001"); was global.
++    __table_args__ = (UniqueConstraint("firm_id", "client_code", name="uq_clients_firm_code"),)
+     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
+-    client_code: Mapped[str] = mapped_column(String(32), unique=True)
++    client_code: Mapped[str] = mapped_column(String(32))
+     name: Mapped[str] = mapped_column(String(255))
+     emirate: Mapped[str] = mapped_column(String(32))
+     entity_type: Mapped[str | None] = mapped_column(String(64))
+diff --git a/engine/app/schemas/engagements.py b/engine/app/schemas/engagements.py
+new file mode 100644
+index 0000000..857ec9d
+--- /dev/null
++++ b/engine/app/schemas/engagements.py
+@@ -0,0 +1,82 @@
++"""Schemas for the engagement sync endpoints (PUT/GET /v1/engagements/{id}, D50-D55).
++
++The front end (Lovable) owns clients, engagements and teams in its own database and copies
++them to the engine with one idempotent PUT. Money fields are Decimal (never float maths).
++"""
++
++from __future__ import annotations
++
++from datetime import date
++from decimal import Decimal
++from typing import Annotated, Any
++
++from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
++
++from app.core.security import normalise_roles
++
++ID_PATTERN = r"^[A-Za-z0-9][A-Za-z0-9._-]*$"
++Money = Annotated[Decimal, Field(ge=0, max_digits=20, decimal_places=2)]
++
++
++class ClientSync(BaseModel):
++    model_config = ConfigDict(extra="forbid")
++    id: str = Field(min_length=1, max_length=36, pattern=ID_PATTERN)
++    client_code: str = Field(min_length=1, max_length=32)
++    name: str = Field(min_length=1, max_length=255)
++    emirate: str = Field(min_length=2, max_length=32)
++    entity_type: str | None = Field(default=None, max_length=64)
++
++
++class MemberSync(BaseModel):
++    model_config = ConfigDict(extra="forbid")
++    user_id: str = Field(min_length=1, max_length=128, pattern=r"^[A-Za-z0-9._@:|-]+$")
++    role: str = Field(min_length=1, max_length=32)
++
++    @field_validator("role")
++    @classmethod
++    def _role(cls, v: str) -> str:
++        roles = normalise_roles(v)
++        if len(roles) != 1:
++            raise ValueError("role must be one of Admin, Partner, Manager, Senior, Staff, "
++                             "TaxPartner")
++        return next(iter(roles))
++
++
++class EngagementSync(BaseModel):
++    """Full engagement as the front end holds it. ``members`` replaces the whole team.
++
++    On update, optional fields that are left out keep their current value; send ``null``
++    to clear one.
++    """
++
++    model_config = ConfigDict(extra="forbid")
++    client: ClientSync
++    fye: date
++    framework: str | None = Field(default=None, max_length=64)
++    materiality: Money | None = None
++    perf_materiality: Money | None = None
++    trivial: Money | None = None
++    status: str | None = Field(default=None, min_length=1, max_length=32)
++    members: list[MemberSync] = Field(max_length=200)
++
++    @model_validator(mode="after")
++    def _check(self) -> EngagementSync:
++        ids = [m.user_id for m in self.members]
++        if len(ids) != len(set(ids)):
++            raise ValueError("members: each user_id may appear only once")
++        if not any(m.role in ("Manager", "Partner") for m in self.members):
++            raise ValueError("members: the team needs at least one Manager or Partner")
++        m, pm, tr = self.materiality, self.perf_materiality, self.trivial
++        if m is not None and pm is not None and pm > m:
++            raise ValueError("perf_materiality cannot be more than materiality")
++        if m is not None and tr is not None and tr > m:
++            raise ValueError("trivial cannot be more than materiality")
++        return self
++
++
++class EngagementOut(BaseModel):
++    created: bool | None = None
++    engagement: dict[str, Any]
++    client: dict[str, Any]
++    members: list[dict[str, str]]
++    stale: list[dict[str, Any]] = Field(default_factory=list)
+diff --git a/engine/app/services/engagements.py b/engine/app/services/engagements.py
+new file mode 100644
+index 0000000..576ef70
+--- /dev/null
++++ b/engine/app/services/engagements.py
+@@ -0,0 +1,234 @@
++"""Engagement sync from the front end (Stage 5.2, D50-D55).
++
++Lovable keeps clients, engagements and teams in its own database. The engine needs the same
++rows because every engagement-scoped call checks membership and the firm boundary
++(``check_membership``, D42/D45). ``PUT /v1/engagements/{id}`` upserts them idempotently.
++
++Rules (docs/MULTI_FIRM_APPROVAL.md section 10):
++* The firm always comes from the caller's token; it must be registered (``POST /v1/firms``).
++* Another firm's client -> 404 (never revealed); another firm's engagement -> 403.
++* A client that is not linked to any firm (legacy) -> 409: the platform Admin links it first.
++* Create: Manager, Partner, TaxPartner or Admin of the firm. Update: a team member whose
++  engagement role is Manager, Partner or TaxPartner, or an Admin of the firm.
++* ``members`` replaces the whole team. Every change is written to ``audit_log`` (old/new).
++* A changed year end marks the engagement's current results STALE (the rule date and the
++  period depend on it); a changed emirate re-checks JE runs against the calendar.
++"""
++
++from __future__ import annotations
++
++from collections.abc import Iterable, Sequence
++from decimal import Decimal
++from typing import Any
++
++from sqlalchemy import select
++from sqlalchemy.orm import Session
++
++from app.models import Client, Engagement, EngagementMember, Firm, InputVatRun, JeRun, Sample
++from app.schemas.engagements import EngagementSync
++from app.services import calendar_admin
++from app.services.rules import _audit, firm_of_engagement
++
++SYNC_ROLES = ("Manager", "Partner", "TaxPartner", "Admin")  # app roles that may sync
++TEAM_EDITORS = ("Manager", "Partner", "TaxPartner")  # engagement roles that may update
++FIRM_ADMIN = "Admin"
++EMIRATE_CODES = {"AUH": "Abu Dhabi", "AD": "Abu Dhabi", "DXB": "Dubai", "SHJ": "Sharjah",
++                 "AJM": "Ajman", "UAQ": "Umm Al Quwain", "RAK": "Ras Al Khaimah",
++                 "FUJ": "Fujairah"}
++ENGAGEMENT_FIELDS = ("framework", "materiality", "perf_materiality", "trivial", "status")
++
++
++class EngagementError(ValueError):
++    def __init__(self, message: str, status_code: int = 422) -> None:
++        super().__init__(message)
++        self.message = message
++        self.status_code = status_code
++
++
++def canonical_emirate(name: str) -> str:
++    raw = name.strip()
++    if raw.upper() in EMIRATE_CODES:
++        return EMIRATE_CODES[raw.upper()]
++    for e in calendar_admin.EMIRATES:
++        if e.lower() == raw.lower():
++            return e
++    raise EngagementError(f"Unknown emirate '{name}' (use one of "
++                          f"{', '.join(calendar_admin.EMIRATES)}).")
++
++
++def _money(v: Decimal | None) -> str | None:
++    return None if v is None else str(Decimal(v).quantize(Decimal("0.01")))
++
++
++def client_dict(c: Client) -> dict[str, Any]:
++    return {"id": c.id, "client_code": c.client_code, "name": c.name, "emirate": c.emirate,
++            "entity_type": c.entity_type, "firm_id": c.firm_id}
++
++
++def engagement_dict(e: Engagement) -> dict[str, Any]:
++    return {"id": e.id, "client_id": e.client_id, "fye": e.fye.isoformat(),
++            "framework": e.framework, "materiality": _money(e.materiality),
++            "perf_materiality": _money(e.perf_materiality), "trivial": _money(e.trivial),
++            "status": e.status}
++
++
++def members_of(s: Session, engagement_id: str) -> list[dict[str, str]]:
++    rows = s.scalars(select(EngagementMember).where(
++        EngagementMember.engagement_id == engagement_id)
++        .order_by(EngagementMember.user_id)).all()
++    return [{"user_id": m.user_id, "role": m.role} for m in rows]
++
++
++def view(s: Session, e: Engagement) -> dict[str, Any]:
++    c = s.get(Client, e.client_id)
++    assert c is not None  # FK
++    return {"engagement": engagement_dict(e), "client": client_dict(c),
++            "members": members_of(s, e.id)}
++
++
++def _member_role(s: Session, engagement_id: str, user_id: str) -> str | None:
++    m = s.get(EngagementMember, {"engagement_id": engagement_id, "user_id": user_id})
++    return m.role if m is not None else None
++
++
++def check_access(s: Session, firm_id: str | None, engagement_id: str, user_id: str,
++                 roles: Iterable[str], *, edit: bool) -> Engagement:
++    """The engagement exists, is the caller's firm's, and the caller may read / edit it."""
++    eng = s.get(Engagement, engagement_id)
++    if eng is None:
++        raise EngagementError("Engagement not found", 404)
++    owner = firm_of_engagement(s, engagement_id)
++    if owner is None:
++        raise EngagementError("This engagement's client is not linked to a firm yet; ask the "
++                              "platform administrator to link it (PUT /v1/firms/{firm_id}/"
++                              "clients/{client_id})", 409)
++    if owner != firm_id:
++        raise EngagementError("This engagement belongs to another firm.", 403)
++    role = _member_role(s, engagement_id, user_id)
++    if FIRM_ADMIN in set(roles):
++        return eng
++    if role is None:
++        raise EngagementError("You are not a member of this engagement.", 403)
++    if edit and role not in TEAM_EDITORS:
++        raise EngagementError(f"Your engagement role ({role}) cannot change this engagement; "
++                              f"needs {', '.join(TEAM_EDITORS)} or a firm Admin.", 403)
++    return eng
++
++
++def _stale_all(s: Session, engagement_id: str, user_id: str, reason: str
++               ) -> list[dict[str, Any]]:
++    out: list[dict[str, Any]] = []
++    groups: list[tuple[str, Sequence[Sample | JeRun | InputVatRun]]] = [
++        ("sample", s.scalars(select(Sample).where(
++            Sample.engagement_id == engagement_id, Sample.status != "STALE")).all()),
++        ("je_run", s.scalars(select(JeRun).where(
++            JeRun.engagement_id == engagement_id, JeRun.status != "STALE")).all()),
++        ("input_vat_run", s.scalars(select(InputVatRun).where(
++            InputVatRun.engagement_id == engagement_id, InputVatRun.status != "STALE")).all()),
++    ]
++    for kind, rows in groups:
++        for r in rows:
++            r.status = "STALE"
++            out.append({"kind": kind, "id": r.id, "engagement_id": engagement_id})
++            _audit(s, user_id, "stale", kind, r.id, {"status": "current"},
++                   {"status": "STALE", "reason": reason})
++    return out
++
++
++def _sync_client(s: Session, firm: Firm, body: EngagementSync, user_id: str
++                 ) -> tuple[Client, bool]:
++    """Create or update the client in the caller's firm. Returns (client, emirate_changed)."""
++    data = body.client
++    emirate = canonical_emirate(data.emirate)
++    code = data.client_code.strip()
++    clash = s.scalars(select(Client).where(Client.firm_id == firm.id,
++                                           Client.client_code == code,
++                                           Client.id != data.id)).first()
++    if clash is not None:
++        raise EngagementError(f"Client code '{code}' is already used by another client of "
++                              "your firm", 409)
++    c = s.get(Client, data.id)
++    new = {"client_code": code, "name": data.name.strip(), "emirate": emirate,
++           "entity_type": data.entity_type}
++    if c is None:
++        c = Client(id=data.id, firm_id=firm.id, **new)
++        s.add(c)
++        s.flush()
++        _audit(s, user_id, "client_sync_create", "client", c.id, None, client_dict(c))
++        return c, False
++    if c.firm_id is None:
++        raise EngagementError("This client is not linked to a firm yet; ask the platform "
++                              "administrator to link it (PUT /v1/firms/{firm_id}/clients/"
++                              "{client_id})", 409)
++    if c.firm_id != firm.id:
++        raise EngagementError("Client not found", 404)  # never reveal another firm's client
++    old = client_dict(c)
++    for k, v in new.items():
++        setattr(c, k, v)
++    if client_dict(c) != old:
++        _audit(s, user_id, "client_sync_update", "client", c.id, old, client_dict(c))
++    return c, old["emirate"] != emirate
++
++
++def upsert(s: Session, firm: Firm, engagement_id: str, body: EngagementSync, *,
++           user_id: str, roles: Iterable[str]) -> dict[str, Any]:
++    roles = frozenset(roles)
++    if not roles.intersection(SYNC_ROLES):
++        raise EngagementError("Syncing an engagement needs one of these roles: "
++                              f"{', '.join(SYNC_ROLES)}.", 403)
++    eng = s.get(Engagement, engagement_id)
++    created = eng is None
++    if eng is not None:
++        check_access(s, firm.id, engagement_id, user_id, roles, edit=True)
++        if eng.client_id != body.client.id:
++            raise EngagementError("An engagement cannot move to another client", 409)
++    client, emirate_changed = _sync_client(s, firm, body, user_id)
++    sent = body.model_fields_set
++    if eng is None:
++        eng = Engagement(id=engagement_id, client_id=client.id, fye=body.fye,
++                         **{k: getattr(body, k) for k in ENGAGEMENT_FIELDS
++                            if k != "status"},
++                         status=(body.status or "planning").strip().lower())
++        s.add(eng)
++        s.flush()
++        old_eng: dict[str, Any] | None = None
++    else:
++        old_eng = engagement_dict(eng)
++        eng.fye = body.fye
++        for k in ENGAGEMENT_FIELDS:
++            if k in sent:
++                v = getattr(body, k)
++                if k == "status":
++                    v = (v or "planning").strip().lower()
++                setattr(eng, k, v)
++        s.flush()
++    new_eng = engagement_dict(eng)
++    old_members = members_of(s, eng.id)
++    wanted = {m.user_id: m.role for m in body.members}
++    for row in s.scalars(select(EngagementMember).where(
++            EngagementMember.engagement_id == eng.id)).all():
++        if row.user_id not in wanted:
++            s.delete(row)
++        elif row.role != wanted[row.user_id]:
++            row.role = wanted[row.user_id]
++    have = {m["user_id"] for m in old_members}
++    s.add_all([EngagementMember(engagement_id=eng.id, user_id=u, role=r)
++               for u, r in wanted.items() if u not in have])
++    s.flush()
++    new_members = members_of(s, eng.id)
++    if old_eng != new_eng or old_members != new_members:
++        _audit(s, user_id, "engagement_sync_create" if created else "engagement_sync_update",
++               "engagement", eng.id,
++               None if old_eng is None else {**old_eng, "members": old_members},
++               {**new_eng, "members": new_members, "firm_id": firm.id})
++    stale: list[dict[str, Any]] = []
++    if old_eng is not None and old_eng["fye"] != new_eng["fye"]:
++        stale += _stale_all(s, eng.id, user_id,
++                            f"year end changed {old_eng['fye']} -> {new_eng['fye']}")
++    if emirate_changed:
++        seen = {x["id"] for x in stale}
++        stale += [x for x in calendar_admin.mark_stale(
++            s, client_ids=[client.id], user_id=user_id, reason="client emirate changed")
++            if x["id"] not in seen]
++    s.commit()
++    return {"created": created, **view(s, eng), "stale": stale}
+diff --git a/engine/app/version.py b/engine/app/version.py
+index d54b99c..a420f27 100644
+--- a/engine/app/version.py
++++ b/engine/app/version.py
+@@ -1,4 +1,4 @@
+ """Single source of the engine version (returned by /v1/health and stored with every result)."""
+ 
+ ENGINE_NAME = "auditsmart-engine"
+-ENGINE_VERSION = "0.2.0"
++ENGINE_VERSION = "0.2.1"
+diff --git a/engine/pyproject.toml b/engine/pyproject.toml
+index 07772c4..03b8abb 100644
+--- a/engine/pyproject.toml
++++ b/engine/pyproject.toml
+@@ -1,6 +1,6 @@
+ [project]
+ name = "auditsmart-engine"
+-version = "0.2.0"
++version = "0.2.1"
+ description = "AuditSmart calculation engine (CLA Emirates) – FastAPI + Decimal"
+ requires-python = ">=3.11,<3.12"
+ 
+diff --git a/engine/tests/api/test_engagements_api.py b/engine/tests/api/test_engagements_api.py
+new file mode 100644
+index 0000000..d1509cb
+--- /dev/null
++++ b/engine/tests/api/test_engagements_api.py
+@@ -0,0 +1,275 @@
++"""Stage 5.2 engagement sync (D50-D55): PUT/GET /v1/engagements/{id}."""
++
++from __future__ import annotations
++
++import copy
++from collections.abc import Callable
++from typing import Any
++
++import pytest
++from fastapi.testclient import TestClient
++from sqlalchemy import select
++
++from tests.api.test_sampling_api import DUMMY, _body, _dataset
++from tests.conftest import auth
++
++ENG = "11111111-1111-4111-8111-111111111111"
++CLIENT = "22222222-2222-4222-8222-222222222222"
++ENG_B = "33333333-3333-4333-8333-333333333333"
++CLIENT_B = "44444444-4444-4444-8444-444444444444"
++
++
++def _db() -> Any:
++    from app.core.db import session_factory
++
++    return session_factory()()
++
++
++def _audit(action: str) -> list[Any]:
++    from app.models import AuditLog
++
++    with _db() as s:
++        return list(s.scalars(select(AuditLog).where(AuditLog.action == action)))
++
++
++def payload(**kw: Any) -> dict[str, Any]:
++    body: dict[str, Any] = {
++        "client": {"id": CLIENT, "client_code": "C001", "name": "Dummy Trading LLC",
++                   "emirate": "Dubai", "entity_type": "LLC"},
++        "fye": "2025-12-31", "framework": "IFRS", "materiality": "1500000.00",
++        "perf_materiality": "1125000", "trivial": 75000, "status": "planning",
++        "members": [{"user_id": "a-mgr", "role": "Manager"},
++                    {"user_id": "a-senior", "role": "Senior"}]}
++    body.update(kw)
++    return body
++
++
++@pytest.fixture
++def ctx(client: TestClient, token: Callable[..., str]) -> dict[str, Any]:
++    admin = token(sub="platform", roles=["Admin"])
++    for fid in ("firm-a", "firm-b"):
++        r = client.post("/v1/firms", headers=auth(admin), json={"id": fid, "name": fid.upper()})
++        assert r.status_code == 201, r.text
++
++    def tok(firm: str | None, sub: str, *roles: str) -> str:
++        return token(sub=sub, roles=list(roles), extra={"firm_id": firm} if firm else None)
++
++    return {"admin": admin,
++            "a_mgr": tok("firm-a", "a-mgr", "Manager"),
++            "a_senior": tok("firm-a", "a-senior", "Senior"),
++            "a_p": tok("firm-a", "a-p", "Partner"),
++            "a_tp": tok("firm-a", "a-tp", "TaxPartner"),
++            "a_admin": tok("firm-a", "a-admin", "Admin"),
++            "a_mgr2": tok("firm-a", "a-mgr2", "Manager"),
++            "b_mgr": tok("firm-b", "b-mgr", "Manager"),
++            "b_admin": tok("firm-b", "b-admin", "Admin"),
++            "ghost": tok("ghost", "g", "Manager"),
++            "nofirm": tok(None, "n", "Manager")}
++
++
++def _put(tc: TestClient, tok: str, eng: str = ENG, **kw: Any) -> Any:
++    return tc.put(f"/v1/engagements/{eng}", headers=auth(tok), json=payload(**kw))
++
++
++def test_create_then_update_idempotent(client: TestClient, ctx: dict[str, Any]) -> None:
++    r = _put(client, ctx["a_mgr"])
++    assert r.status_code == 201, r.text
++    b = r.json()
++    assert b["created"] is True and b["stale"] == []
++    assert b["engagement"] == {"id": ENG, "client_id": CLIENT, "fye": "2025-12-31",
++                               "framework": "IFRS", "materiality": "1500000.00",
++                               "perf_materiality": "1125000.00", "trivial": "75000.00",
++                               "status": "planning"}
++    assert b["client"] == {"id": CLIENT, "client_code": "C001", "name": "Dummy Trading LLC",
++                           "emirate": "Dubai", "entity_type": "LLC", "firm_id": "firm-a"}
++    assert b["members"] == [{"user_id": "a-mgr", "role": "Manager"},
++                            {"user_id": "a-senior", "role": "Senior"}]
++    again = _put(client, ctx["a_mgr"])
++    assert again.status_code == 200 and again.json()["created"] is False
++    assert len(_audit("engagement_sync_create")) == 1
++    assert _audit("engagement_sync_update") == []  # no change -> no audit row
++    # update: materiality, emirate code, team replaced, role alias normalised
++    r = _put(client, ctx["a_mgr"], materiality="2000000.5",
++             client={**payload()["client"], "emirate": "shj", "name": "Renamed LLC"},
++             members=[{"user_id": "a-mgr", "role": "manager"},
++                      {"user_id": "a-tp", "role": "tax_partner"}])
++    assert r.status_code == 200, r.text
++    b = r.json()
++    assert b["engagement"]["materiality"] == "2000000.50"
++    assert b["client"]["emirate"] == "Sharjah" and b["client"]["name"] == "Renamed LLC"
++    assert b["members"] == [{"user_id": "a-mgr", "role": "Manager"},
++                            {"user_id": "a-tp", "role": "TaxPartner"}]
++    upd = _audit("engagement_sync_update")
++    assert len(upd) == 1 and upd[0].old["materiality"] == "1500000.00"
++    assert upd[0].new["materiality"] == "2000000.50" and upd[0].new["firm_id"] == "firm-a"
++    assert {m["user_id"] for m in upd[0].old["members"]} == {"a-mgr", "a-senior"}
++    assert len(_audit("client_sync_create")) == 1 and len(_audit("client_sync_update")) == 1
++    # omitted optional fields keep their value; explicit null clears
++    body = payload()
++    for k in ("framework", "materiality", "perf_materiality", "trivial", "status"):
++        body.pop(k)
++    r = client.put(f"/v1/engagements/{ENG}", headers=auth(ctx["a_mgr"]), json=body)
++    assert r.json()["engagement"]["materiality"] == "2000000.50"
++    assert r.json()["engagement"]["framework"] == "IFRS"
++    r = _put(client, ctx["a_mgr"], framework=None, status="Fieldwork")
++    assert r.json()["engagement"]["framework"] is None
++    assert r.json()["engagement"]["status"] == "fieldwork"
++    g = client.get(f"/v1/engagements/{ENG}", headers=auth(ctx["a_senior"]))
++    assert g.status_code == 200 and g.json()["created"] is None
++
++
++def test_roles_and_firm_claim(client: TestClient, ctx: dict[str, Any]) -> None:
++    assert _put(client, ctx["a_senior"]).status_code == 403  # app role Senior
++    r = _put(client, ctx["nofirm"])
++    assert r.status_code == 403 and "not linked to a firm" in r.json()["detail"]
++    r = _put(client, ctx["ghost"])
++    assert r.status_code == 403 and "not registered" in r.json()["detail"]
++    assert client.put(f"/v1/engagements/{ENG}", json=payload()).status_code == 401
++    assert _put(client, ctx["a_admin"]).status_code == 201  # firm Admin may create
++    # update needs membership as Manager/Partner/TaxPartner, or firm Admin
++    r = _put(client, ctx["a_mgr2"])
++    assert r.status_code == 403 and "not a member" in r.json()["detail"]
++    assert _put(client, ctx["a_p"]).status_code == 403
++    assert _put(client, ctx["a_mgr"]).status_code == 200
++    assert _put(client, ctx["a_admin"], status="review").status_code == 200
++    # a member Senior (app role Manager would pass role check) cannot edit
++    _put(client, ctx["a_mgr"], members=[{"user_id": "a-mgr", "role": "Manager"},
++                                        {"user_id": "a-mgr2", "role": "Senior"}])
++    r = _put(client, ctx["a_mgr2"])
++    assert r.status_code == 403 and "(Senior)" in r.json()["detail"]
++    assert client.get(f"/v1/engagements/{ENG}", headers=auth(ctx["a_mgr2"])).status_code == 200
++    assert client.get(f"/v1/engagements/{ENG}", headers=auth(ctx["a_p"])).status_code == 403
++    assert client.get(f"/v1/engagements/{ENG}", headers=auth(ctx["a_admin"])).status_code == 200
++    assert client.get("/v1/engagements/nope", headers=auth(ctx["a_mgr"])).status_code == 404
++
++
++def test_cross_firm(client: TestClient, ctx: dict[str, Any]) -> None:
++    assert _put(client, ctx["a_mgr"]).status_code == 201
++    r = _put(client, ctx["b_admin"])  # firm B targets firm A's engagement
++    assert r.status_code == 403 and r.json()["detail"] == "This engagement belongs to another firm."
++    r = client.get(f"/v1/engagements/{ENG}", headers=auth(ctx["b_admin"]))
++    assert r.status_code == 403
++    # firm B tries to attach a new engagement to firm A's client -> 404, nothing created
++    r = _put(client, ctx["b_mgr"], eng=ENG_B,
++             members=[{"user_id": "b-mgr", "role": "Manager"}])
++    assert r.status_code == 404 and r.json()["detail"] == "Client not found"
++    assert client.get(f"/v1/engagements/{ENG_B}", headers=auth(ctx["b_mgr"])).status_code == 404
++    # same client code in another firm is fine (D52); duplicate inside a firm is 409
++    r = _put(client, ctx["b_mgr"], eng=ENG_B,
++             client={**payload()["client"], "id": CLIENT_B},
++             members=[{"user_id": "b-mgr", "role": "Manager"}])
++    assert r.status_code == 201, r.text
++    r = _put(client, ctx["a_mgr"], eng=ENG_B.replace("3", "5"),
++             client={**payload()["client"], "id": CLIENT_B.replace("4", "6")})
++    assert r.status_code == 409 and "already used" in r.json()["detail"]
++    # an engagement cannot move to another client
++    r = _put(client, ctx["a_mgr"], client={**payload()["client"], "id": CLIENT_B.replace("4", "7"),
++                                          "client_code": "C002"})
++    assert r.status_code == 409 and "another client" in r.json()["detail"]
++    assert client.get(f"/v1/engagements/{ENG}", headers=auth(ctx["a_mgr"])).json()[
++        "client"]["client_code"] == "C001"
++
++
++def test_unassigned_client_and_engagement(client: TestClient, ctx: dict[str, Any],
++                                          engagement: str) -> None:
++    from app.models import Engagement
++
++    with _db() as s:
++        legacy_client = s.get(Engagement, engagement).client_id
++    r = _put(client, ctx["a_mgr"], eng=ENG,
++             client={**payload()["client"], "id": legacy_client})
++    assert r.status_code == 409 and "platform administrator" in r.json()["detail"]
++    r = _put(client, ctx["a_admin"], eng=engagement)
++    assert r.status_code == 409 and "not linked to a firm" in r.json()["detail"]
++    assert client.put(f"/v1/firms/firm-a/clients/{legacy_client}",
++                      headers=auth(ctx["admin"])).status_code == 200
++    r = _put(client, ctx["a_admin"], eng=engagement,
++             client={**payload()["client"], "id": legacy_client, "client_code": "DUMMY01"})
++    assert r.status_code == 200, r.text
++
++
++@pytest.mark.parametrize("change", [
++    {"materiality": "12.345"}, {"materiality": "-1"}, {"materiality": "abc"},
++    {"perf_materiality": "2000000", "materiality": "1000000"},
++    {"trivial": "2000000", "materiality": "1000000", "perf_materiality": None},
++    {"members": []}, {"members": [{"user_id": "x", "role": "Senior"}]},
++    {"members": [{"user_id": "a-mgr", "role": "Manager"}, {"user_id": "a-mgr", "role": "Staff"}]},
++    {"members": [{"user_id": "a-mgr", "role": "Boss"}]},
++    {"client": {"id": CLIENT, "client_code": "C1", "name": "X", "emirate": "Mars"}},
++    {"client": {"id": "bad id!", "client_code": "C1", "name": "X", "emirate": "Dubai"}},
++    {"fye": "2025-13-01"}, {"unexpected": 1},
++])
++def test_validation(client: TestClient, ctx: dict[str, Any], change: dict[str, Any]) -> None:
++    r = _put(client, ctx["a_mgr"], **change)
++    assert r.status_code == 422, r.text
++
++
++def test_bad_path_id(client: TestClient, ctx: dict[str, Any]) -> None:
++    r = client.put("/v1/engagements/bad%20id", headers=auth(ctx["a_mgr"]), json=payload())
++    assert r.status_code == 422
++
++
++def test_membership_drives_engine_access_and_fye_stale(client: TestClient,
++                                                       ctx: dict[str, Any]) -> None:
++    assert _put(client, ctx["a_mgr"]).status_code == 201
++    did = _dataset(client, ctx["a_senior"], ENG, DUMMY)  # synced Senior may upload
++    r = client.post("/v1/sample", headers=auth(ctx["a_mgr"]), json=_body(did))
++    assert r.status_code == 201, r.text
++    assert r.json()["n_required"] == 161 and r.json()["cf_value"] == "3.00"
++    sid = r.json()["sample_id"] if "sample_id" in r.json() else r.json()["id"]
++    # firm B cannot upload into firm A's engagement
++    r = client.post("/v1/datasets", headers=auth(ctx["b_mgr"]), data={"engagement_id": ENG},
++                    files={"file": ("gl.csv", DUMMY)})
++    assert r.status_code == 403
++    # remove the Senior -> no more access
++    team = [{"user_id": "a-mgr", "role": "Manager"}]
++    assert _put(client, ctx["a_mgr"], members=team).status_code == 200
++    r = client.post("/v1/datasets", headers=auth(ctx["a_senior"]), data={"engagement_id": ENG},
++                    files={"file": ("gl.csv", DUMMY)})
++    assert r.status_code == 403 and "not a member" in r.json()["detail"]
++    # materiality-only change: results stay current
++    r = _put(client, ctx["a_mgr"], members=team, materiality="1600000")
++    assert r.json()["stale"] == []
++    # year-end change: current results become STALE (audit-logged)
++    r = _put(client, ctx["a_mgr"], members=team, fye="2025-06-30")
++    assert r.status_code == 200
++    stale = r.json()["stale"]
++    assert [x["kind"] for x in stale] == ["sample"] and stale[0]["id"] == sid
++    from app.models import Sample
++
++    with _db() as s:
++        assert s.get(Sample, sid).status == "STALE"
++    assert any("year end changed" in a.new["reason"] for a in _audit("stale"))
++    assert _put(client, ctx["a_mgr"], members=team, fye="2025-06-30").json()["stale"] == []
++
++
++def test_emirate_change_rechecks_je_calendar(client: TestClient, ctx: dict[str, Any]) -> None:
++    assert _put(client, ctx["a_mgr"]).status_code == 201
++    did = _dataset(client, ctx["a_mgr"], ENG, DUMMY)
++    r = client.post("/v1/je-tests", headers=auth(ctx["a_mgr"]), json={"dataset_id": did})
++    assert r.status_code == 202, r.text
++    run = r.json()["je_run_id"]
++    from datetime import date
++
++    from app.models import EmirateProfile, JeRun
++
++    with _db() as s:  # Abu Dhabi gets its own (different) work week
++        s.add(EmirateProfile(emirate="Abu Dhabi", off_days=[5], half_days=None,
++                             effective_from=date(2020, 1, 1), effective_to=None))
++        s.commit()
++    body = copy.deepcopy(payload())
++    body["client"]["emirate"] = "Abu Dhabi"
++    r = client.put(f"/v1/engagements/{ENG}", headers=auth(ctx["a_mgr"]), json=body)
++    assert r.status_code == 200
++    assert r.json()["stale"] == [{"kind": "je_run", "id": run, "engagement_id": ENG}]
++    with _db() as s:
++        assert s.get(JeRun, run).status == "STALE"
++
++
++def test_member_role_change_in_place(client: TestClient, ctx: dict[str, Any]) -> None:
++    assert _put(client, ctx["a_mgr"]).status_code == 201
++    r = _put(client, ctx["a_mgr"], members=[{"user_id": "a-mgr", "role": "Manager"},
++                                             {"user_id": "a-senior", "role": "staff"}])
++    assert r.status_code == 200, r.text
++    assert {m["user_id"]: m["role"] for m in r.json()["members"]} == {
++        "a-mgr": "Manager", "a-senior": "Staff"}
+diff --git a/plans/DECISIONS.md b/plans/DECISIONS.md
+index 4c732b6..fd31a55 100644
+--- a/plans/DECISIONS.md
++++ b/plans/DECISIONS.md
+@@ -54,3 +54,9 @@ Savio was offline from 27 Oct 2026, 18:24. Each open decision below defaults to
+ | D47 | Who approves a **shared default** (platform user, no firm claim) | TaxPartner or Admin (Stage 3); or the D43 domain split | **D43 split, Admin never**: TaxPartner for tax domains (VAT, INPUT_VAT, CT, TRN, LEGAL_REF), Partner for methodology (SAMPLING, JE, BENFORD, VALIDATION, ...). Same for reject. Supersedes the "Tax Partner or Admin" wording in SPEC 3.8; `APPROVER_ROLES` is now `("TaxPartner", "Partner")` | `FIRM_TAX_APPROVERS` / `FIRM_METHOD_APPROVERS` / `TAX_DOMAINS` in app/services/rules.py |
+ | D48 | Where the Supabase firm claim is read | `app_metadata` then top-level (Stage 3 fallback); or `app_metadata` only | **`app_metadata.<AUTH_FIRM_CLAIM>` only** for `AUTH_PROVIDER=supabase` (server-set; a top-level claim could come from a custom hook or a third-party token and is ignored, like `user_metadata`). Entra: top-level claim. `dev` (development only) keeps the fallback, like its roles | app/core/security.py `_principal` |
+ | D49 | VARCHAR lengths only failing on PostgreSQL | Shorten seed units; or widen the column | **Migration 0009 widens `rule_versions.unit` to 128** (three JE seed units are 41-64 characters; SQLite never enforced 32). Found by a local PostgreSQL 16 rehearsal of the Render start. The suite can now run on PostgreSQL: set `AUDITSMART_TEST_PG_URL` to a scratch database (its schema is dropped per test) | `alembic downgrade 0008` reverses it (fails if a longer unit is stored) |
++| D50 | How the front end gives the engine its clients, engagements and teams (Stage 5.2) | Engine reads Supabase directly; a webhook; or the front end calls an engine endpoint | **`PUT /v1/engagements/{id}`: idempotent upsert of client + engagement + the whole team in one call**, keyed by the Lovable uuids (engagement and client), 201 on create / 200 on update with `created`. `members` replaces the team; optional fields left out keep their value, `null` clears them; unchanged body = no audit row. `GET /v1/engagements/{id}` returns the engine copy. The engine holds no Supabase key | n/a |
++| D51 | Who may sync | Any signed-in user; or role- and firm-bound | **Firm only from the token, and it must already be registered (403 otherwise; firms are created by the platform Admin, D42 – not auto-created). Create: app role Manager, Partner, TaxPartner or the firm's Admin. Update: a team member whose engagement role is Manager, Partner or TaxPartner, or the firm's Admin.** Other firm's engagement 403, other firm's client 404 (not revealed), unassigned (legacy) client or engagement 409, change of client 409. The team must keep at least one Manager or Partner (422) so it cannot lock itself out; a caller may remove themselves | Firm access policy |
++| D52 | `clients.client_code` uniqueness | Global (Stage 1); or per firm | **Unique per firm** `(firm_id, client_code)` (migration 0010), so two firms may both use "C001". Same code for a different client id in the same firm → 409 | `alembic downgrade 0009` (fails if two firms share a code) |
++| D53 | Which sync changes make results STALE | All changes; or only inputs the engine uses | **Year end → every current sample / JE run / input-VAT run of the engagement STALE** (period and rule dates depend on it); **emirate → JE calendar re-check** of the client's runs (D33 hash). Materiality, framework, status and team: audit only (no engine calculation uses them; WP headers show the values at generation; locked WPs never change) | Firm review policy |
++| D54 | Value formats from the front end | Strict; or tolerant | **Roles normalised** with the token rules (`tax_partner`, `TAXPARTNER` → TaxPartner; unknown → 422); **emirate codes** DXB/AUH/AD/SHJ/AJM/UAQ/RAK/FUJ → names; status lower-cased; money as Decimal strings, max 2 decimals | n/a |
++| D55 | Telling the user the redeploy worked | Check the commit on Render; or the version | **Engine version 0.2.1** (`/v1/health`), shown by the Lovable "Engine status" card | n/a |
+-- 
+2.47.3
+

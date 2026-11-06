@@ -1,0 +1,20 @@
+# Run from the engine/ folder: pre-commit install  (hooks run on every commit)
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.17.3
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+  - repo: local
+    hooks:
+      - id: mypy
+        name: mypy (strict on app/services)
+        entry: mypy
+        language: system
+        pass_filenames: false
+      - id: no-env-file
+        name: block .env commits
+        entry: .env files must not be committed
+        language: fail
+        files: (^|/)\.env$

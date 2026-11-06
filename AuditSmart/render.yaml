@@ -1,0 +1,110 @@
+# AuditSmart - Render Blueprint for the DEVELOPMENT engine (Stage 5, step 1; D46).
+# Render reads this file when you choose New > Blueprint and pick this repository.
+# Guide for non-developers: docs/DEPLOY_DEV.md
+#
+# DUMMY DATA ONLY. The free plan sleeps after 15 minutes idle, keeps uploaded files only until
+# the next restart/redeploy (no disks on free), and the free database is deleted 30 days after
+# it is created (14-day grace to upgrade). Nothing here is fit for real client data.
+#
+# Secrets are never written in this file: every "sync: false" value is typed into the Render
+# dashboard when the Blueprint is first created (Render asks for each one).
+
+services:
+  - type: web
+    name: auditsmart-engine
+    runtime: docker
+    # Free plan: 512 MB RAM / 0.1 CPU, sleeps when idle, no pre-deploy command, no disk.
+    # Upgrade later by changing to a paid plan such as "0.5c-512mb" - docs/DEPLOY_DEV.md section 9.
+    plan: free
+    # Frankfurt is the Render region closest to the UAE.
+    region: frankfurt
+    dockerfilePath: ./engine/Dockerfile
+    dockerContext: ./engine
+    # Free plan has no preDeployCommand, so migrations run in the start script:
+    # `alembic upgrade head` (when DATABASE_URL is set), then uvicorn on Render's $PORT.
+    dockerCommand: sh scripts/start.sh
+    healthCheckPath: /v1/health
+    # Only rebuild when the engine (or this file) changes, not for docs-only commits.
+    buildFilter:
+      paths:
+        - engine/**
+        - render.yaml
+      ignoredPaths:
+        - engine/tests/**
+        - engine/**/*.md
+    envVars:
+      # "development" makes the engine seed the shared default rules and the watched FTA
+      # sources at start-up (idempotent). It is the only mode that seeds; see D46.
+      - key: ENVIRONMENT
+        value: development
+      - key: DATABASE_URL
+        fromDatabase:
+          name: auditsmart-db
+          property: connectionString
+      # Sign-in comes from Lovable Cloud (Supabase Auth).
+      - key: AUTH_PROVIDER
+        value: supabase
+      # https://<project-ref>.supabase.co/auth/v1  (no trailing slash)
+      - key: AUTH_ISSUER
+        sync: false
+      - key: AUTH_AUDIENCE
+        value: authenticated
+      # Optional. Empty = <AUTH_ISSUER>/.well-known/jwks.json (Supabase signing keys).
+      - key: AUTH_JWKS_URL
+        sync: false
+      # Optional. Only if the Supabase project still signs with the legacy HS256 JWT secret.
+      - key: AUTH_HS256_SECRET
+        sync: false
+      # Lovable preview + published URLs, comma-separated, e.g.
+      # https://id-preview--xxxx.lovable.app,https://auditsmart.lovable.app
+      - key: ALLOWED_ORIGINS
+        sync: false
+      # AI wording only (the AI never calculates). Empty or "stub" = no external AI call.
+      - key: AI_PROVIDER
+        sync: false
+      - key: AI_MODEL
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      # Development: unverified (pending_verification) seed rules may be used, flagged.
+      - key: RULES_ALLOW_PENDING
+        value: "true"
+      # The firm is read from app_metadata.firm_id in the Supabase token (D48).
+      - key: AUTH_FIRM_CLAIM
+        value: firm_id
+      # No REDIS_URL: jobs run in-process on the free plan (no Render Key Value needed).
+
+  # Weekly FTA source monitor - DISABLED. Render cron jobs have no free plan (smallest is
+  # "0.5c-512mb", billed for its run time), and a cron job runs in its own container,
+  # so it cannot see the web service's ephemeral files. Until it is enabled, run the check by hand from the app
+  # (POST /v1/rules-monitor/check) or locally with `python -m app.cli monitor-check`.
+  # To enable later, uncomment (and copy the auth/AI envVars above if it needs them):
+  #
+  # - type: cron
+  #   name: auditsmart-fta-monitor
+  #   runtime: docker
+  #   plan: 0.5c-512mb
+  #   region: frankfurt
+  #   schedule: "0 4 * * 1"   # Mondays 04:00 UTC = 08:00 UAE
+  #   dockerfilePath: ./engine/Dockerfile
+  #   dockerContext: ./engine
+  #   dockerCommand: python -m app.cli monitor-check
+  #   envVars:
+  #     - key: ENVIRONMENT
+  #       value: development
+  #     - key: DATABASE_URL
+  #       fromDatabase:
+  #         name: auditsmart-db
+  #         property: connectionString
+
+databases:
+  - name: auditsmart-db
+    # Free: 1 GB, no backups, one per workspace, EXPIRES 30 days after creation.
+    plan: free
+    region: frankfurt
+    databaseName: auditsmart
+    user: auditsmart
+    postgresMajorVersion: "16"
+    # Empty list = no connections from the internet; only Render services in this
+    # workspace (the engine) can connect.
+    ipAllowList: []
