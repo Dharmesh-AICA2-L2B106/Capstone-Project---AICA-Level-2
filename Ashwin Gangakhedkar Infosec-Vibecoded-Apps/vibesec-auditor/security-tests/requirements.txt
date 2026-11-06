@@ -1,0 +1,6 @@
+# Dependencies for Vibesec Auditor Executable Test Suite
+pytest==8.0.0
+requests==2.31.0
+PyJWT==2.8.0
+beautifulsoup4==4.12.3
+pyyaml==6.0.1
