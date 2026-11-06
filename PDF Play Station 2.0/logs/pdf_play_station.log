@@ -1,0 +1,52 @@
+2026-10-29 22:58:42,511  INFO     pps: Starting PDF Play Station 2.0.0 (Python 3.14.8)
+2026-10-29 23:43:09,746  INFO     pps: Closed (exit code 0)
+2026-10-31 13:23:23,049  INFO     pps: Starting PDF Play Station 2.0.0 (Python 3.14.8)
+2026-10-31 13:24:04,506  INFO     pps.jobs: Job bank started (process)
+2026-10-31 13:24:23,846  INFO     pps.jobs: Job finished: ok
+2026-10-31 15:37:40,436  INFO     pps.jobs: Job bank started (process)
+2026-10-31 16:12:04,646  INFO     pps.jobs: Job finished: ok
+2026-10-31 16:50:13,848  INFO     pps: Closed (exit code 0)
+2026-10-31 16:51:07,274  INFO     pps: Starting PDF Play Station 2.0.0 (Python 3.14.8)
+2026-10-31 17:16:21,252  INFO     pps: Closed (exit code 0)
+2026-10-31 20:52:58,012  INFO     pps: Starting PDF Play Station 2.0.0 (Python 3.14.8)
+2026-10-31 20:53:02,087  INFO     pps: Closed (exit code 0)
+2026-10-31 21:19:28,618  INFO     pps.ocr: Tesseract 5.4.0.20240606 at C:\Program Files\Tesseract-OCR\tesseract.exe (eng, hin, mar, osd)
+2026-10-31 21:19:49,424  INFO     pps.jobs: Job scan started (process)
+2026-10-31 21:19:51,069  INFO     pps.ocr: Tesseract 5.4.0.20240606 at C:\Program Files\Tesseract-OCR\tesseract.exe (eng, hin, mar, osd)
+2026-10-31 21:19:52,480  INFO     pps.jobs: Job finished: ok
+2026-10-31 21:19:56,921  ERROR    pps.jobs: Job extract failed:
+Traceback (most recent call last):
+  File "E:\PDF Play Station 2.0\app\jobs.py", line 37, in run_function
+    return "ok", fn(Job(progress, is_cancelled), **kwargs)
+                 ~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\PDF Play Station 2.0\app\runners.py", line 106, in extract
+    return _each(job, files, work)
+  File "E:\PDF Play Station 2.0\app\runners.py", line 39, in _each
+    r = work(sub, f)
+  File "E:\PDF Play Station 2.0\app\runners.py", line 105, in work
+    return ut.extract(sub, f, pw, pages, output_path(Path(f), out_dir, "_extract", ".pdf"))
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\PDF Play Station 2.0\app\services\utilities.py", line 96, in extract
+    save_pdf(out, out_path)
+    ~~~~~~~~^^^^^^^^^^^^^^^
+  File "E:\PDF Play Station 2.0\app\services\common.py", line 230, in save_pdf
+    doc.save(tmp, **opts)
+    ~~~~~~~~^^^^^^^^^^^^^
+  File "E:\PDF Play Station 2.0\.venv\Lib\site-packages\pymupdf\__init__.py", line 6644, in save
+    mupdf.pdf_save_document(pdf, filename, opts)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "E:\PDF Play Station 2.0\.venv\Lib\site-packages\pymupdf\mupdf.py", line 60655, in pdf_save_document
+    return _mupdf.pdf_save_document(doc, filename, opts)
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+pymupdf.mupdf.FzErrorSystem: code=2: cannot open file 'C:\Windows\.Invoice A (1)_extract.pdf.fbb94299.part': Permission denied
+
+2026-11-02 18:52:16,984  INFO     pps: Starting PDF Play Station 2.0.0 (Python 3.14.8)
+2026-11-02 18:52:16,995  CRITICAL  pps: Unhandled error
+Traceback (most recent call last):
+  File "E:\PDF Play Station 2.0\PDF_Play_Station.py", line 59, in <module>
+    sys.exit(main(sys.argv))
+             ~~~~^^^^^^^^^^
+  File "E:\PDF Play Station 2.0\PDF_Play_Station.py", line 31, in main
+    from PySide6.QtCore import Qt
+ModuleNotFoundError: No module named 'PySide6'
+2026-11-02 18:55:24,864  INFO     pps: Starting PDF Play Station 2.0.0 (Python 3.14.8)
